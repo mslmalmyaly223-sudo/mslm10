@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المدرسة الذكية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --boys-primary: #2196f3;
+            --boys-secondary: #0d47a1;
+            --girls-primary: #e91e63;
+            --girls-secondary: #880e4f;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+            height: 100vh;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        body.boys-theme {
+            background: linear-gradient(135deg, #2196f3 0%, #0d47a1 100%);
+        }
+        
+        body.girls-theme {
+            background: linear-gradient(135deg, #e91e63 0%, #880e4f 100%);
+        }
+        
+        body.dark-mode {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #ecf0f1;
+        }
+        
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--light);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-mode .screen {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+        
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .screen-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 15px;
+        }
+        
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        
+        body.boys-theme .header {
+            background: linear-gradient(135deg, var(--boys-primary) 0%, var(--boys-secondary) 100%);
+        }
+        
+        body.girls-theme .header {
+            background: linear-gradient(135deg, var(--girls-primary) 0%, var(--girls-secondary) 100%);
+        }
+        
+        body.dark-mode .header {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+        }
+        
+        .header h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .back-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+            border-radius: 20px 20px 0 0;
+            flex-shrink: 0;
+        }
+        
+        body.dark-mode .bottom-nav {
+            background: #34495e;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        body.boys-theme .nav-item.active {
+            color: var(--boys-primary);
+        }
+        
+        body.girls-theme .nav-item.active {
+            color: var(--girls-primary);
+        }
+        
+        .nav-icon {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            left: 55%;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger);
+            border-radius: 50%;
+            display: none;
+        }
+        
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            margin: 15px 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        body.dark-mode .card {
+            background: #34495e;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+        }
+        
+        body.dark-mode .card-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            border-bottom: 1px solid #4a5f7a;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Form Styles */
+        .form-container {
+            max-width: 100%;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        body.dark-mode .form-card {
+            background: #34495e;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .form-title {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        body.boys-theme .form-title {
+            color: var(--boys-primary);
+        }
+        
+        body.girls-theme .form-title {
+            color: var(--girls-primary);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        body.dark-mode .form-label {
+            color: #ecf0f1;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        body.dark-mode .form-control {
+            background: #2c3e50;
+            border-color: #4a5f7a;
+            color: #ecf0f1;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        body.boys-theme .form-control:focus {
+            border-color: var(--boys-primary);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+        }
+        
+        body.girls-theme .form-control:focus {
+            border-color: var(--girls-primary);
+            box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.2);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+        
+        body.boys-theme .btn-primary {
+            background: linear-gradient(135deg, var(--boys-primary) 0%, var(--boys-secondary) 100%);
+        }
+        
+        body.girls-theme .btn-primary {
+            background: linear-gradient(135deg, var(--girls-primary) 0%, var(--girls-secondary) 100%);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            color: #7f8c8d;
+        }
+        
+        .divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: 42%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 42%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        /* Choice Buttons */
+        .choice-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            gap: 15px;
+        }
+        
+        .choice-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 48%;
+            background: #f8f9fa;
+        }
+        
+        body.dark-mode .choice-btn {
+            background: #2c3e50;
+            border-color: #4a5f7a;
+        }
+        
+        .choice-btn.selected {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+            transform: scale(1.05);
+        }
+        
+        body.boys-theme .choice-btn.selected {
+            border-color: var(--boys-primary);
+            background: rgba(33, 150, 243, 0.1);
+        }
+        
+        body.girls-theme .choice-btn.selected {
+            border-color: var(--girls-primary);
+            background: rgba(233, 30, 99, 0.1);
+        }
+        
+        .choice-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .choice-text {
+            font-weight: 600;
+        }
+        
+        /* Alert Styles */
+        .alert {
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 12px;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .alert-error {
+            background: #ffe6e6;
+            color: #d63031;
+            border: 1px solid #ff7675;
+        }
+        
+        body.dark-mode .alert-error {
+            background: rgba(214, 48, 49, 0.2);
+            color: #ff7675;
+            border-color: #d63031;
+        }
+        
+        .alert-success {
+            background: #e6f7e6;
+            color: #00b894;
+            border: 1px solid #55efc4;
+        }
+        
+        /* Teachers Grid */
+        .teachers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 15px;
+        }
+        
+        .teacher-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        body.dark-mode .teacher-card {
+            background: #34495e;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .teacher-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        
+        .teacher-img {
+            height: 140px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: white;
+        }
+        
+        body.boys-theme .teacher-img {
+            background: linear-gradient(135deg, var(--boys-primary) 0%, var(--boys-secondary) 100%);
+        }
+        
+        body.girls-theme .teacher-img {
+            background: linear-gradient(135deg, var(--girls-primary) 0%, var(--girls-secondary) 100%);
+        }
+        
+        .teacher-name {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        /* Filter Styles */
+        .filter-container {
+            padding: 15px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        body.dark-mode .filter-container {
+            background: #34495e;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: #f8f9fa;
+            font-size: 1rem;
+        }
+        
+        body.dark-mode .filter-select {
+            background: #2c3e50;
+            border-color: #4a5f7a;
+            color: #ecf0f1;
+        }
+        
+        /* Profile Styles */
+        .profile-header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            margin-bottom: 15px;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        body.boys-theme .profile-header {
+            background: linear-gradient(135deg, var(--boys-primary) 0%, var(--boys-secondary) 100%);
+        }
+        
+        body.girls-theme .profile-header {
+            background: linear-gradient(135deg, var(--girls-primary) 0%, var(--girls-secondary) 100%);
+        }
+        
+        body.dark-mode .profile-header {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            border: 3px solid white;
+        }
+        
+        .profile-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .profile-email {
+            opacity: 0.9;
+        }
+        
+        /* Settings List */
+        .settings-list {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+        }
+        
+        body.dark-mode .settings-list {
+            background: #34495e;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .settings-item {
+            padding: 18px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        body.dark-mode .settings-item {
+            border-bottom: 1px solid #4a5f7a;
+        }
+        
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-item:hover {
+            background: #f8f9fa;
+        }
+        
+        body.dark-mode .settings-item:hover {
+            background: #2c3e50;
+        }
+        
+        .settings-item.danger {
+            color: #e74c3c;
+        }
+        
+        .settings-item.danger:hover {
+            background: #ffe6e6;
+        }
+        
+        body.dark-mode .settings-item.danger:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+        
+        /* Pull to Refresh */
+        .pull-to-refresh {
+            text-align: center;
+            padding: 15px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            position: relative;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .refreshing {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Welcome Screen */
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .app-logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .app-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .app-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .welcome-buttons {
+            width: 100%;
+            max-width: 320px;
+        }
+        
+        .welcome-btn {
+            margin-bottom: 15px;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary);
+            border: none;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .welcome-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        .welcome-btn i {
+            margin-left: 8px;
+        }
+        
+        /* Accounting Screen */
+        .accounting-item {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            margin: 15px;
+            padding: 20px;
+        }
+        
+        body.dark-mode .accounting-item {
+            background: #34495e;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .accounting-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .accounting-amount {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .accounting-date {
+            color: #7f8c8d;
+        }
+        
+        /* Theme Screen */
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 15px;
+        }
+        
+        .theme-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        body.dark-mode .theme-card {
+            background: #34495e;
+        }
+        
+        .theme-card.selected {
+            border-color: var(--primary);
+        }
+        
+        body.boys-theme .theme-card.selected {
+            border-color: var(--boys-primary);
+        }
+        
+        body.girls-theme .theme-card.selected {
+            border-color: var(--girls-primary);
+        }
+        
+        .theme-emoji {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Developer Screen */
+        .developer-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+        }
+        
+        body.dark-mode .developer-card {
+            background: #34495e;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .developer-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+        }
+        
+        .developer-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .developer-contact {
+            margin-top: 20px;
+        }
+        
+        .contact-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            right: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        body.boys-theme input:checked + .slider {
+            background-color: var(--boys-primary);
+        }
+        
+        body.girls-theme input:checked + .slider {
+            background-color: var(--girls-primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(-26px);
+        }
+        
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 700px;
+                margin: 0 auto;
+            }
+            
+            .teachers-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .welcome-buttons {
+                max-width: 400px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .teachers-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        /* Animation for screen transitions */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .screen.active {
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        /* Pull to refresh animation */
+        @keyframes pull {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(10px); }
+        }
+        
+        .pull-indicator {
+            animation: pull 0.6s ease-in-out infinite alternate;
+        }
+    </style>
+</head>
+<body class="boys-theme">
+    <!-- شاشة الترحيب -->
+    <div id="welcome-screen" class="screen active">
+        <div class="welcome-container">
+            <div class="app-logo">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h1 class="app-title">المدرسة الذكية</h1>
+            <p class="app-subtitle">منصة تعليمية متكاملة للطلاب والمعلمين</p>
+            
+            <div class="welcome-buttons">
+                <button class="welcome-btn btn" id="student-register-btn">
+                    <i class="fas fa-user-graduate"></i> تسجيل الطلاب
+                </button>
+                <button class="welcome-btn btn" id="parent-register-btn">
+                    <i class="fas fa-users"></i> تسجيل الآباء
+                </button>
+                <button class="welcome-btn btn" id="admin-register-btn">
+                    <i class="fas fa-user-tie"></i> تسجيل الإدارة
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- شاشة تسجيل الدخول للطلاب -->
+    <div id="student-auth-screen" class="screen">
+        <div class="header">
+            <button class="back-btn" id="back-from-student-auth">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1>تسجيل الدخول للطلاب</h1>
+        </div>
+        
+        <div class="screen-content">
+            <div class="form-container">
+                <div class="form-card">
+                    <h2 class="form-title">مرحباً بعودتك!</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="student-email">البريد الإلكتروني</label>
+                        <input type="email" id="student-email" class="form-control" placeholder="example@gmail.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="student-password">كلمة المرور</label>
+                        <input type="password" id="student-password" class="form-control" placeholder="أدخل كلمة المرور">
+                    </div>
+                    
+                    <button class="btn btn-primary" id="student-login-btn">تسجيل الدخول</button>
+                    
+                    <div class="divider">أو</div>
+                    
+                    <button class="btn btn-secondary" id="student-create-account-btn">إنشاء حساب جديد</button>
+                    
+                    <div id="student-auth-alert" class="alert alert-error"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- شاشة إنشاء حساب طالب جديد -->
+    <div id="student-create-screen" class="screen">
+        <div class="header">
+            <button class="back-btn" id="back-from-student-create">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1>إنشاء حساب طالب</h1>
+        </div>
+        
+        <div class="screen-content">
+            <div class="form-container">
+                <div class="form-card">
+                    <h2 class="form-title">أنشئ حسابك الآن</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="student-fullname">الاسم الثلاثي</label>
+                        <input type="text" id="student-fullname" class="form-control" placeholder="أدخل الاسم الثلاثي بالعربية">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="student-new-email">البريد الإلكتروني</label>
+                        <input type="email" id="student-new-email" class="form-control" placeholder="example@gmail.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="student-new-password">كلمة المرور</label>
+                        <input type="password" id="student-new-password" class="form-control" placeholder="كلمة مرور قوية (6 أحرف على الأقل)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">اختر نوع الطالب</label>
+                        <div class="choice-container">
+                            <div class="choice-btn" id="male-student">
+                                <div class="choice-emoji">👨‍🎓</div>
+                                <div class="choice-text">طالب</div>
+                            </div>
+                            <div class="choice-btn" id="female-student">
+                                <div class="choice-emoji">👩‍🎓</div>
+                                <div class="choice-text">طالبة</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-success" id="student-create-account-submit">إنشاء الحساب</button>
+                    
+                    <div id="student-create-alert" class="alert alert-error"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- الشاشة الرئيسية للطالب -->
+    <div id="student-main-screen" class="screen">
+        <div class="header">
+            <h1 id="student-main-title">المنشورات</h1>
+        </div>
+        
+        <!-- محتوى المنشورات -->
+        <div id="student-posts-content" class="screen-content">
+            <div class="pull-to-refresh" id="posts-refresh">
+                <i class="fas fa-sync-alt pull-indicator"></i> اسحب للتحديث
+            </div>
+            
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-bullhorn"></i> إعلان هام
+                    </div>
+                    <div class="card-body">
+                        <p>سيتم عقد امتحان نهاية الفصل الدراسي الأول خلال الأسبوع القادم. يرجى الاستعداد الجيد.</p>
+                        <div style="margin-top: 10px; color: #7f8c8d; font-size: 0.9rem;">
+                            <i class="far fa-clock"></i> ٢٠٢٣-١٠-٢٠
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-alt"></i> فعالية ثقافية
+                    </div>
+                    <div class="card-body">
+                        <p>تدعو المدرسة طلابها للمشاركة في الفعالية الثقافية التي ستقام يوم الخميس القادم في قاعة المسرح.</p>
+                        <div style="margin-top: 10px; color: #7f8c8d; font-size: 0.9rem;">
+                            <i class="far fa-clock"></i> ٢٠٢٣-١٠-١٨
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-trophy"></i> نتائج المسابقة
+                    </div>
+                    <div class="card-body">
+                        <p>تهنئ المدرسة الطلاب الفائزين في مسابقة الرواية العربية. سيتم توزيع الجوائز يوم الأحد.</p>
+                        <div style="margin-top: 10px; color: #7f8c8d; font-size: 0.9rem;">
+                            <i class="far fa-clock"></i> ٢٠٢٣-١٠-١٥
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-book"></i> جدول الامتحانات
+                    </div>
+                    <div class="card-body">
+                        <p>تم نشر جدول امتحانات منتصف الفصل على الموقع الإلكتروني للمدرسة. يرجى المراجعة.</p>
+                        <div style="margin-top: 10px; color: #7f8c8d; font-size: 0.9rem;">
+                            <i class="far fa-clock"></i> ٢٠٢٣-١٠-١٠
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- محتوى المدرسين -->
+        <div id="student-teachers-content" class="screen-content" style="display: none;">
+            <div class="filter-container">
+                <select id="teacher-filter" class="filter-select">
+                    <option value="all">جميع الصفوف</option>
+                    <option value="sixth-science">السادس العلمي</option>
+                    <option value="sixth-literary">السادس الأدبي</option>
+                    <option value="fifth-science">الخامس العلمي</option>
+                    <option value="fifth-literary">الخامس الأدبي</option>
+                    <option value="fourth-science">الرابع العلمي</option>
+                    <option value="fourth-literary">الرابع الأدبي</option>
+                    <option value="third-intermediate">الثالث متوسط</option>
+                    <option value="second-intermediate">الثاني متوسط</option>
+                    <option value="first-intermediate">الأول متوسط</option>
+                </select>
+            </div>
+            
+            <div class="pull-to-refresh" id="teachers-refresh">
+                <i class="fas fa-sync-alt pull-indicator"></i> اسحب للتحديث
+            </div>
+            
+            <div class="teachers-grid">
+                <div class="teacher-card">
+                    <div class="teacher-img">ع</div>
+                    <div class="teacher-name">أ. علي محمد</div>
+                </div>
+                <div class="teacher-card">
+                    <div class="teacher-img">س</div>
+                    <div class="teacher-name">أ. سارة أحمد</div>
+                </div>
+                <div class="teacher-card">
+                    <div class="teacher-img">م</div>
+                    <div class="teacher-name">أ. محمد كريم</div>
+                </div>
+                <div class="teacher-card">
+                    <div class="teacher-img">ن</div>
+                    <div class="teacher-name">أ. نادية حسن</div>
+                </div>
+                <div class="teacher-card">
+                    <div class="teacher-img">ح</div>
+                    <div class="teacher-name">أ. حسين علي</div>
+                </div>
+                <div class="teacher-card">
+                    <div class="teacher-img">ف</div>
+                    <div class="teacher-name">أ. فاطمة عمر</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- محتوى النتائج -->
+        <div id="student-results-content" class="screen-content" style="display: none;">
+            <div class="filter-container">
+                <select id="results-filter" class="filter-select">
+                    <option value="all">جميع الصفوف</option>
+                    <option value="sixth-science">السادس العلمي</option>
+                    <option value="sixth-literary">السادس الأدبي</option>
+                    <option value="fifth-science">الخامس العلمي</option>
+                    <option value="fifth-literary">الخامس الأدبي</option>
+                    <option value="fourth-science">الرابع العلمي</option>
+                    <option value="fourth-literary">الرابع الأدبي</option>
+                    <option value="third-intermediate">الثالث متوسط</option>
+                    <option value="second-intermediate">الثاني متوسط</option>
+                    <option value="first-intermediate">الأول متوسط</option>
+                </select>
+            </div>
+            
+            <div class="pull-to-refresh" id="results-refresh">
+                <i class="fas fa-sync-alt pull-indicator"></i> اسحب للتحديث
+            </div>
+            
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i> نتائج امتحان الرياضيات
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                            <span>الدرجة الكاملة: 25</span>
+                            <span>درجتك: 20</span>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>التقييم:</span>
+                                <span style="color: #00b894; font-weight: bold;">ممتاز</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i> نتائج امتحان العلوم
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                            <span>الدرجة الكاملة: 25</span>
+                            <span>درجتك: 18</span>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>التقييم:</span>
+                                <span style="color: #fdcb6e; font-weight: bold;">جيد جداً</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i> نتائج امتحان اللغة العربية
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                            <span>الدرجة الكاملة: 25</span>
+                            <span>درجتك: 22</span>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>التقييم:</span>
+                                <span style="color: #00b894; font-weight: bold;">ممتاز</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- محتوى الملف الشخصي -->
+        <div id="student-profile-content" class="screen-content" style="display: none;">
+            <div class="profile-header">
+                <div class="profile-avatar" id="student-profile-avatar">👨‍🎓</div>
+                <div class="profile-name" id="student-profile-name">أحمد محمد</div>
+                <div class="profile-email" id="student-profile-email">ahmed@gmail.com</div>
+            </div>
+            
+            <div class="settings-list">
+                <div class="settings-item" id="accounting-btn">
+                    <span><i class="fas fa-calculator"></i> المحاسبة</span>
+                    <span>→</span>
+                </div>
+                <div class="settings-item" id="theme-style-btn">
+                    <span><i class="fas fa-palette"></i> نمط التطبيق</span>
+                    <span>→</span>
+                </div>
+                <div class="settings-item">
+                    <span><i class="fas fa-moon"></i> الوضع الليلي</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="dark-mode-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item" id="developer-btn">
+                    <span><i class="fas fa-code"></i> مطور التطبيق</span>
+                    <span>→</span>
+                </div>
+                <div class="settings-item danger" id="logout-btn">
+                    <span><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</span>
+                    <span>→</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الشريط السفلي -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-screen="student-posts">
+                <div class="nav-icon"><i class="fas fa-bullhorn"></i></div>
+                <div>المنشورات</div>
+                <div class="notification-dot" id="posts-notification"></div>
+            </div>
+            <div class="nav-item" data-screen="student-teachers">
+                <div class="nav-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                <div>المدرسين</div>
+                <div class="notification-dot" id="teachers-notification"></div>
+            </div>
+            <div class="nav-item" data-screen="student-results">
+                <div class="nav-icon"><i class="fas fa-chart-line"></i></div>
+                <div>النتائج</div>
+                <div class="notification-dot" id="results-notification"></div>
+            </div>
+            <div class="nav-item" data-screen="student-profile">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <div>حسابي</div>
+                <div class="notification-dot" id="profile-notification"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة المحاسبة -->
+    <div id="accounting-screen" class="screen">
+        <div class="header">
+            <button class="back-btn" id="back-from-accounting">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1>المحاسبة</h1>
+        </div>
+        
+        <div class="screen-content">
+            <div class="pull-to-refresh" id="accounting-refresh">
+                <i class="fas fa-sync-alt pull-indicator"></i> اسحب للتحديث
+            </div>
+            
+            <div class="accounting-item">
+                <div class="accounting-header">
+                    <div class="accounting-amount">المبلغ المتبقي: 150,000 دينار</div>
+                </div>
+                <div class="accounting-date">آخر تحديث: ٢٠٢٣-١٠-٠١</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-history"></i> سجل الدفعات</h3>
+                </div>
+                <div class="card-body">
+                    <div class="accounting-item">
+                        <div class="accounting-header">
+                            <div class="accounting-amount">+50,000 دينار</div>
+                            <div class="accounting-date">٢٠٢٣-١٠-٠١</div>
+                        </div>
+                        <div>دفعة أولى</div>
+                    </div>
+                    
+                    <div class="accounting-item">
+                        <div class="accounting-header">
+                            <div class="accounting-amount">+100,000 دينار</div>
+                            <div class="accounting-date">٢٠٢٣-٠٩-١٥</div>
+                        </div>
+                        <div>رسوم التسجيل</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- شاشة نمط التطبيق -->
+    <div id="theme-style-screen" class="screen">
+        <div class="header">
+            <button class="back-btn" id="back-from-theme">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1>نمط التطبيق</h1>
+        </div>
+        
+        <div class="screen-content">
+            <div class="pull-to-refresh" id="theme-refresh">
+                <i class="fas fa-sync-alt pull-indicator"></i> اسحب للتحديث
+            </div>
+            
+            <div class="form-container">
+                <div class="form-card">
+                    <h2 class="form-title">اختر نمط التطبيق</h2>
+                    
+                    <div class="theme-options">
+                        <div class="theme-card" id="boys-theme-card">
+                            <div class="theme-emoji">👦</div>
+                            <div class="choice-text">نمط الأولاد</div>
+                        </div>
+                        <div class="theme-card" id="girls-theme-card">
+                            <div class="theme-emoji">👧</div>
+                            <div class="choice-text">نمط البنات</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة المطور -->
+    <div id="developer-screen" class="screen">
+        <div class="header">
+            <button class="back-btn" id="back-from-developer">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <h1>مطور التطبيق</h1>
+        </div>
+        
+        <div class="screen-content">
+            <div class="developer-card">
+                <div class="developer-avatar">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="developer-name">مصطفى الميالي</div>
+                <p>مطور تطبيقات ويب وموبايل</p>
+                
+                <div class="developer-contact">
+                    <a href="https://t.me/MSLM_ALMYALY" class="contact-btn" target="_blank">
+                        <i class="fab fa-telegram"></i> التواصل على تيليجرام
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> معلومات التطبيق
+                </div>
+                <div class="card-body">
+                    <p>تم تطوير هذا التطبيق باستخدام أحدث تقنيات الويب ليكون منصة تعليمية متكاملة للمدارس.</p>
+                    <p>الإصدار: 1.0.0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // بيانات التطبيق
+        const appData = {
+            currentUser: null,
+            userType: null,
+            studentGender: null,
+            darkMode: false,
+            appTheme: 'boys',
+            notifications: {
+                posts: false,
+                teachers: false,
+                results: false,
+                profile: false
+            },
+            pullToRefresh: {
+                startY: 0,
+                currentY: 0,
+                isRefreshing: false
+            }
+        };
+
+        // عناصر DOM
+        const screens = document.querySelectorAll('.screen');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const studentAuthScreen = document.getElementById('student-auth-screen');
+        const studentCreateScreen = document.getElementById('student-create-screen');
+        const studentMainScreen = document.getElementById('student-main-screen');
+        const accountingScreen = document.getElementById('accounting-screen');
+        const themeStyleScreen = document.getElementById('theme-style-screen');
+        const developerScreen = document.getElementById('developer-screen');
+        
+        // أزرار الشاشة الرئيسية
+        document.getElementById('student-register-btn').addEventListener('click', () => {
+            showScreen(studentAuthScreen);
+        });
+        
+        document.getElementById('parent-register-btn').addEventListener('click', () => {
+            // تسجيل الآباء
+            alert('تسجيل الآباء - تم تفعيل النظام');
+            showScreen(studentAuthScreen);
+        });
+        
+        document.getElementById('admin-register-btn').addEventListener('click', () => {
+            // تسجيل الإدارة
+            alert('تسجيل الإدارة - تم تفعيل النظام');
+            showScreen(studentAuthScreen);
+        });
+        
+        // أزرار العودة
+        document.getElementById('back-from-student-auth').addEventListener('click', () => {
+            showScreen(welcomeScreen);
+        });
+        
+        document.getElementById('back-from-student-create').addEventListener('click', () => {
+            showScreen(studentAuthScreen);
+        });
+        
+        document.getElementById('back-from-accounting').addEventListener('click', () => {
+            showScreen(studentMainScreen);
+        });
+        
+        document.getElementById('back-from-theme').addEventListener('click', () => {
+            showScreen(studentMainScreen);
+        });
+        
+        document.getElementById('back-from-developer').addEventListener('click', () => {
+            showScreen(studentMainScreen);
+        });
+        
+        // أزرار تسجيل الدخول للطلاب
+        document.getElementById('student-login-btn').addEventListener('click', studentLogin);
+        document.getElementById('student-create-account-btn').addEventListener('click', () => {
+            showScreen(studentCreateScreen);
+        });
+        
+        // اختيار نوع الطالب
+        const maleStudentBtn = document.getElementById('male-student');
+        const femaleStudentBtn = document.getElementById('female-student');
+        let selectedGender = null;
+        
+        maleStudentBtn.addEventListener('click', () => {
+            selectedGender = 'male';
+            maleStudentBtn.classList.add('selected');
+            femaleStudentBtn.classList.remove('selected');
+        });
+        
+        femaleStudentBtn.addEventListener('click', () => {
+            selectedGender = 'female';
+            femaleStudentBtn.classList.add('selected');
+            maleStudentBtn.classList.remove('selected');
+        });
+        
+        // إنشاء حساب طالب جديد
+        document.getElementById('student-create-account-submit').addEventListener('click', createStudentAccount);
+        
+        // التنقل بين الشاشات في الواجهة الرئيسية
+        const navItems = document.querySelectorAll('.nav-item');
+        const screenContents = document.querySelectorAll('.screen-content');
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const targetScreen = item.getAttribute('data-screen');
+                
+                // تحديث الشريط السفلي
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                
+                // تحديث المحتوى المعروض
+                screenContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                document.getElementById(`${targetScreen}-content`).style.display = 'block';
+                
+                // تحديث عنوان الشاشة
+                const titles = {
+                    'student-posts': 'المنشورات',
+                    'student-teachers': 'المدرسين',
+                    'student-results': 'النتائج',
+                    'student-profile': 'حسابي'
+                };
+                
+                document.getElementById('student-main-title').textContent = titles[targetScreen];
+                
+                // إخفاء الإشعار عند النقر
+                const notificationDot = item.querySelector('.notification-dot');
+                if (notificationDot) {
+                    notificationDot.style.display = 'none';
+                    appData.notifications[targetScreen.split('-')[1]] = false;
+                }
+            });
+        });
+        
+        // الانتقال إلى شاشة المحاسبة
+        document.getElementById('accounting-btn').addEventListener('click', () => {
+            showScreen(accountingScreen);
+        });
+        
+        // الانتقال إلى شاشة نمط التطبيق
+        document.getElementById('theme-style-btn').addEventListener('click', () => {
+            showScreen(themeStyleScreen);
+        });
+        
+        // اختيار نمط التطبيق
+        document.getElementById('boys-theme-card').addEventListener('click', () => {
+            setAppTheme('boys');
+            document.getElementById('boys-theme-card').classList.add('selected');
+            document.getElementById('girls-theme-card').classList.remove('selected');
+        });
+        
+        document.getElementById('girls-theme-card').addEventListener('click', () => {
+            setAppTheme('girls');
+            document.getElementById('girls-theme-card').classList.add('selected');
+            document.getElementById('boys-theme-card').classList.remove('selected');
+        });
+        
+        // الانتقال إلى شاشة المطور
+        document.getElementById('developer-btn').addEventListener('click', () => {
+            showScreen(developerScreen);
+        });
+        
+        // تبديل الوضع الليلي
+        document.getElementById('dark-mode-toggle').addEventListener('change', (e) => {
+            setDarkMode(e.target.checked);
+        });
+        
+        // تسجيل الخروج
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                showScreen(welcomeScreen);
+                resetAppData();
+            }
+        });
+        
+        // وظائف التطبيق
+        function showScreen(screen) {
+            screens.forEach(s => s.classList.remove('active'));
+            screen.classList.add('active');
+        }
+        
+        function studentLogin() {
+            const email = document.getElementById('student-email').value;
+            const password = document.getElementById('student-password').value;
+            const alertDiv = document.getElementById('student-auth-alert');
+            
+            // التحقق من صحة البيانات
+            if (!email || !password) {
+                showAlert(alertDiv, 'يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            if (!email.endsWith('@gmail.com')) {
+                showAlert(alertDiv, 'يجب أن ينتهي البريد بـ @gmail.com');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert(alertDiv, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+                return;
+            }
+            
+            // تسجيل الدخول الناجح
+            appData.currentUser = {
+                name: 'أحمد محمد',
+                email: email,
+                gender: 'male'
+            };
+            
+            appData.userType = 'student';
+            appData.studentGender = 'male';
+            
+            // تحديث الملف الشخصي
+            document.getElementById('student-profile-name').textContent = appData.currentUser.name;
+            document.getElementById('student-profile-email').textContent = appData.currentUser.email;
+            document.getElementById('student-profile-avatar').textContent = appData.currentUser.gender === 'male' ? '👨‍🎓' : '👩‍🎓';
+            
+            showScreen(studentMainScreen);
+            
+            // محاكاة الإشعارات بعد تسجيل الدخول
+            simulateNotifications();
+        }
+        
+        function createStudentAccount() {
+            const fullname = document.getElementById('student-fullname').value;
+            const email = document.getElementById('student-new-email').value;
+            const password = document.getElementById('student-new-password').value;
+            const alertDiv = document.getElementById('student-create-alert');
+            
+            // التحقق من صحة البيانات
+            if (!fullname || !email || !password) {
+                showAlert(alertDiv, 'يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            if (!isValidArabicName(fullname)) {
+                showAlert(alertDiv, 'يرجى إدخال اسم ثلاثي عربي صحيح');
+                return;
+            }
+            
+            if (!email.endsWith('@gmail.com')) {
+                showAlert(alertDiv, 'يجب أن ينتهي البريد بـ @gmail.com');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert(alertDiv, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+                return;
+            }
+            
+            if (!selectedGender) {
+                showAlert(alertDiv, 'يرجى اختيار نوع الطالب');
+                return;
+            }
+            
+            // إنشاء الحساب الناجح
+            appData.currentUser = {
+                name: fullname,
+                email: email,
+                gender: selectedGender
+            };
+            
+            appData.userType = 'student';
+            appData.studentGender = selectedGender;
+            
+            // تحديث الملف الشخصي
+            document.getElementById('student-profile-name').textContent = appData.currentUser.name;
+            document.getElementById('student-profile-email').textContent = appData.currentUser.email;
+            document.getElementById('student-profile-avatar').textContent = selectedGender === 'male' ? '👨‍🎓' : '👩‍🎓';
+            
+            showScreen(studentMainScreen);
+            
+            // محاكاة الإشعارات بعد إنشاء الحساب
+            simulateNotifications();
+        }
+        
+        function isValidArabicName(name) {
+            // تحقق بسيط من أن الاسم يحتوي على ثلاثة أجزاء على الأقل
+            const nameParts = name.trim().split(' ');
+            return nameParts.length >= 3 && /^[\u0600-\u06FF\s]+$/.test(name);
+        }
+        
+        function showAlert(alertDiv, message) {
+            alertDiv.textContent = message;
+            alertDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function setDarkMode(enabled) {
+            appData.darkMode = enabled;
+            if (enabled) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            
+            // حفظ التفضيل
+            localStorage.setItem('darkMode', enabled);
+        }
+        
+        function setAppTheme(theme) {
+            appData.appTheme = theme;
+            document.body.classList.remove('boys-theme', 'girls-theme');
+            document.body.classList.add(`${theme}-theme`);
+            
+            // حفظ التفضيل
+            localStorage.setItem('appTheme', theme);
+        }
+        
+        function resetAppData() {
+            appData.currentUser = null;
+            appData.userType = null;
+            appData.studentGender = null;
+            
+            // إعادة تعيين الحقول
+            document.getElementById('student-email').value = '';
+            document.getElementById('student-password').value = '';
+            document.getElementById('student-fullname').value = '';
+            document.getElementById('student-new-email').value = '';
+            document.getElementById('student-new-password').value = '';
+            
+            // إعادة تعيين اختيار الجنس
+            selectedGender = null;
+            maleStudentBtn.classList.remove('selected');
+            femaleStudentBtn.classList.remove('selected');
+            
+            // إخفاء جميع الإشعارات
+            document.querySelectorAll('.notification-dot').forEach(dot => {
+                dot.style.display = 'none';
+            });
+            
+            // إعادة تعيين حالة الإشعارات
+            appData.notifications = {
+                posts: false,
+                teachers: false,
+                results: false,
+                profile: false
+            };
+        }
+        
+        // محاكاة الإشعارات
+        function simulateNotifications() {
+            setTimeout(() => {
+                appData.notifications.posts = true;
+                document.getElementById('posts-notification').style.display = 'block';
+            }, 2000);
+            
+            setTimeout(() => {
+                appData.notifications.teachers = true;
+                document.getElementById('teachers-notification').style.display = 'block';
+            }, 4000);
+            
+            setTimeout(() => {
+                appData.notifications.results = true;
+                document.getElementById('results-notification').style.display = 'block';
+            }, 6000);
+            
+            setTimeout(() => {
+                appData.notifications.profile = true;
+                document.getElementById('profile-notification').style.display = 'block';
+            }, 8000);
+        }
+        
+        // سحب للتحديث
+        function initPullToRefresh() {
+            const screenContents = document.querySelectorAll('.screen-content');
+            
+            screenContents.forEach(content => {
+                content.addEventListener('touchstart', handleTouchStart);
+                content.addEventListener('touchmove', handleTouchMove);
+                content.addEventListener('touchend', handleTouchEnd);
+            });
+        }
+        
+        function handleTouchStart(e) {
+            if (e.target.closest('.screen-content') && e.target.closest('.screen-content').scrollTop === 0) {
+                appData.pullToRefresh.startY = e.touches[0].clientY;
+            }
+        }
+        
+        function handleTouchMove(e) {
+            if (!appData.pullToRefresh.startY) return;
+            
+            appData.pullToRefresh.currentY = e.touches[0].clientY;
+            const diff = appData.pullToRefresh.currentY - appData.pullToRefresh.startY;
+            
+            if (diff > 0 && e.target.closest('.screen-content').scrollTop === 0) {
+                e.preventDefault();
+            }
+        }
+        
+        function handleTouchEnd(e) {
+            if (!appData.pullToRefresh.startY) return;
+            
+            const diff = appData.pullToRefresh.currentY - appData.pullToRefresh.startY;
+            const screenContent = e.target.closest('.screen-content');
+            
+            if (diff > 100 && screenContent.scrollTop === 0) {
+                // تنفيذ التحديث
+                const refreshElement = screenContent.querySelector('.pull-to-refresh');
+                if (refreshElement) {
+                    refreshElement.classList.add('refreshing');
+                    
+                    // محاكاة عملية التحديث
+                    setTimeout(() => {
+                        refreshElement.classList.remove('refreshing');
+                        showRefreshSuccess();
+                    }, 1500);
+                }
+            }
+            
+            // إعادة تعيين القيم
+            appData.pullToRefresh.startY = 0;
+            appData.pullToRefresh.currentY = 0;
+        }
+        
+        function showRefreshSuccess() {
+            // يمكن إضافة رسالة نجاح التحديث هنا
+            console.log('تم تحديث المحتوى بنجاح');
+        }
+        
+        // تحميل التفضيلات المحفوظة
+        function loadPreferences() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            const appTheme = localStorage.getItem('appTheme') || 'boys';
+            
+            if (darkMode) {
+                document.getElementById('dark-mode-toggle').checked = true;
+                setDarkMode(true);
+            }
+            
+            setAppTheme(appTheme);
+            
+            // تحديد النمط الحالي في شاشة النمط
+            if (appTheme === 'boys') {
+                document.getElementById('boys-theme-card').classList.add('selected');
+            } else {
+                document.getElementById('girls-theme-card').classList.add('selected');
+            }
+        }
+        
+        // منع التكبير والتصغير
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('touchmove', function (e) {
+            if (e.scale !== 1) { e.preventDefault(); }
+        }, { passive: false });
+        
+        // تهيئة التطبيق عند التحميل
+        window.addEventListener('load', () => {
+            loadPreferences();
+            initPullToRefresh();
+        });
+    </script>
+</body>
+</html>
