@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حسابات مسلم جواد</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .floating-bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-40px) translateX(-10px); }
+            75% { transform: translateY(-20px) translateX(10px); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-header {
+            margin-bottom: 30px;
+        }
+
+        .profile-name {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
+            margin: 25px 0;
+        }
+
+        .links-container {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .link-item {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+            text-align: center;
+            transition: all 0.4s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .link-item:hover::before {
+            left: 100%;
+        }
+
+        .link-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .link-item a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .social-icon {
+            margin-left: 12px;
+            font-size: 1.4rem;
+        }
+
+        .telegram { border-right: 4px solid #0088cc; }
+        .telegram-channel { border-right: 4px solid #29b6f6; }
+        .instagram { border-right: 4px solid #E4405F; }
+        .tiktok { border-right: 4px solid #000000; }
+        .facebook { border-right: 4px solid #1877F2; }
+
+        footer {
+            margin-top: 40px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .signature {
+            margin-top: 10px;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        /* تأثيرات إضافية */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .profile-name {
+                font-size: 1.8rem;
+            }
+            
+            .profile-description {
+                font-size: 1rem;
+            }
+            
+            .link-item a {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- فقاعات متحركة في الخلفية -->
+    <div class="floating-bubbles" id="bubbles"></div>
+
+    <div class="container">
+        <div class="profile-header">
+            <h1 class="profile-name pulse">حسابات مسلم جواد</h1>
+            <p class="profile-description">طالب جامعي مرحلة اولى تربية رياضيات</p>
+            
+            <div class="divider"></div>
+        </div>
+
+        <div class="links-container">
+            <div class="link-item telegram">
+                <a href="https://t.me/mslmh19">
+                    <i class="fab fa-telegram-plane social-icon"></i>
+                    حساب تيليجرام
+                </a>
+            </div>
+            
+            <div class="link-item telegram-channel">
+                <a href="https://t.me/Mslim0">
+                    <i class="fab fa-telegram social-icon"></i>
+                    قناة تيليجرام
+                </a>
+            </div>
+            
+            <div class="link-item instagram">
+                <a href="https://www.instagram.com/muslim_almyaly?igsh=NGFucWkwemt6cWE2">
+                    <i class="fab fa-instagram social-icon"></i>
+                    حساب انستغرام
+                </a>
+            </div>
+            
+            <div class="link-item tiktok">
+                <a href="https://tiktok.com/@muslimh16">
+                    <i class="fab fa-tiktok social-icon"></i>
+                    حساب تيك توك
+                </a>
+            </div>
+            
+            <div class="link-item facebook">
+                <a href="https://www.facebook.com/mslm.jwad.902134">
+                    <i class="fab fa-facebook-f social-icon"></i>
+                    حساب فيسبوك
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p>تواصل معي عبر منصات التواصل الاجتماعي</p>
+            <p class="signature">تحياتي من الاستاذ مسلم جواد 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // إنشاء الفقاعات المتحركة في الخلفية
+        function createBubbles() {
+            const bubblesContainer = document.getElementById('bubbles');
+            const colors = [
+                'rgba(255, 255, 255, 0.1)',
+                'rgba(255, 255, 255, 0.15)',
+                'rgba(255, 255, 255, 0.2)',
+                'rgba(255, 255, 255, 0.05)'
+            ];
+            
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                // أحجام وأماكن عشوائية
+                const size = Math.random() * 100 + 20;
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const delay = Math.random() * 15;
+                
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${left}%`;
+                bubble.style.top = `${top}%`;
+                bubble.style.background = color;
+                bubble.style.animationDelay = `${delay}s`;
+                
+                bubblesContainer.appendChild(bubble);
+            }
+        }
+
+        // تأثيرات تفاعلية للروابط
+        document.addEventListener('DOMContentLoaded', function() {
+            createBubbles();
+            
+            const links = document.querySelectorAll('.link-item');
+            
+            links.forEach(link => {
+                link.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
