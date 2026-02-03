@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>هكر الوزاري</title>
     <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     
@@ -7362,11 +7361,21 @@ window.setQType('mcq');
 // تحميل المحاولات المتبقية عند تسجيل الدخول
 // (سيتم إضافة هذا في onAuthStateChanged)
 
-// نظام المطابقة المتقدم
-let matchmakingInterval = null;
-let matchmakingTimeout = null;
-let currentSocket = null;
 
+// ============================================
+// نظام اللعب ضد لاعب حقيقي - النظام الاحترافي
+// ============================================
+
+// ====== 1. المتغيرات الأساسية ======
+let matchmakingInterval = null;
+let currentSearch = null;
+let gameConnection = null;
+let opponentHeartbeatInterval = null;
+let lastHeartbeatTime = null;
+let reconnectionAttempts = 0;
+const MAX_RECONNECTION_ATTEMPTS = 3;
+
+// ====== 2. نظام البحث عن لاعب حقيقي ======
 window.startMatchmaking = async function(type) {
     if (type === 'online') {
         const subject = document.getElementById('challenge-subject').value;
@@ -7382,412 +7391,534 @@ window.startMatchmaking = async function(type) {
             return;
         }
         
-        // إخفاء واجهة التحدي وإظهار البحث
+        // إخفاء واجهة التحدي وإظهار واجهة البحث
         document.getElementById('challenge-active-card').classList.add('hidden');
         document.getElementById('searching-ui').classList.remove('hidden');
         
         // تحديث رسالة البحث
-        document.getElementById('search-msg').textContent = '🔎 جاري البحث عن لاعب حقيقي...';
+        const searchMsg = document.getElementById('search-msg');
+        searchMsg.textContent = '🔍 جاري البحث عن خصم مناسب...';
         
-        try {
-            // البحث عن مباراة
-            await searchForOnlineMatch(subject, questionType);
-        } catch (error) {
-            console.error("خطأ في البحث:", error);
-            cancelSearch();
-        }
+        // تعريف بيانات البحث الحالية
+        currentSearch = {
+            userId: currentUser.uid,
+            name: userData.name,
+            photo: userData.photo,
+            grade: userData.grade,
+            subject: subject,
+            questionType: questionType,
+            timestamp: Date.now(),
+            isPremium: userData.isPremium && isPremiumValid(userData),
+            searchId: generateSearchId()
+        };
+        
+        // تسجيل البحث في Firebase
+        await registerSearch(currentSearch);
+        
+        // بدء البحث النشط
+        startActiveSearch();
+        
+        // إظهار عداد البحث
+        startSearchCounter();
+        
     } else if (type === 'ai') {
-        // ... الكود الحالي للذكاء الاصطناعي ...
+        // الكود الحالي للذكاء الاصطناعي يبقى كما هو
+        // ... الكود الموجود سابقاً
     }
 };
 
-async function searchForOnlineMatch(subject, questionType) {
-    // تنظيف أي بحث سابق
+// توليد معرف فريد للبحث
+function generateSearchId() {
+    return 'search_' + currentUser.uid + '_' + Date.now();
+}
+
+// تسجيل البحث في قاعدة البيانات
+async function registerSearch(searchData) {
+    try {
+        // حذف أي بحث سابق للمستخدم
+        const previousSearchQuery = query(
+            collection(db, "matchmaking_searches"),
+            where("userId", "==", currentUser.uid)
+        );
+        const previousSearchSnap = await getDocs(previousSearchQuery);
+        
+        if (!previousSearchSnap.empty) {
+            const batch = writeBatch(db);
+            previousSearchSnap.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+        }
+        
+        // تسجيل البحث الجديد
+        const searchRef = doc(db, "matchmaking_searches", searchData.searchId);
+        await setDoc(searchRef, {
+            ...searchData,
+            status: 'searching',
+            createdAt: serverTimestamp(),
+            expiresAt: Timestamp.fromDate(new Date(Date.now() + 2 * 60 * 1000)) // 2 دقائق
+        });
+        
+        console.log("✅ تم تسجيل البحث بنجاح");
+        
+    } catch (error) {
+        console.error("❌ خطأ في تسجيل البحث:", error);
+    }
+}
+
+// البحث النشط عن خصم
+async function startActiveSearch() {
     if (matchmakingInterval) clearInterval(matchmakingInterval);
-    if (matchmakingTimeout) clearTimeout(matchmakingTimeout);
     
-    // إنشاء طلب مطابقة
-    const matchRequest = {
-        userId: currentUser.uid,
-        userName: userData.name,
-        userPhoto: userData.photo,
-        grade: userData.grade,
-        subject: subject,
-        questionType: questionType,
-        timestamp: Date.now()
-    };
-    
-    // حفظ طلب المطابقة في قاعدة البيانات
-    const matchRef = await addDoc(collection(db, "matchmaking_queue"), matchRequest);
-    
-    // البحث عن خصم مناسب
     matchmakingInterval = setInterval(async () => {
         try {
-            // البحث عن لاعبين متطابقين
-            const q = query(
-                collection(db, "matchmaking_queue"),
-                where("userId", "!=", currentUser.uid), // ليس المستخدم نفسه
-                where("grade", "==", userData.grade), // نفس الصف
-                where("subject", "==", subject), // نفس المادة
-                where("questionType", "==", questionType), // نفس نوع الأسئلة
-                orderBy("timestamp", "asc"),
-                limit(1)
-            );
-            
-            const snapshot = await getDocs(q);
-            
-            if (!snapshot.empty) {
-                // وجد خصم!
-                const opponentData = snapshot.docs[0].data();
-                const opponentRef = snapshot.docs[0].id;
-                
+            if (!currentSearch) {
                 clearInterval(matchmakingInterval);
-                await deleteDoc(doc(db, "matchmaking_queue", matchRef.id));
-                await deleteDoc(doc(db, "matchmaking_queue", opponentRef));
-                
-                // بدء المباراة
-                await startOnlineMatch(opponentData);
+                return;
+            }
+            
+            // البحث عن خصم مناسب
+            const opponent = await findSuitableOpponent();
+            
+            if (opponent) {
+                clearInterval(matchmakingInterval);
+                await createMatch(opponent);
+            } else {
+                // تحديث رسالة البحث
+                updateSearchMessage();
             }
             
         } catch (error) {
-            console.error("خطأ في البحث:", error);
+            console.error("❌ خطأ في البحث:", error);
         }
-    }, 2000); // البحث كل 2 ثانية
-    
-    // مهلة البحث (30 ثانية)
-    matchmakingTimeout = setTimeout(async () => {
-        clearInterval(matchmakingInterval);
-        
-        if (document.getElementById('searching-ui').classList.contains('hidden')) {
-            return; // تم العثور على خصم بالفعل
-        }
-        
-        // لم يتم العثور على خصم
-        showBeautifulAlert('info', 'لم يتم العثور', 'لم نتمكن من العثور على خصم مناسب.\nيمكنك المحاولة لاحقاً أو اللعب ضد الذكاء الاصطناعي.');
-        await deleteDoc(doc(db, "matchmaking_queue", matchRef.id));
-        cancelSearch();
-    }, 30000);
+    }, 2000); // بحث كل 2 ثانية
 }
 
-async function startOnlineMatch(opponentData) {
+// البحث عن خصم مناسب
+async function findSuitableOpponent() {
     try {
-        // تحديث واجهة البحث
-        document.getElementById('search-msg').innerHTML = 
-            `<span class="text-green-600">✅ تم العثور على خصم!</span><br>
-             <span class="text-sm">${opponentData.userName}</span>`;
-        
-        // إنشاء المباراة في قاعدة البيانات
-        const battleRef = await addDoc(collection(db, "battles"), {
-            player1: currentUser.uid,
-            player2: opponentData.userId,
-            player1Name: userData.name,
-            player2Name: opponentData.userName,
-            player1Photo: userData.photo,
-            player2Photo: opponentData.userPhoto,
-            subject: opponentData.subject,
-            grade: opponentData.grade,
-            questionType: opponentData.questionType,
-            status: 'starting',
-            currentQuestion: 0,
-            player1Score: 0,
-            player2Score: 0,
-            player1Answers: [],
-            player2Answers: [],
-            questions: [],
-            createdAt: serverTimestamp(),
-            lastActivity: serverTimestamp()
-        });
-        
-        // تحميل الأسئلة
-        const questions = await loadGameQuestionsForBattle(
-            opponentData.subject, 
-            opponentData.questionType, 
-            10 // 10 أسئلة
+        const q = query(
+            collection(db, "matchmaking_searches"),
+            where("userId", "!=", currentUser.uid),
+            where("status", "==", "searching"),
+            where("subject", "==", currentSearch.subject),
+            where("questionType", "==", currentSearch.questionType)
         );
         
-        // حفظ الأسئلة في المباراة
-        await updateDoc(doc(db, "battles", battleRef.id), {
-            questions: questions
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            return null;
+        }
+        
+        let bestMatch = null;
+        let bestScore = -1;
+        
+        querySnapshot.forEach(doc => {
+            const opponentData = doc.data();
+            
+            // حساب درجة التطابق
+            const matchScore = calculateMatchScore(opponentData);
+            
+            if (matchScore > bestScore) {
+                bestScore = matchScore;
+                bestMatch = {
+                    id: doc.id,
+                    ...opponentData
+                };
+            }
         });
         
-        gameId = battleRef.id;
+        // إذا وجدنا خصم مناسب
+        if (bestMatch && bestScore >= 0) {
+            // حذف بحث الخصم
+            await deleteDoc(doc(db, "matchmaking_searches", bestMatch.id));
+            
+            return bestMatch;
+        }
+        
+        return null;
+        
+    } catch (error) {
+        console.error("❌ خطأ في البحث عن الخصم:", error);
+        return null;
+    }
+}
+
+// حساب درجة التطابق بين اللاعبين
+function calculateMatchScore(opponentData) {
+    let score = 0;
+    
+    // 1. نفس المرحلة الدراسية (40 نقطة)
+    if (opponentData.grade === currentSearch.grade) {
+        score += 40;
+    } 
+    // 2. المواد المشتركة بين السادس العلمي والأدبي (20 نقطة)
+    else if (['6sci', '6lit'].includes(currentSearch.grade) && 
+             ['6sci', '6lit'].includes(opponentData.grade) &&
+             ['اسلامية', 'عربي', 'انكليزي'].includes(currentSearch.subject)) {
+        score += 20;
+    }
+    // 3. خصم من مرحلة مختلفة (غير مسموح) = 0 نقطة
+    else {
+        return -1; // غير مناسب
+    }
+    
+    // 4. نفس نوع المستخدم (عادي/مميز) (10 نقطة)
+    if (opponentData.isPremium === currentSearch.isPremium) {
+        score += 10;
+    }
+    
+    // 5. فرق الوقت في البحث (أسرع = أفضل) (10 نقطة)
+    const timeDiff = Math.abs(Date.now() - opponentData.timestamp);
+    if (timeDiff < 30000) { // أقل من 30 ثانية
+        score += 10;
+    } else if (timeDiff < 60000) { // أقل من دقيقة
+        score += 5;
+    }
+    
+    return score;
+}
+
+// تحديث رسالة البحث
+function updateSearchMessage() {
+    if (!currentSearch) return;
+    
+    const searchMsg = document.getElementById('search-msg');
+    const searchTime = Math.floor((Date.now() - currentSearch.timestamp) / 1000);
+    
+    const messages = [
+        '🔍 نبحث عن خصم بنفس الصف والمادة...',
+        '👥 نبحث عن لاعب حقيقي...',
+        '🎮 جاري العثور على خصم مناسب...',
+        '⏳ البحث قد يستغرق بضع ثواني...'
+    ];
+    
+    // تغيير الرسالة كل 5 ثواني
+    const messageIndex = Math.floor(searchTime / 5) % messages.length;
+    searchMsg.textContent = messages[messageIndex];
+    
+    // إضافة عداد الوقت
+    const timerElement = document.querySelector('#searching-ui .text-xl');
+    if (timerElement) {
+        timerElement.textContent = `⏱️ ${Math.floor(searchTime / 60)}:${(searchTime % 60).toString().padStart(2, '0')}`;
+    }
+}
+
+// بدء عداد البحث
+function startSearchCounter() {
+    const counterDiv = document.createElement('div');
+    counterDiv.className = 'mt-4 text-sm text-gray-500';
+    counterDiv.innerHTML = '<span class="font-bold">⏱️ 0:00</span>';
+    
+    const searchingUI = document.getElementById('searching-ui');
+    const existingCounter = searchingUI.querySelector('.text-sm');
+    if (existingCounter) existingCounter.remove();
+    
+    searchingUI.appendChild(counterDiv);
+    
+    let seconds = 0;
+    const counterInterval = setInterval(() => {
+        seconds++;
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        counterDiv.innerHTML = `<span class="font-bold">⏱️ ${minutes}:${remainingSeconds.toString().padStart(2, '0')}</span>`;
+        
+        // إلغاء البحث بعد دقيقتين
+        if (seconds >= 120) {
+            clearInterval(counterInterval);
+            cancelSearch('انتهى وقت البحث');
+        }
+    }, 1000);
+}
+
+// ====== 3. إنشاء المباراة ======
+async function createMatch(opponentData) {
+    try {
+        // إخفاء واجهة البحث
+        document.getElementById('searching-ui').classList.add('hidden');
+        
+        // حذف بحث المستخدم الحالي
+        if (currentSearch) {
+            await deleteDoc(doc(db, "matchmaking_searches", currentSearch.searchId));
+        }
+        
+        // إنشاء معرف فريد للمباراة
+        const matchId = 'match_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // تحميل الأسئلة
+        const questionCount = 10; // 10 أسئلة لكل مباراة
+        await loadGameQuestions(currentSearch.subject, currentSearch.questionType, questionCount);
+        
+        // إنشاء بيانات المباراة
+        const matchData = {
+            matchId: matchId,
+            player1: {
+                uid: currentUser.uid,
+                name: userData.name,
+                photo: userData.photo,
+                grade: userData.grade,
+                score: 0,
+                ready: false
+            },
+            player2: {
+                uid: opponentData.userId,
+                name: opponentData.name,
+                photo: opponentData.photo,
+                grade: opponentData.grade,
+                score: 0,
+                ready: false
+            },
+            subject: currentSearch.subject,
+            questionType: currentSearch.questionType,
+            questions: gameQuestions.map(q => ({
+                id: q.id,
+                question: q.question,
+                type: q.type,
+                answers: q.answers || [],
+                correct: q.correct
+            })),
+            currentQuestion: 0,
+            status: 'waiting',
+            createdAt: serverTimestamp(),
+            lastActivity: serverTimestamp(),
+            turn: currentUser.uid, // يبدأ اللاعب الذي وجد الخصم
+            answers: {},
+            timer: 15,
+            gameStarted: false
+        };
+        
+        // حفظ المباراة في قاعدة البيانات
+        const matchRef = doc(db, "online_matches", matchId);
+        await setDoc(matchRef, matchData);
+        
+        // تعيين البيانات الحالية
+        gameId = matchId;
         opponentId = opponentData.userId;
-        opponentData = opponentData;
+        opponentData = {
+            name: opponentData.name,
+            photo: opponentData.photo,
+            uid: opponentData.userId
+        };
         gameType = 'online';
         
         // إظهار شاشة VS
         showVSscreen(userData, opponentData);
         
         // بدء الاستماع لتحديثات المباراة
-        listenToBattleUpdates(battleRef.id);
+        startMatchListener(matchId);
         
-        // الانتقال للمباراة بعد 3 ثواني
-        setTimeout(() => {
-            document.getElementById('vs-screen').classList.add('hidden');
-            joinBattle(battleRef.id);
-        }, 3000);
+        // إرسال إشعار للخصم
+        await sendMatchNotification(opponentData.userId, matchId, userData.name);
         
     } catch (error) {
-        console.error("خطأ في بدء المباراة:", error);
-        cancelSearch();
+        console.error("❌ خطأ في إنشاء المباراة:", error);
         showBeautifulAlert('error', 'خطأ', 'حدث خطأ في بدء المباراة');
+        cancelSearch();
     }
 }
 
-let battleListener = null;
-let battleTimerInterval = null;
-let currentBattleData = null;
-let pendingAnswer = null;
-
-function listenToBattleUpdates(battleId) {
-    if (battleListener) battleListener();
+// ====== 4. نظام الاستماع للمباراة (اتصال في الوقت الحقيقي) ======
+function startMatchListener(matchId) {
+    if (gameConnection) {
+        gameConnection();
+    }
     
-    const battleRef = doc(db, "battles", battleId);
+    const matchRef = doc(db, "online_matches", matchId);
     
-    battleListener = onSnapshot(battleRef, (snapshot) => {
+    gameConnection = onSnapshot(matchRef, async (snapshot) => {
         if (!snapshot.exists()) {
-            // تم حذف المباراة
-            handleBattleEnd();
+            // المباراة محذوفة
+            handleMatchEnded('تم إنهاء المباراة من قبل الخصم');
             return;
         }
         
-        const battleData = snapshot.data();
-        currentBattleData = battleData;
+        const matchData = snapshot.data();
+        const currentTime = Date.now();
         
-        // تحديث النقاط في الواجهة
-        if (document.getElementById('game-overlay').classList.contains('hidden') === false) {
-            updateGameUI(battleData);
+        // تحديث وقت النشاط الأخير
+        if (matchData.lastActivity) {
+            const lastActivityTime = matchData.lastActivity.toDate().getTime();
+            const inactiveTime = currentTime - lastActivityTime;
+            
+            // إذا كان الخصم غير نشط لأكثر من 30 ثانية
+            if (inactiveTime > 30000 && !matchData.gameStarted) {
+                handleOpponentDisconnected();
+                return;
+            }
         }
         
-        // معالجة تغيير الحالة
-        switch (battleData.status) {
-            case 'active':
-                if (document.getElementById('game-overlay').classList.contains('hidden')) {
-                    // دخول المباراة
-                    enterBattle(battleData);
-                }
+        // تحديث حالة المباراة
+        switch (matchData.status) {
+            case 'waiting':
+                handleWaitingState(matchData);
                 break;
                 
-            case 'question_waiting':
-                showQuestion(battleData);
+            case 'starting':
+                handleStartingState(matchData);
                 break;
                 
-            case 'question_result':
-                showQuestionResult(battleData);
+            case 'in_progress':
+                handleInProgressState(matchData);
                 break;
                 
             case 'finished':
-                endBattle(battleData);
+                handleFinishedState(matchData);
                 break;
                 
-            case 'player_disconnected':
-                handleDisconnection(battleData);
+            case 'disconnected':
+                handleDisconnectedState(matchData);
                 break;
-        }
-        
-        // تحديث آخر نشاط
-        if (battleData.player1 === currentUser.uid || battleData.player2 === currentUser.uid) {
-            updateDoc(battleRef, {
-                lastActivity: serverTimestamp()
-            });
         }
     });
 }
 
-async function joinBattle(battleId) {
-    const battleRef = doc(db, "battles", battleId);
-    const battleSnap = await getDoc(battleRef);
+// ====== 5. معالجة حالات المباراة ======
+
+// حالة الانتظار
+function handleWaitingState(matchData) {
+    const isPlayer1 = matchData.player1.uid === currentUser.uid;
+    const player = isPlayer1 ? matchData.player1 : matchData.player2;
+    const opponent = isPlayer1 ? matchData.player2 : matchData.player1;
     
-    if (!battleSnap.exists()) {
-        showBeautifulAlert('error', 'خطأ', 'المباراة لم تعد موجودة');
+    // التحقق من جاهزية الخصم
+    if (opponent.ready && !player.ready) {
+        showBeautifulAlert('info', 'الخصم جاهز', `${opponent.name} جاهز للبدء!`);
+    }
+    
+    // تحديث واجهة الانتظار
+    updateWaitingUI(matchData);
+}
+
+// حالة البدء
+async function handleStartingState(matchData) {
+    // إخفاء شاشة VS وبدء المباراة
+    document.getElementById('vs-screen').classList.add('hidden');
+    
+    // بدء المباراة
+    startOnlineGame(matchData);
+    
+    // تحديث حالة المستخدم إلى جاهز
+    await updateMatchStatus(gameId, {
+        [`player${matchData.player1.uid === currentUser.uid ? '1' : '2'}.ready`]: true
+    });
+}
+
+// حالة المباراة قيد التقدم
+function handleInProgressState(matchData) {
+    if (!isGameActive) {
         return;
     }
     
-    const battleData = battleSnap.data();
-    const isPlayer1 = battleData.player1 === currentUser.uid;
+    // تحديث النتائج
+    const isPlayer1 = matchData.player1.uid === currentUser.uid;
+    const myScore = isPlayer1 ? matchData.player1.score : matchData.player2.score;
+    const opponentScore = isPlayer1 ? matchData.player2.score : matchData.player1.score;
     
-    // التحقق من أن اللاعب الآخر جاهز
-    if (battleData.status === 'starting') {
-        // تغيير الحالة إلى نشطة
-        await updateDoc(battleRef, {
-            status: 'active',
-            [`player${isPlayer1 ? '1' : '2'}Joined`]: true,
-            startTime: serverTimestamp()
-        });
-        
-        // إظهار واجهة المباراة
-        showBattleUI(battleData);
-        
-    } else if (battleData.status === 'active') {
-        // المباراة بدأت بالفعل، الانضمام
-        showBattleUI(battleData);
+    // تحديث النتيجة على الشاشة
+    document.getElementById('game-my-score').textContent = myScore;
+    document.getElementById('game-op-score').textContent = opponentScore;
+    
+    // التحقق من الإجابات
+    checkOpponentAnswer(matchData);
+    
+    // التحقق من انتهاء المباراة
+    if (matchData.currentQuestion >= matchData.questions.length) {
+        endOnlineGame(matchData);
     }
 }
 
-function showBattleUI(battleData) {
-    const isPlayer1 = battleData.player1 === currentUser.uid;
+// حالة المباراة المنتهية
+function handleFinishedState(matchData) {
+    if (!matchData.winner) return;
     
+    const isPlayer1 = matchData.player1.uid === currentUser.uid;
+    const isWinner = (isPlayer1 && matchData.winner === 'player1') || 
+                    (!isPlayer1 && matchData.winner === 'player2');
+    
+    // إخفاء شاشة اللعبة
+    document.getElementById('game-overlay').classList.add('hidden');
+    
+    // عرض النتيجة النهائية
+    showFinalResult(matchData, isWinner);
+    
+    // إرسال إشعار النتيجة
+    sendGameResultNotification(matchData, isWinner);
+}
+
+// حالة انقطاع الاتصال
+function handleDisconnectedState(matchData) {
+    const disconnectedPlayer = matchData.disconnectedPlayer;
+    const isMe = disconnectedPlayer === currentUser.uid;
+    
+    if (isMe) {
+        showBeautifulAlert('error', 'انقطاع', 'انقطع اتصالك باللعبة');
+        cancelSearch();
+    } else {
+        showBeautifulAlert('warning', 'انقطع الخصم', 'انقطع اتصال الخصم. انتظر 30 ثانية أو اخرج');
+        
+        // بدء مؤقت الانقطاع
+        startDisconnectTimer(matchData);
+    }
+}
+
+// ====== 6. بدء المباراة عبر الإنترنت ======
+function startOnlineGame(matchData) {
+    // إعداد اللعبة
+    myScore = 0;
+    opponentScore = 0;
+    currentQuestionIndex = 0;
+    playerAnswers = [];
+    opponentAnswers = [];
+    isGameActive = true;
+    
+    // تحميل الأسئلة
+    gameQuestions = matchData.questions || [];
+    
+    // إظهار واجهة اللعبة
     document.getElementById('game-overlay').classList.remove('hidden');
     
-    // تعيين بيانات اللاعبين
-    document.getElementById('game-p1-img').src = isPlayer1 ? userData.photo : battleData.player2Photo;
-    document.getElementById('p1-name').textContent = isPlayer1 ? userData.name : battleData.player2Name;
-    document.getElementById('game-my-score').textContent = isPlayer1 ? battleData.player1Score : battleData.player2Score;
+    // تحديث بيانات اللاعبين
+    const isPlayer1 = matchData.player1.uid === currentUser.uid;
     
-    document.getElementById('game-p2-img').src = isPlayer1 ? battleData.player2Photo : userData.photo;
-    document.getElementById('p2-name').textContent = isPlayer1 ? battleData.player2Name : userData.name;
-    document.getElementById('game-op-score').textContent = isPlayer1 ? battleData.player2Score : battleData.player1Score;
+    document.getElementById('game-p1-img').src = isPlayer1 ? userData.photo : matchData.player2.photo;
+    document.getElementById('p1-name').textContent = isPlayer1 ? userData.name : matchData.player2.name;
+    document.getElementById('game-my-score').textContent = myScore;
+    
+    document.getElementById('game-p2-img').src = isPlayer1 ? matchData.player2.photo : userData.photo;
+    document.getElementById('p2-name').textContent = isPlayer1 ? matchData.player2.name : userData.name;
+    document.getElementById('game-op-score').textContent = opponentScore;
     
     // زر الانسحاب
     const withdrawBtn = document.getElementById('withdraw-game-btn');
     withdrawBtn.classList.remove('hidden');
-    withdrawBtn.onclick = () => withdrawFromBattle(battleData);
+    withdrawBtn.onclick = () => withdrawFromOnlineGame(matchData.matchId);
     
-    // بدء السؤال الأول بعد 2 ثانية
-    setTimeout(() => {
-        startNextQuestion(battleData);
-    }, 2000);
+    // بدء السؤال الأول
+    showNextOnlineQuestion(matchData);
+    
+    // بدء نظام Heartbeat
+    startHeartbeat(matchData.matchId);
 }
 
-async function startNextQuestion(battleData) {
-    const battleRef = doc(db, "battles", gameId);
-    const currentQIndex = battleData.currentQuestion || 0;
-    
-    if (currentQIndex >= battleData.questions.length) {
-        // انتهت الأسئلة
-        await updateDoc(battleRef, {
-            status: 'finished',
-            endTime: serverTimestamp()
-        });
+// ====== 7. عرض الأسئلة عبر الإنترنت ======
+function showNextOnlineQuestion(matchData) {
+    if (!isGameActive || currentQuestionIndex >= gameQuestions.length) {
         return;
     }
     
-    // بدء سؤال جديد
-    await updateDoc(battleRef, {
-        status: 'question_waiting',
-        questionStartTime: serverTimestamp(),
-        questionTimer: 15,
-        player1Answered: false,
-        player2Answered: false,
-        player1Answer: null,
-        player2Answer: null,
-        questionCorrectAnswer: battleData.questions[currentQIndex].correct
-    });
+    const question = gameQuestions[currentQuestionIndex];
     
-    // بدء المؤقت
-    startQuestionTimer();
-}
-
-function startQuestionTimer() {
-    if (battleTimerInterval) clearInterval(battleTimerInterval);
-    
-    let timeLeft = 15;
-    document.getElementById('game-timer').textContent = timeLeft;
-    
-    battleTimerInterval = setInterval(async () => {
-        timeLeft--;
-        document.getElementById('game-timer').textContent = timeLeft;
-        
-        if (timeLeft <= 0) {
-            clearInterval(battleTimerInterval);
-            await handleQuestionTimeout();
-        }
-    }, 1000);
-}
-
-async function handleQuestionTimeout() {
-    const battleRef = doc(db, "battles", gameId);
-    const battleSnap = await getDoc(battleRef);
-    
-    if (!battleSnap.exists()) return;
-    
-    const battleData = battleSnap.data();
-    const isPlayer1 = battleData.player1 === currentUser.uid;
-    
-    // إذا لم يجب اللاعب، تعتبر إجابته خاطئة
-    if ((isPlayer1 && !battleData.player1Answered) || (!isPlayer1 && !battleData.player2Answered)) {
-        await submitAnswer(null, false);
-    }
-    
-    // الانتقال لنتيجة السؤال
-    await updateDoc(battleRef, {
-        status: 'question_result',
-        resultShown: false
-    });
-    
-    // عرض النتيجة لمدة 3 ثواني
-    setTimeout(async () => {
-        await updateDoc(battleRef, {
-            currentQuestion: battleData.currentQuestion + 1,
-            status: 'active'
-        });
-        
-        // بدء السؤال التالي
-        setTimeout(() => {
-            startNextQuestion(battleData);
-        }, 1000);
-    }, 3000);
-}
-
-async function submitAnswer(answer, isCorrect) {
-    const battleRef = doc(db, "battles", gameId);
-    const battleSnap = await getDoc(battleRef);
-    
-    if (!battleSnap.exists()) return;
-    
-    const battleData = battleSnap.data();
-    const isPlayer1 = battleData.player1 === currentUser.uid;
-    
-    // تحديث إجابة اللاعب
-    const updateData = {
-        [`player${isPlayer1 ? '1' : '2'}Answered`]: true,
-        [`player${isPlayer1 ? '1' : '2'}Answer`]: answer,
-        [`player${isPlayer1 ? '1' : '2'}AnswerTime`]: serverTimestamp()
-    };
-    
-    if (isCorrect) {
-        updateData[`player${isPlayer1 ? '1' : '2'}Score`] = increment(1);
-    }
-    
-    await updateDoc(battleRef, updateData);
-    
-    // التحقق إذا أجاب كلا اللاعبين
-    const newSnap = await getDoc(battleRef);
-    const newData = newSnap.data();
-    
-    if (newData.player1Answered && newData.player2Answered) {
-        // الانتقال لنتيجة السؤال
-        clearInterval(battleTimerInterval);
-        await updateDoc(battleRef, {
-            status: 'question_result'
-        });
-    }
-}
-
-function showQuestion(battleData) {
-    const currentQIndex = battleData.currentQuestion || 0;
-    const question = battleData.questions[currentQIndex];
-    
-    if (!question) return;
-    
-    // تحديث واجهة السؤال
-    document.getElementById('q-progress').textContent = `${currentQIndex + 1} / ${battleData.questions.length}`;
+    // تحديث تقدم السؤال
+    document.getElementById('q-progress').textContent = `${currentQuestionIndex + 1} / ${gameQuestions.length}`;
     document.getElementById('q-text').textContent = question.question;
     
     const answersContainer = document.getElementById('answers-container');
     answersContainer.innerHTML = '';
     
-    // إخفاء رسائل الانتظار
+    // إخفاء الرسائل
     document.getElementById('waiting-msg').classList.add('hidden');
-    
-    const isPlayer1 = battleData.player1 === currentUser.uid;
-    const playerAnswered = isPlayer1 ? battleData.player1Answered : battleData.player2Answered;
-    
-    if (playerAnswered) {
-        document.getElementById('waiting-msg').classList.remove('hidden');
-        document.getElementById('waiting-msg').textContent = '⏳ منتظر إجابة الخصم...';
-        return;
-    }
+    document.getElementById('ai-thinking-msg').classList.add('hidden');
     
     // عرض الخيارات
     if (question.type === 'mcq') {
@@ -7795,259 +7926,421 @@ function showQuestion(battleData) {
             const btn = document.createElement('button');
             btn.className = 'w-full bg-white border-2 border-gray-200 rounded-xl p-4 text-right font-bold text-gray-700 hover:bg-gray-50 transition answer-neutral';
             btn.textContent = answer;
-            btn.onclick = () => handleAnswerClick(index, question);
+            btn.onclick = () => selectOnlineAnswer(index, question, matchData.matchId);
             answersContainer.appendChild(btn);
         });
     } else {
         const trueBtn = document.createElement('button');
         trueBtn.className = 'w-full bg-white border-2 border-gray-200 rounded-xl p-4 text-right font-bold text-gray-700 hover:bg-gray-50 transition answer-neutral';
         trueBtn.textContent = 'صح';
-        trueBtn.onclick = () => handleAnswerClick(true, question);
+        trueBtn.onclick = () => selectOnlineAnswer(true, question, matchData.matchId);
         answersContainer.appendChild(trueBtn);
         
         const falseBtn = document.createElement('button');
         falseBtn.className = 'w-full bg-white border-2 border-gray-200 rounded-xl p-4 text-right font-bold text-gray-700 hover:bg-gray-50 transition answer-neutral';
         falseBtn.textContent = 'خطأ';
-        falseBtn.onclick = () => handleAnswerClick(false, question);
+        falseBtn.onclick = () => selectOnlineAnswer(false, question, matchData.matchId);
         answersContainer.appendChild(falseBtn);
     }
+    
+    // بدء المؤقت
+    startOnlineTimer(matchData.matchId, question);
+    
+    // تحديث السؤال الحالي في قاعدة البيانات
+    updateCurrentQuestion(matchData.matchId, currentQuestionIndex);
 }
 
-async function handleAnswerClick(answer, question) {
+// ====== 8. نظام المؤقت عبر الإنترنت ======
+function startOnlineTimer(matchId, question) {
+    let timeLeft = 15;
+    document.getElementById('game-timer').textContent = timeLeft;
+    
+    // إرسال بدء المؤقت للخصم
+    sendTimerStart(matchId, timeLeft);
+    
+    if (gameTimerInterval) clearInterval(gameTimerInterval);
+    
+    gameTimerInterval = setInterval(async () => {
+        timeLeft--;
+        document.getElementById('game-timer').textContent = timeLeft;
+        
+        // تحديث المؤقت للخصم
+        if (timeLeft % 5 === 0) {
+            updateTimer(matchId, timeLeft);
+        }
+        
+        // عند انتهاء الوقت
+        if (timeLeft <= 0) {
+            clearInterval(gameTimerInterval);
+            
+            // تسجيل الإجابة كخاطئة
+            await handleTimeoutOnline(matchId, question);
+            
+            // الانتقال للسؤال التالي
+            currentQuestionIndex++;
+            if (currentQuestionIndex < gameQuestions.length) {
+                setTimeout(() => {
+                    showNextOnlineQuestion(matchData);
+                }, 2000);
+            } else {
+                endOnlineGame();
+            }
+        }
+    }, 1000);
+}
+
+// ====== 9. اختيار الإجابة عبر الإنترنت ======
+async function selectOnlineAnswer(answer, question, matchId) {
+    if (!isGameActive) return;
+    
+    clearInterval(gameTimerInterval);
+    
     const isCorrect = answer === question.correct;
     
-    // تعطيل جميع الأزرار
-    const buttons = document.querySelectorAll('#answers-container button');
-    buttons.forEach(btn => {
-        btn.disabled = true;
-        btn.classList.add('opacity-50');
+    // تسجيل الإجابة
+    playerAnswers.push({
+        questionIndex: currentQuestionIndex,
+        answer: answer,
+        isCorrect: isCorrect,
+        time: Date.now()
     });
     
-    // تسليط الضوء على الإجابة المختارة
-    if (question.type === 'mcq') {
-        buttons.forEach((btn, index) => {
-            if (index === answer) {
-                btn.classList.add(isCorrect ? 'border-green-500' : 'border-red-500');
-            }
-        });
-    } else {
-        buttons.forEach(btn => {
-            if ((btn.textContent === 'صح' && answer === true) || 
-                (btn.textContent === 'خطأ' && answer === false)) {
-                btn.classList.add(isCorrect ? 'border-green-500' : 'border-red-500');
-            }
-        });
+    // تحديث النتيجة
+    if (isCorrect) {
+        myScore++;
+        document.getElementById('game-my-score').textContent = myScore;
+        
+        // تحديث النتيجة في قاعدة البيانات
+        await updatePlayerScore(matchId, myScore);
     }
     
-    // إرسال الإجابة
-    await submitAnswer(answer, isCorrect);
+    // إرسال الإجابة للخصم
+    await sendAnswerToOpponent(matchId, currentQuestionIndex, answer, isCorrect);
     
-    // إظهار رسالة الانتظار
-    document.getElementById('waiting-msg').classList.remove('hidden');
-    document.getElementById('waiting-msg').textContent = '⏳ منتظر إجابة الخصم...';
+    // عرض النتيجة
+    highlightAnswers(answer, question, isCorrect);
+    
+    // الانتقال للسؤال التالي بعد تأخير
+    setTimeout(async () => {
+        currentQuestionIndex++;
+        
+        if (currentQuestionIndex < gameQuestions.length) {
+            showNextOnlineQuestion(matchData);
+        } else {
+            await endOnlineGame();
+        }
+    }, 2000);
 }
 
-function showQuestionResult(battleData) {
-    const currentQIndex = battleData.currentQuestion || 0;
-    const question = battleData.questions[currentQIndex];
+// ====== 10. نظام Heartbeat (نبضات الحياة) ======
+function startHeartbeat(matchId) {
+    if (opponentHeartbeatInterval) clearInterval(opponentHeartbeatInterval);
     
-    if (!question) return;
-    
-    const answersContainer = document.getElementById('answers-container');
-    const buttons = answersContainer.querySelectorAll('button');
-    
-    // تسليط الضوء على الإجابات الصحيحة والخاطئة
-    if (question.type === 'mcq') {
-        buttons.forEach((btn, index) => {
-            // الإجابة الصحيحة
-            if (index === question.correct) {
-                btn.classList.remove('answer-neutral', 'border-gray-200');
-                btn.classList.add('answer-correct');
+    // إرسال نبضة كل 5 ثواني
+    opponentHeartbeatInterval = setInterval(async () => {
+        try {
+            await updateDoc(doc(db, "online_matches", matchId), {
+                lastActivity: serverTimestamp(),
+                [`player${matchData.player1.uid === currentUser.uid ? '1' : '2'}.lastHeartbeat`]: Date.now()
+            });
+            
+            // التحقق من نبضات الخصم
+            await checkOpponentHeartbeat(matchId);
+            
+        } catch (error) {
+            console.error("❌ خطأ في إرسال Heartbeat:", error);
+        }
+    }, 5000);
+}
+
+// التحقق من نبضات الخصم
+async function checkOpponentHeartbeat(matchId) {
+    try {
+        const matchSnap = await getDoc(doc(db, "online_matches", matchId));
+        if (!matchSnap.exists()) return;
+        
+        const matchData = matchSnap.data();
+        const isPlayer1 = matchData.player1.uid === currentUser.uid;
+        const opponentHeartbeat = isPlayer1 ? matchData.player2.lastHeartbeat : matchData.player1.lastHeartbeat;
+        
+        if (opponentHeartbeat) {
+            const timeSinceHeartbeat = Date.now() - opponentHeartbeat;
+            
+            // إذا مر أكثر من 30 ثانية بدون نبضات
+            if (timeSinceHeartbeat > 30000) {
+                handleOpponentDisconnected();
             }
-            
-            // إجابات اللاعبين
-            const isPlayer1 = battleData.player1 === currentUser.uid;
-            const playerAnswer = isPlayer1 ? battleData.player1Answer : battleData.player2Answer;
-            const opponentAnswer = isPlayer1 ? battleData.player2Answer : battleData.player1Answer;
-            
-            // إجابتي (إذا كانت خاطئة)
-            if (index === playerAnswer && playerAnswer !== question.correct) {
-                btn.classList.remove('answer-neutral', 'border-gray-200');
-                btn.classList.add('answer-wrong');
-            }
-            
-            // إجابة الخصم (إذا كانت خاطئة)
-            if (index === opponentAnswer && opponentAnswer !== question.correct) {
-                btn.classList.add('opacity-50', 'line-through');
-            }
-        });
-    } else {
-        buttons.forEach(btn => {
-            const isTrueButton = btn.textContent === 'صح';
-            
-            // الإجابة الصحيحة
-            if ((isTrueButton && question.correct === true) || 
-                (!isTrueButton && question.correct === false)) {
-                btn.classList.remove('answer-neutral', 'border-gray-200');
-                btn.classList.add('answer-correct');
-            }
-            
-            // إجابات اللاعبين
-            const isPlayer1 = battleData.player1 === currentUser.uid;
-            const playerAnswer = isPlayer1 ? battleData.player1Answer : battleData.player2Answer;
-            
-            // إجابتي (إذا كانت خاطئة)
-            if ((isTrueButton && playerAnswer === true && question.correct === false) ||
-                (!isTrueButton && playerAnswer === false && question.correct === true)) {
-                btn.classList.remove('answer-neutral', 'border-gray-200');
-                btn.classList.add('answer-wrong');
-            }
-        });
+        }
+    } catch (error) {
+        console.error("❌ خطأ في التحقق من Heartbeat:", error);
     }
 }
 
-async function endBattle(battleData) {
-    clearInterval(battleTimerInterval);
-    if (battleListener) battleListener();
+// ====== 11. معالجة انقطاع الاتصال ======
+function handleOpponentDisconnected() {
+    if (!isGameActive) return;
     
-    const isPlayer1 = battleData.player1 === currentUser.uid;
-    const myScore = isPlayer1 ? battleData.player1Score : battleData.player2Score;
-    const opponentScore = isPlayer1 ? battleData.player2Score : battleData.player1Score;
+    showBeautifulAlert('warning', 'انقطع الخصم', 'انقطع اتصال الخصم. انتظر 30 ثانية...');
     
-    // إخفاء واجهة المباراة
+    // بدء مؤقت الانقطاع
+    const disconnectTimer = setTimeout(async () => {
+        if (isGameActive) {
+            // إذا لم يعد الخصم خلال 30 ثانية، اعتبارك الفائز
+            await declareWinnerByDisconnect();
+        }
+    }, 30000);
+    
+    // زر الخروج السريع
+    const quickExitBtn = document.createElement('button');
+    quickExitBtn.className = 'mt-4 bg-red-500 text-white px-4 py-2 rounded-lg';
+    quickExitBtn.textContent = 'خروج سريع (+10 نقاط)';
+    quickExitBtn.onclick = async () => {
+        clearTimeout(disconnectTimer);
+        await declareWinnerByDisconnect();
+    };
+    
+    document.querySelector('#game-overlay .p-5').appendChild(quickExitBtn);
+}
+
+async function declareWinnerByDisconnect() {
+    const pointsGained = 10;
+    
+    await updateUserPoints(pointsGained);
+    
+    showBeautifulAlert('success', 'فوز', `🏆 فزت بسبب انقطاع الخصم! +${pointsGained} نقاط`);
+    
+    // إنهاء المباراة
+    await endMatch(gameId, 'disconnected');
+    
     document.getElementById('game-overlay').classList.add('hidden');
+    document.getElementById('challenge-active-card').classList.remove('hidden');
+}
+
+// ====== 12. إنهاء المباراة ======
+async function endOnlineGame() {
+    isGameActive = false;
     
-    // حساب النقاط المكتسبة
+    // تنظيف المؤقتات
+    if (gameTimerInterval) clearInterval(gameTimerInterval);
+    if (opponentHeartbeatInterval) clearInterval(opponentHeartbeatInterval);
+    if (gameConnection) gameConnection();
+    
+    // حساب النتيجة النهائية
+    const finalMyScore = myScore;
+    const finalOpponentScore = opponentScore;
+    
+    // تحديد الفائز
+    let winner = null;
     let pointsGained = 0;
-    const pointsMultiplier = (userData.isPremium && isPremiumValid(userData)) ? 2 : 1;
     
-    if (myScore > opponentScore) {
-        pointsGained = myScore * 3 * pointsMultiplier;
-    } else if (myScore < opponentScore) {
-        pointsGained = Math.floor(myScore * 0.5 * pointsMultiplier);
+    if (finalMyScore > finalOpponentScore) {
+        winner = currentUser.uid;
+        pointsGained = finalMyScore * 2;
+    } else if (finalMyScore < finalOpponentScore) {
+        winner = opponentId;
+        pointsGained = Math.floor(finalMyScore * 0.5);
     } else {
-        pointsGained = myScore * 2 * pointsMultiplier;
+        pointsGained = finalMyScore;
+    }
+    
+    // مضاعفة النقاط للمشتركين المميزين
+    if (userData.isPremium && isPremiumValid(userData)) {
+        pointsGained *= 2;
     }
     
     // تحديث نقاط المستخدم
     await updateUserPoints(pointsGained);
     
-    // إرسال إشعار المباراة
-    await sendGameNotification(
-        currentUser.uid,
-        `${myScore}-${opponentScore}`,
-        isPlayer1 ? battleData.player2Name : battleData.player1Name,
-        pointsGained,
-        false,
-        false
-    );
+    // تحديث نتيجة المباراة
+    await updateMatchResult(gameId, winner, {
+        player1Score: matchData.player1.uid === currentUser.uid ? finalMyScore : finalOpponentScore,
+        player2Score: matchData.player2.uid === currentUser.uid ? finalMyScore : finalOpponentScore
+    });
     
-    // عرض شاشة النتائج
-    showResultScreen(myScore, opponentScore, pointsGained, 
-                    isPlayer1 ? battleData.player2Name : battleData.player1Name);
+    // إظهار النتيجة النهائية
+    showFinalResultOnline(finalMyScore, finalOpponentScore, pointsGained);
 }
 
-async function withdrawFromBattle(battleData) {
+// ====== 13. إلغاء البحث ======
+window.cancelSearch = function(reason) {
+    if (matchmakingInterval) {
+        clearInterval(matchmakingInterval);
+        matchmakingInterval = null;
+    }
+    
+    if (currentSearch) {
+        // حذف البحث من قاعدة البيانات
+        deleteDoc(doc(db, "matchmaking_searches", currentSearch.searchId));
+        currentSearch = null;
+    }
+    
+    document.getElementById('searching-ui').classList.add('hidden');
+    document.getElementById('challenge-active-card').classList.remove('hidden');
+    
+    if (reason) {
+        showBeautifulAlert('info', 'تم الإلغاء', reason);
+    }
+};
+
+// ====== 14. مساعدة الخصم ======
+async function sendAnswerToOpponent(matchId, questionIndex, answer, isCorrect) {
+    try {
+        await updateDoc(doc(db, "online_matches", matchId), {
+            [`answers.q${questionIndex}_${currentUser.uid}`]: {
+                answer: answer,
+                isCorrect: isCorrect,
+                timestamp: Date.now()
+            }
+        });
+    } catch (error) {
+        console.error("❌ خطأ في إرسال الإجابة:", error);
+    }
+}
+
+async function updatePlayerScore(matchId, score) {
+    try {
+        const isPlayer1 = matchData.player1.uid === currentUser.uid;
+        await updateDoc(doc(db, "online_matches", matchId), {
+            [`player${isPlayer1 ? '1' : '2'}.score`]: score
+        });
+    } catch (error) {
+        console.error("❌ خطأ في تحديث النتيجة:", error);
+    }
+}
+
+// ====== 15. دعم Firebase Functions ======
+// هذه تحتاج إلى إعداد Firebase Functions منفصل
+// سأقدم الكود الأساسي هنا
+
+// دالة لتحديث المباراة
+async function updateMatchStatus(matchId, updates) {
+    try {
+        await updateDoc(doc(db, "online_matches", matchId), updates);
+    } catch (error) {
+        console.error("❌ خطأ في تحديث المباراة:", error);
+    }
+}
+
+// ====== 16. دوال المساعدة ======
+function updateWaitingUI(matchData) {
+    // يمكن تحديث واجهة الانتظار هنا
+    console.log("جاري تحديث واجهة الانتظار...");
+}
+
+function showFinalResultOnline(myScore, opponentScore, pointsGained) {
+    // تحديث عناصر النتيجة
+    document.getElementById('final-my-score').textContent = myScore;
+    document.getElementById('final-op-score').textContent = opponentScore;
+    document.getElementById('final-op-name').textContent = opponentData.name;
+    
+    // تحديد نتيجة المباراة
+    let resultTitle, resultMsg, resultIcon;
+    
+    if (myScore > opponentScore) {
+        resultTitle = '🎉 انتصرت!';
+        resultMsg = 'أحسنت! لقد فزت في هذه المباراة';
+        resultIcon = '🏆';
+    } else if (myScore < opponentScore) {
+        resultTitle = '💔 خسرت';
+        resultMsg = 'حاول مرة أخرى في المرة القادمة';
+        resultIcon = '😢';
+    } else {
+        resultTitle = '🤝 تعادل';
+        resultMsg = 'نتيجة متكافئة بين الطرفين';
+        resultIcon = '⚖️';
+    }
+    
+    document.getElementById('result-title').textContent = resultTitle;
+    document.getElementById('result-msg').textContent = resultMsg;
+    document.getElementById('result-icon-container').textContent = resultIcon;
+    
+    const resultPoints = document.getElementById('result-points-gained-text');
+    resultPoints.textContent = pointsGained > 0 ? `+${pointsGained}` : `${pointsGained}`;
+    
+    // تلوين صندوق النقاط
+    const pointsBox = resultPoints.parentElement;
+    if (pointsGained > 0) {
+        pointsBox.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%)';
+    } else if (pointsGained < 0) {
+        pointsBox.style.background = 'linear-gradient(135deg, #fee2e2 0%, #f87171 100%)';
+    } else {
+        pointsBox.style.background = 'linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%)';
+    }
+    
+    // عرض شاشة النتائج
+    document.getElementById('result-screen').classList.remove('hidden');
+}
+
+// ====== 17. التنظيف عند الخروج ======
+window.withdrawFromOnlineGame = async function(matchId) {
     if (!confirm('هل أنت متأكد من الانسحاب؟ سيتم خصم 10 نقاط وسيحصل الخصم على 10 نقاط.')) {
         return;
     }
     
-    const isPlayer1 = battleData.player1 === currentUser.uid;
+    isGameActive = false;
     
-    // خصم النقاط
+    // تنظيف المؤقتات والمستمعين
+    if (gameTimerInterval) clearInterval(gameTimerInterval);
+    if (opponentHeartbeatInterval) clearInterval(opponentHeartbeatInterval);
+    if (gameConnection) gameConnection();
+    
+    // خصم 10 نقاط
     await updateUserPoints(-10);
     
-    // منح الخصم النقاط
-    const opponentId = isPlayer1 ? battleData.player2 : battleData.player1;
-    await updateDoc(doc(db, "users", opponentId), {
-        points: increment(10)
-    });
+    // منح الخصم 10 نقاط
+    if (opponentId) {
+        await updateDoc(doc(db, "users", opponentId), {
+            points: increment(10)
+        });
+    }
     
-    // تحديث حالة المباراة
-    const battleRef = doc(db, "battles", gameId);
-    await updateDoc(battleRef, {
-        status: 'player_withdrew',
+    // إنهاء المباراة
+    await updateMatchStatus(matchId, {
+        status: 'finished',
         winner: opponentId,
-        endTime: serverTimestamp()
+        reason: 'withdrawal'
     });
-    
-    // إغلاق المباراة
-    clearInterval(battleTimerInterval);
-    if (battleListener) battleListener();
-    
-    document.getElementById('game-overlay').classList.add('hidden');
     
     showBeautifulAlert('warning', 'انسحاب', 'لقد انسحبت من المباراة وتم خصم 10 نقاط منك.');
-}
+    
+    document.getElementById('game-overlay').classList.add('hidden');
+    document.getElementById('searching-ui').classList.add('hidden');
+    document.getElementById('challenge-active-card').classList.remove('hidden');
+};
 
-// تحسين تحميل الأسئلة
-async function loadGameQuestionsForBattle(subject, questionType, count) {
+// ====== 18. تهيئة النظام ======
+// إضافة استدعاء للتهيئة عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    // تنظيف أي مباريات سابقة للمستخدم
+    cleanupPreviousMatches();
+});
+
+async function cleanupPreviousMatches() {
     try {
         const q = query(
-            collection(db, "questions"),
-            where("grade", "==", userData.grade),
-            where("subject", "==", subject),
-            where("type", "==", questionType),
-            limit(50)
-        );
-        
-        const snap = await getDocs(q);
-        const questions = [];
-        
-        snap.forEach(doc => {
-            questions.push({ id: doc.id, ...doc.data() });
-        });
-        
-        if (questions.length < count) {
-            throw new Error(`لا توجد أسئلة كافية (${questions.length} فقط)`);
-        }
-        
-        // خلط الأسئلة واختيار العدد المطلوب
-        return shuffleArray(questions).slice(0, count);
-        
-    } catch (error) {
-        console.error("خطأ في تحميل الأسئلة:", error);
-        throw error;
-    }
-}
-
-// نظام تنظيف المباريات القديمة
-setInterval(async () => {
-    try {
-        const q = query(
-            collection(db, "battles"),
-            where("createdAt", "<", Timestamp.fromDate(new Date(Date.now() - 30 * 60 * 1000))), // أقدم من 30 دقيقة
-            where("status", "in", ['starting', 'active', 'question_waiting'])
+            collection(db, "online_matches"),
+            where("status", "in", ['waiting', 'starting', 'in_progress']),
+            where("player1.uid", "==", currentUser?.uid)
         );
         
         const snap = await getDocs(q);
         const batch = writeBatch(db);
         
         snap.forEach(doc => {
-            batch.delete(doc.ref);
+            batch.update(doc.ref, {
+                status: 'cancelled',
+                reason: 'cleanup'
+            });
         });
         
         await batch.commit();
         
-        // تنظيف طلبات المطابقة القديمة
-        const q2 = query(
-            collection(db, "matchmaking_queue"),
-            where("timestamp", "<", Date.now() - 5 * 60 * 1000) // أقدم من 5 دقائق
-        );
-        
-        const snap2 = await getDocs(q2);
-        const batch2 = writeBatch(db);
-        
-        snap2.forEach(doc => {
-            batch2.delete(doc.ref);
-        });
-        
-        await batch2.commit();
-        
     } catch (error) {
-        console.error("خطأ في التنظيف:", error);
+        console.error("❌ خطأ في تنظيف المباريات السابقة:", error);
     }
-}, 5 * 60 * 1000); // كل 5 دقائق
+}
+
+
 
     </script>
 </body>
