@@ -70,34 +70,40 @@ class SmartMatchmaking {
     }
 
     async findExistingMatch(userData, subject, type) {
-        const grade = userData.grade;
-        let group = `${grade}_${subject}`;
-        
-        if (['اسلامية', 'عربي', 'انكليزي'].includes(subject) && ['6sci', '6lit'].includes(grade)) {
-            group = `6shared_${subject}`;
-        }
+    const grade = userData.grade;
+    let group = `${grade}_${subject}`;
+    
+    if (['اسلامية', 'عربي', 'انكليزي'].includes(subject) && ['6sci', '6lit'].includes(grade)) {
+        group = `6shared_${subject}`;
+    }
 
+    try {
         const q = query(
             collection(db, "match_queue"),
             where("group", "==", group),
             where("status", "==", "waiting"),
-            where("player1.grade", "==", grade),
+            where("grade", "==", grade),
             limit(1)
         );
 
         const snapshot = await getDocs(q);
+        
         if (!snapshot.empty) {
             const doc = snapshot.docs[0];
             const data = doc.data();
             
             // تحقق أن اللاعب ليس هو نفسه
-            if (data.player1.uid !== userData.uid) {
+            if (data.player1 && data.player1.uid !== userData.uid) {
                 return { id: doc.id, data: data };
             }
         }
         
         return null;
+    } catch (error) {
+        console.error('Error finding existing match:', error);
+        return null;
     }
+}
 
     async createMatch(userData, subject, type, questions) {
         const grade = userData.grade;
@@ -131,7 +137,8 @@ class SmartMatchmaking {
             grade: grade,
             createdAt: serverTimestamp(),
             lastActivity: Date.now(),
-            expiresAt: Date.now() + 300000 // 5 دقائق
+            expiresAt: Date.now() + 300000, // 5 دقائق
+lastActivity: Date.now()
         };
 
         const docRef = await addDoc(collection(db, "match_queue"), matchData);
@@ -167,10 +174,11 @@ class SmartMatchmaking {
     }
 
     listenToMatch(matchId) {
-        if (this.matchListeners[matchId]) {
-            this.matchListeners[matchId]();
-        }
+    if (this.matchListeners[matchId]) {
+        this.matchListeners[matchId]();
+    }
 
+    try {
         const matchRef = doc(db, "match_queue", matchId);
         
         this.matchListeners[matchId] = onSnapshot(matchRef, (snapshot) => {
@@ -181,8 +189,14 @@ class SmartMatchmaking {
 
             const matchData = snapshot.data();
             this.handleMatchUpdate(matchData);
+        }, (error) => {
+            console.error('Listen error:', error);
+            this.handleDisconnection();
         });
+    } catch (error) {
+        console.error('Error setting up listener:', error);
     }
+}
 
     handleMatchUpdate(matchData) {
         // تحديث نشاط المباراة
