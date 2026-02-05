@@ -1201,11 +1201,6 @@
             <button id="withdraw-game-btn" onclick="withdrawFromGame()" class="withdraw-btn hidden">
                 <i class="fas fa-sign-out-alt"></i> انسحاب
             </button>
-            
-            <!-- أضف هذا الزر في game-overlay بعد زر الانسحاب -->
-<button onclick="showDiagnosticModal()" id="diagnostic-btn" class="withdraw-btn hidden" style="bottom: 80px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
-    <i class="fas fa-heartbeat"></i> تشخيص المشكلة
-</button>
         </div>
 
         <div id="result-screen" class="fixed inset-0 bg-white z-[200] hidden">
@@ -2083,48 +2078,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- أضف هذا الكود قبل </body> مباشرة -->
-<div id="connection-diagnostic-modal" class="modal-overlay hidden">
-    <div class="modal-content relative bg-gradient-to-br from-gray-900 to-gray-800 text-white border-2 border-blue-500">
-        <button onclick="closeDiagnosticModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-            <i class="fas fa-times"></i>
-        </button>
-        <div class="text-center mb-6">
-            <i class="fas fa-heartbeat text-5xl text-red-400 mb-3 animate-pulse"></i>
-            <h2 class="text-2xl font-black text-blue-400">تشخيص انقطاع المباراة</h2>
-            <p class="text-gray-300 text-sm mt-2">تحليل أسباب توقف اللعبة</p>
-        </div>
-        
-        <div class="bg-gray-800 bg-opacity-50 rounded-xl p-4 mb-6">
-            <div class="space-y-4">
-                <div id="diagnostic-result" class="text-right">
-                    <!-- سيتم ملؤها بالنتائج -->
-                </div>
-                
-                <div class="grid grid-cols-2 gap-3 mt-6">
-                    <button onclick="runQuickDiagnostic()" class="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold">
-                        <i class="fas fa-search ml-1"></i> تشخيص سريع
-                    </button>
-                    <button onclick="runFullDiagnostic()" class="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-bold">
-                        <i class="fas fa-stethoscope ml-1"></i> فحص كامل
-                    </button>
-                </div>
-                
-                <div class="mt-6">
-                    <h3 class="text-lg font-bold text-yellow-400 mb-3">🔧 حلول سريعة:</h3>
-                    <div id="quick-fixes" class="space-y-2">
-                        <!-- سيتم ملؤها بالحلول -->
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="text-center text-xs text-gray-400 mt-4">
-            <p>آخر تحديث: <span id="diagnostic-timestamp">--</span></p>
-        </div>
-    </div>
-</div>
 
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -2208,8 +2161,11 @@
             const banScreen = document.getElementById('ban-screen');
 
             if (user) {
-                currentUser = user;
-                console.log("تم تسجيل الدخول بنجاح، UID:", user.uid);
+        currentUser = user;
+        console.log("تم تسجيل الدخول بنجاح، UID:", user.uid);
+        
+        // أضف هذا السطر ↓
+        setupNetworkMonitoring(); // تشغيل مراقبة الشبكة
 
                 try {
                     const docSnap = await getDoc(doc(db, "users", user.uid));
@@ -3331,178 +3287,31 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         }
 
         function listenToMatch(id) {
-    if(matchListenerUnsubscribe) matchListenerUnsubscribe(); 
-    matchListenerUnsubscribe = onSnapshot(doc(db, "match_queue", id), async (snap) => {
-        if(isExitingGame) return;
-        if(!snap.exists()) {
-            if (currentGameMode === 'online') {
-                console.log("❌ المباراة حذفت من السيرفر");
-                logConnectionIssue('MATCH_DELETED', { matchId: id });
-                stopFreezeProtection();
-                return;
-            }
-            return;
-        }
-        const d = snap.data();
-        
-        // تسجيل نشاط المباراة
-        if (d.lastActivity) {
-            const inactiveTime = Date.now() - d.lastActivity;
-            if (inactiveTime > 30000 && d.status === 'active') {
-                logConnectionIssue('MATCH_INACTIVE', { 
-                    matchId: id, 
-                    inactiveSeconds: Math.round(inactiveTime/1000),
-                    answersCount: d.answersCount 
-                });
-            }
-        }
-        
-        // بدء حماية التجميد
-        if (d.status === 'active' && currentGameMode === 'online') {
-            startFreezeProtection();
-        }
-        
-        if(d.status === 'active') {
-            if (document.getElementById('game-overlay').classList.contains('hidden') && !document.getElementById('vs-screen').classList.contains('flex')) {
-                 await showVSAnimation(d.player1, d.player2);
-                 // في دالة listenToMatch عند عرض game-overlay
-document.getElementById('game-overlay').classList.remove('hidden');
-document.getElementById('withdraw-game-btn').classList.remove('hidden');
-document.getElementById('diagnostic-btn').classList.remove('hidden'); // أضف هذا السطر
-                 renderGame(d);
-            } else {
-                 renderGame(d);
-            }
-        }
-    }, (error) => {
-        console.error("❌ خطأ في مستمع المباراة:", error);
-        logConnectionIssue('LISTENER_ERROR', { 
-            errorCode: error.code, 
-            errorMessage: error.message,
-            matchId: currentMatchId 
-        });
-        
-        if (currentGameMode === 'online') {
-            showBeautifulAlert('warning', 'انقطع الاتصال', 'تم فقدان الاتصال بالمباراة، جاري إعادة المحاولة...');
-            setTimeout(() => {
-                if (currentMatchId) {
-                    listenToMatch(currentMatchId);
-                }
-            }, 2000);
-        }
-    });
-}
-        // دالة جديدة لمعالجة انتهاء الوقت
-async function handleTimeOut() {
-    if (currentGameMode !== 'online' || !currentMatchId) return;
-    
-    try {
-        const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
-        if (!matchDoc.exists()) {
-            logConnectionIssue('TIMEOUT_MATCH_MISSING', { matchId: currentMatchId });
-            return;
-        }
-        
-        const matchData = matchDoc.data();
-        const isP1 = matchData.player1.uid === currentUser.uid;
-        
-        console.log("⏰ معالجة انتهاء الوقت للاعب:", isP1 ? "Player 1" : "Player 2");
-        
-        // تسجيل المشكلة
-        logConnectionIssue('TIMEOUT_EXCEEDED', {
-            matchId: currentMatchId,
-            player: isP1 ? 'player1' : 'player2',
-            currentIdx: matchData.currentIdx,
-            answersCount: matchData.answersCount
-        });
-        
-        // زيادة answersCount دون إضافة نقاط
-        await updateDoc(doc(db, "match_queue", currentMatchId), {
-            answersCount: increment(1),
-            lastActivity: Date.now()
-        });
-        
-        // إذا كان هذا اللاعب هو الأول للإجابة، عرض رسالة انتظار
-        const updatedMatch = await getDoc(doc(db, "match_queue", currentMatchId));
-        if (updatedMatch.exists() && updatedMatch.data().answersCount === 1) {
-            document.getElementById('waiting-msg').classList.remove('hidden');
-        }
-        
-    } catch (error) {
-        console.error("❌ خطأ في معالجة انتهاء الوقت:", error);
-        logConnectionIssue('TIMEOUT_HANDLE_ERROR', { error: error.message });
-    }
-}
-
-// دالة للتحقق من تجميد المباراة وإصلاحها
-let freezeCheckInterval = null;
-
-function startFreezeProtection() {
-    if (freezeCheckInterval) clearInterval(freezeCheckInterval);
-    
-    freezeCheckInterval = setInterval(async () => {
-        if (currentGameMode !== 'online' || !currentMatchId || isExitingGame) {
-            clearInterval(freezeCheckInterval);
-            return;
-        }
-        
-        try {
-            const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
-            if (!matchDoc.exists()) {
-                stopFreezeProtection();
-                return;
-            }
-            
-            const matchData = matchDoc.data();
-            const lastActiveTime = matchData.lastActivity || 0;
-            const currentTime = Date.now();
-            
-            // إذا مر أكثر من 45 ثانية دون تحديث، إصلاح تلقائي
-            if ((currentTime - lastActiveTime) > 45000) {
-                console.log("⚡ إصلاح تلقائي للتجميد - آخر نشاط:", Math.round((currentTime - lastActiveTime)/1000), "ثانية مضت");
-                
-                // تحديث lastActivity لمنع تكرار الإصلاح
-                await updateDoc(doc(db, "match_queue", currentMatchId), {
-                    lastActivity: Date.now()
-                }).catch(e => console.error("Update error in freeze protection:", e));
-                
-                // إذا كان answersCount ≥ 2 ولم يتغير السؤال، الانتقال للسؤال التالي
-                if (matchData.answersCount >= 2) {
-                    console.log("🔄 تجميد مع answersCount ≥ 2، الانتقال للسؤال التالي");
-                    if(matchData.player1.uid === currentUser.uid) {
-                        await updateDoc(doc(db, "match_queue", currentMatchId), { 
-                            currentIdx: increment(1), 
-                            answersCount: 0,
-                            lastActivity: Date.now()
-                        }).catch(e => console.error("Auto-advance error:", e));
+            if(matchListenerUnsubscribe) matchListenerUnsubscribe(); 
+            matchListenerUnsubscribe = onSnapshot(doc(db, "match_queue", id), async (snap) => {
+                if(isExitingGame) return;
+                if(!snap.exists()) {
+                    if (currentGameMode === 'online') {
+                        console.log("المباراة حذفت من السيرفر");
+                        return;
                     }
-                } else if (matchData.answersCount === 1 && (currentTime - lastActiveTime) > 60000) {
-                    // إذا أجاب لاعب واحد فقط ومر أكثر من دقيقة
-                    console.log("🔄 لاعب واحد أجاب فقط منذ أكثر من دقيقة، إعادة تعيين");
-                    if(matchData.player1.uid === currentUser.uid) {
-                        await updateDoc(doc(db, "match_queue", currentMatchId), { 
-                            currentIdx: increment(1), 
-                            answersCount: 0,
-                            lastActivity: Date.now()
-                        }).catch(e => console.error("Reset error:", e));
+                    return;
+                }
+                const d = snap.data();
+                
+                if(d.status === 'active') {
+                    if (document.getElementById('game-overlay').classList.contains('hidden') && !document.getElementById('vs-screen').classList.contains('flex')) {
+                         await showVSAnimation(d.player1, d.player2);
+                         document.getElementById('game-overlay').classList.remove('hidden');
+                         document.getElementById('withdraw-game-btn').classList.remove('hidden');
+                         renderGame(d);
+                    } else {
+                         renderGame(d);
                     }
                 }
-            }
-        } catch (error) {
-            console.error("❌ خطأ في حماية التجميد:", error);
+            });
         }
-    }, 10000); // التحقق كل 10 ثواني
-}
-
-function stopFreezeProtection() {
-    if (freezeCheckInterval) {
-        clearInterval(freezeCheckInterval);
-        freezeCheckInterval = null;
-        console.log("✅ توقفت حماية التجميد");
-    }
-}
-
-
+        
         function showVSAnimation(p1, p2) {
             return new Promise(resolve => {
                 document.getElementById('searching-ui').classList.add('hidden');
@@ -3529,172 +3338,169 @@ function stopFreezeProtection() {
         }
 
         function renderGame(data) {
-    if (isExitingGame) return;
-    const totalQs = data.questions.length;
-    if(!data.questions || data.currentIdx >= totalQs) { 
-        endGame(data); 
-        return; 
-    }
-    
-    // تحسن هنا: إضافة تحقق من lastActivity لمنع التجميد
-    const lastActiveTime = data.lastActivity || 0;
-    const currentTime = Date.now();
-    
-    // إذا مر أكثر من 30 ثانية دون نشاط، إعادة تعيين
-    if (currentGameMode === 'online' && (currentTime - lastActiveTime) > 30000) {
-        console.log("🔄 إعادة تعيين بسبب عدم النشاط");
-        if(data.player1.uid === currentUser.uid) {
-            updateDoc(doc(db, "match_queue", currentMatchId), { 
-                currentIdx: increment(1), 
-                answersCount: 0,
-                lastActivity: Date.now()
-            }).catch(e => console.error("Update error:", e));
-        }
-        return;
-    }
-    
-    // الكود الأصلي مع تحسين
-    if (currentGameMode === 'online' && data.answersCount >= 2) {
-        console.log("✅ كلا اللاعبين أجابا، الانتقال للسؤال التالي");
-        // الانتقال التلقائي بعد إجابة الاثنين
-        setTimeout(() => {
-            if(data.player1.uid === currentUser.uid) {
-                updateDoc(doc(db, "match_queue", currentMatchId), { 
-                    currentIdx: increment(1), 
-                    answersCount: 0,
-                    lastActivity: Date.now()
-                }).catch(e => console.error("Auto-advance error:", e));
+            if (isExitingGame) return;
+            const totalQs = data.questions.length;
+            if(!data.questions || data.currentIdx >= totalQs) { 
+                endGame(data); 
+                return; 
             }
-        }, 1500); // انتظار 1.5 ثانية قبل الانتقال
-        return;
-    }
-    
-    const q = data.questions[data.currentIdx];
-    if (!q) { 
-        endGame(data); 
-        return; 
-    }
-    
-    if (currentGameMode === 'online') {
-        const isP1 = data.player1.uid === currentUser.uid;
-        document.getElementById('p1-name').innerText = userData.name;
-        document.getElementById('game-p1-img').src = userData.photo;
-        document.getElementById('p2-name').innerText = isP1 ? data.player2.name : data.player1.name;
-        document.getElementById('game-p2-img').src = isP1 ? data.player2.photo : data.player1.photo;
-        document.getElementById('game-my-score').innerText = isP1 ? data.player1.score : data.player2.score;
-        document.getElementById('game-op-score').innerText = isP1 ? data.player2.score : data.player1.score;
-    } else {
-        document.getElementById('p1-name').innerText = userData.name;
-        document.getElementById('game-p1-img').src = userData.photo;
-        document.getElementById('p2-name').innerText = data.player2.name;
-        document.getElementById('game-p2-img').src = data.player2.photo;
-        document.getElementById('game-my-score').innerText = data.player1.score;
-        document.getElementById('game-op-score').innerText = data.player2.score;
-    }
+            
+            if (currentGameMode === 'online' && data.answersCount >= 2) {
+                 if(data.player1.uid === currentUser.uid) {
+                     updateDoc(doc(db, "match_queue", currentMatchId), { 
+                         currentIdx: increment(1), 
+                         answersCount: 0 
+                     });
+                 }
+                 return;
+            }
+            
+            const q = data.questions[data.currentIdx];
+            if (!q) { 
+                endGame(data); 
+                return; 
+            }
+            
+            if (currentGameMode === 'online') {
+                const isP1 = data.player1.uid === currentUser.uid;
+                document.getElementById('p1-name').innerText = userData.name;
+                document.getElementById('game-p1-img').src = userData.photo;
+                document.getElementById('p2-name').innerText = isP1 ? data.player2.name : data.player1.name;
+                document.getElementById('game-p2-img').src = isP1 ? data.player2.photo : data.player1.photo;
+                document.getElementById('game-my-score').innerText = isP1 ? data.player1.score : data.player2.score;
+                document.getElementById('game-op-score').innerText = isP1 ? data.player2.score : data.player1.score;
+            } else {
+                document.getElementById('p1-name').innerText = userData.name;
+                document.getElementById('game-p1-img').src = userData.photo;
+                document.getElementById('p2-name').innerText = data.player2.name;
+                document.getElementById('game-p2-img').src = data.player2.photo;
+                document.getElementById('game-my-score').innerText = data.player1.score;
+                document.getElementById('game-op-score').innerText = data.player2.score;
+            }
 
-    const qTextEl = document.getElementById('q-text');
-    if(qTextEl.innerText !== q.question) {
-        hasAnsweredCurrentQ = false;
-        userAnsweredCorrectly = false;
-        currentQuestionCorrectAnswer = null;
-        clearTimeout(aiTimeoutId); 
-        document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
-        document.getElementById('waiting-msg').classList.add('hidden');
-        document.getElementById('ai-thinking-msg').classList.add('hidden');
+            const qTextEl = document.getElementById('q-text');
+            if(qTextEl.innerText !== q.question) {
+                hasAnsweredCurrentQ = false;
+                userAnsweredCorrectly = false;
+                currentQuestionCorrectAnswer = null;
+                clearTimeout(aiTimeoutId); 
+                document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
+                document.getElementById('waiting-msg').classList.add('hidden');
+                document.getElementById('ai-thinking-msg').classList.add('hidden');
+                
+clearInterval(gameTimer);
+let t = 15;
+document.getElementById('game-timer').innerText = t;
+gameTimer = setInterval(() => {
+    if (isExitingGame) { clearInterval(gameTimer); return; }
+    t--;
+    document.getElementById('game-timer').innerText = t;
+    if(t <= 0) { 
+        clearInterval(gameTimer); 
+        console.log("⏰ العداد وصل 0، الانتقال فوري");
         
-        clearInterval(gameTimer);
-        let t = 15;
-        document.getElementById('game-timer').innerText = t;
-        gameTimer = setInterval(() => {
-            if (isExitingGame) { clearInterval(gameTimer); return; }
-            t--;
-            document.getElementById('game-timer').innerText = t;
-            if(t <= 0) { 
-                clearInterval(gameTimer); 
-                if(!hasAnsweredCurrentQ) {
-                    console.log("⏰ الوقت انتهى، معالجة تلقائية");
-                    handleTimeOut(); // استدعاء دالة معالجة انتهاء الوقت
+        // إذا لم يجب، معالجة تلقائية
+        if(!hasAnsweredCurrentQ) {
+            handleTimeOut();
+            // الانتقال فوري للسؤال التالي بعد 1 ثانية
+            setTimeout(() => {
+                if(currentGameMode === 'online' && currentMatchId) {
+                    forceNextQuestionImmediate();
                 } else if (currentGameMode === 'ai') {
                     handleAINextTurn();
                 }
-            }
-        }, 1000);
+            }, 1000);
+        }
     }
-    
-    document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
-    qTextEl.innerText = q.question;
-    const div = document.getElementById('answers-container');
-    if(div.children.length === 0 || div.getAttribute('data-curr-q') !== q.question) {
-        div.setAttribute('data-curr-q', q.question);
-        div.innerHTML = '';
-        let ansList = [];
-        if(q.type === 'mcq') ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
-        else ansList = [{ txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }];
-        
-        const correctAns = ansList.find(ans => ans.isCorrect);
-        if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
+}, 1000);
+            
+            document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
+            qTextEl.innerText = q.question;
+            const div = document.getElementById('answers-container');
+            if(div.children.length === 0 || div.getAttribute('data-curr-q') !== q.question) {
+                div.setAttribute('data-curr-q', q.question);
+                div.innerHTML = '';
+                let ansList = [];
+                if(q.type === 'mcq') ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
+                else ansList = [{ txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }];
+                
+                const correctAns = ansList.find(ans => ans.isCorrect);
+                if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
 
-        ansList.sort(() => 0.5 - Math.random());
-        ansList.forEach(ansObj => {
-            const btn = document.createElement('button');
-            btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
-            btn.innerText = ansObj.txt;
-            btn.dataset.value = ansObj.value;
-            btn.onclick = () => { if(hasAnsweredCurrentQ) return; submitGameAnswer(ansObj, q, data); };
-            div.appendChild(btn);
-        });
+                ansList.sort(() => 0.5 - Math.random());
+                ansList.forEach(ansObj => {
+                    const btn = document.createElement('button');
+                    btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
+                    btn.innerText = ansObj.txt;
+                    btn.dataset.value = ansObj.value;
+                    btn.onclick = () => { if(hasAnsweredCurrentQ) return; submitGameAnswer(ansObj, q, data); };
+                    div.appendChild(btn);
+                });
+            }
+        }
+        
+        // دالة للانتقال الفوري للسؤال التالي بدون انتظار
+async function forceNextQuestionImmediate() {
+    if (!currentMatchId || currentGameMode !== 'online') return;
+    
+    try {
+        const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
+        if (!matchDoc.exists()) return;
+        
+        const matchData = matchDoc.data();
+        const isHost = matchData.player1.uid === currentUser.uid;
+        
+        // إذا كان اللاعب هو المضيف، يتحكم بالانتقال
+        if (isHost) {
+            await updateDoc(doc(db, "match_queue", currentMatchId), {
+                currentIdx: increment(1),
+                answersCount: 0,
+                lastActivity: Date.now(),
+                forceAdvanced: true
+            });
+            console.log("⚡ تم الانتقال الفوري للسؤال التالي");
+        }
+        
+    } catch (error) {
+        console.error("❌ خطأ في الانتقال الفوري:", error);
     }
 }
 
         async function submitGameAnswer(ansObj, q, matchData) {
-    if(hasAnsweredCurrentQ || isExitingGame) return;
-    hasAnsweredCurrentQ = true;
-    userAnsweredCorrectly = ansObj && ansObj.isCorrect;
-    
-    const answerButtons = document.querySelectorAll('#answers-container button');
-    answerButtons.forEach(btn => {
-        btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
-        if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) btn.classList.add('answer-correct');
-        else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) btn.classList.add('answer-wrong');
-        else btn.classList.add('answer-neutral');
-    });
-    
-    document.getElementById('answers-container').classList.add('pointer-events-none');
+            if(hasAnsweredCurrentQ || isExitingGame) return;
+            hasAnsweredCurrentQ = true;
+            userAnsweredCorrectly = ansObj && ansObj.isCorrect;
+            
+            const answerButtons = document.querySelectorAll('#answers-container button');
+            answerButtons.forEach(btn => {
+                btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
+                if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) btn.classList.add('answer-correct');
+                else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) btn.classList.add('answer-wrong');
+                else btn.classList.add('answer-neutral');
+            });
+            
+            document.getElementById('answers-container').classList.add('pointer-events-none');
 
-    if (currentGameMode === 'online') {
-        document.getElementById('waiting-msg').classList.remove('hidden');
-        const isP1 = matchData.player1.uid === currentUser.uid;
-        if (!currentMatchId) return;
-        const scoreIncrement = ansObj && ansObj.isCorrect ? 1 : 0;
-        const updates = { 
-            answersCount: increment(1),
-            lastActivity: Date.now()
-        };
-        if(ansObj && ansObj.isCorrect) updates[isP1?'player1.score':'player2.score'] = increment(scoreIncrement);
-        
-        try {
-            await updateDoc(doc(db, "match_queue", currentMatchId), updates);
-            console.log("✅ تم تسجيل الإجابة بنجاح");
-        } catch (error) {
-            console.error("❌ خطأ في تسجيل الإجابة:", error);
-            // محاولة استعادة
-            setTimeout(() => {
-                if (!hasAnsweredCurrentQ) {
-                    hasAnsweredCurrentQ = false;
-                    document.getElementById('answers-container').classList.remove('pointer-events-none');
-                    document.getElementById('waiting-msg').classList.add('hidden');
+            if (currentGameMode === 'online') {
+                document.getElementById('waiting-msg').classList.remove('hidden');
+                const isP1 = matchData.player1.uid === currentUser.uid;
+                if (!currentMatchId) return;
+                const scoreIncrement = ansObj && ansObj.isCorrect ? 1 : 0;
+                const updates = { 
+                    answersCount: increment(1),
+                    lastActivity: Date.now()
+                };
+                if(ansObj && ansObj.isCorrect) updates[isP1?'player1.score':'player2.score'] = increment(scoreIncrement);
+                await updateDoc(doc(db, "match_queue", currentMatchId), updates);
+            } else {
+                document.getElementById('waiting-msg').classList.add('hidden'); 
+                if(ansObj && ansObj.isCorrect) {
+                    localMatchData.player1.score += 1;
+                    document.getElementById('game-my-score').innerText = localMatchData.player1.score;
                 }
-            }, 1000);
+                triggerAIResponse();
+            }
         }
-    } else {
-        document.getElementById('waiting-msg').classList.add('hidden'); 
-        if(ansObj && ansObj.isCorrect) {
-            localMatchData.player1.score += 1;
-            document.getElementById('game-my-score').innerText = localMatchData.player1.score;
-        }
-        triggerAIResponse();
-    }
-}
 
         function triggerAIResponse() {
             document.getElementById('waiting-msg').classList.add('hidden');
@@ -3789,136 +3595,118 @@ function stopFreezeProtection() {
         }
 
         async function endGame(d) {
-    // أوقف حماية التجميد
-    stopFreezeProtection();
-    
-    clearInterval(gameTimer);
-    document.getElementById('game-overlay').classList.add('hidden');
-    document.getElementById('withdraw-game-btn').classList.add('hidden');
-    if (isExitingGame) return;
-    
-    let myScore, opScore, opName;
-    if (currentGameMode === 'online') {
-        const isP1 = d.player1.uid === currentUser.uid;
-        myScore = isP1 ? d.player1.score : d.player2.score;
-        opScore = isP1 ? d.player2.score : d.player1.score;
-        opName = isP1 ? d.player2.name : d.player1.name;
-    } else {
-        myScore = localMatchData.player1.score;
-        opScore = localMatchData.player2.score;
-        opName = localMatchData.player2.name;
-    }
-    
-    let pointsGained = 0; 
-    let msg = ""; 
-    let icon = "";
-    if (myScore > opScore) { 
-        msg = "فوز ساحق!"; 
-        icon = "🏆"; 
-        pointsGained = myScore * 2;
-    } else if (myScore < opScore) { 
-        msg = "حظ أوفر!"; 
-        icon = "😢"; 
-        pointsGained = 0;
-    } else { 
-        if(myScore > 0) { 
-            msg = "تعادل إيجابي!"; 
-            icon = "🤝"; 
-            pointsGained = myScore * 1; 
-        } else { 
-            msg = "تعادل سلبي!"; 
-            icon = "😐"; 
-            pointsGained = 0; 
-        }
-    }
-    
-    if (isPremiumValid(userData) && pointsGained > 0) {
-         pointsGained = pointsGained * 2;
-    }
+            clearInterval(gameTimer);
+            document.getElementById('game-overlay').classList.add('hidden');
+            document.getElementById('withdraw-game-btn').classList.add('hidden');
+            if (isExitingGame) return;
+            
+            let myScore, opScore, opName;
+            if (currentGameMode === 'online') {
+                const isP1 = d.player1.uid === currentUser.uid;
+                myScore = isP1 ? d.player1.score : d.player2.score;
+                opScore = isP1 ? d.player2.score : d.player1.score;
+                opName = isP1 ? d.player2.name : d.player1.name;
+            } else {
+                myScore = localMatchData.player1.score;
+                opScore = localMatchData.player2.score;
+                opName = localMatchData.player2.name;
+            }
+            
+            let pointsGained = 0; 
+            let msg = ""; 
+            let icon = "";
+            if (myScore > opScore) { 
+                msg = "فوز ساحق!"; 
+                icon = "🏆"; 
+                pointsGained = myScore * 2;
+            } else if (myScore < opScore) { 
+                msg = "حظ أوفر!"; 
+                icon = "😢"; 
+                pointsGained = 0;
+            } else { 
+                if(myScore > 0) { 
+                    msg = "تعادل إيجابي!"; 
+                    icon = "🤝"; 
+                    pointsGained = myScore * 1; 
+                } else { 
+                    msg = "تعادل سلبي!"; 
+                    icon = "😐"; 
+                    pointsGained = 0; 
+                }
+            }
+            
+            if (isPremiumValid(userData) && pointsGained > 0) {
+                 pointsGained = pointsGained * 2;
+            }
 
-    if(pointsGained > 0) {
-        await updateDoc(doc(db, "users", currentUser.uid), { points: increment(pointsGained) });
-        userData.points += pointsGained;
-        setupHeaderUI();
-    }
-    
-    if(currentMatchId && currentGameMode === 'online') {
-        try {
-            await deleteDoc(doc(db, "match_queue", currentMatchId));
-            console.log("🗑️ تم حذف المباراة من قاعدة البيانات");
-        } catch (error) {
-            console.error("❌ خطأ في حذف المباراة:", error);
+            if(pointsGained > 0) {
+                await updateDoc(doc(db, "users", currentUser.uid), { points: increment(pointsGained) });
+                userData.points += pointsGained;
+                setupHeaderUI();
+            }
+            
+            if(currentMatchId && currentGameMode === 'online') {
+                await deleteDoc(doc(db, "match_queue", currentMatchId));
+            }
+            
+            const resultScreen = document.getElementById('result-screen');
+            const iconContainer = document.getElementById('result-icon-container');
+            const title = document.getElementById('result-title');
+            const resultMsg = document.getElementById('result-msg');
+            const finalMyScore = document.getElementById('final-my-score');
+            const finalOpScore = document.getElementById('final-op-score');
+            const finalOpName = document.getElementById('final-op-name');
+            const pointsGainedText = document.getElementById('result-points-gained-text');
+            
+            iconContainer.innerText = icon;
+            title.innerText = msg;
+            resultMsg.innerText = "لقد قمت بأداء رائع";
+            finalMyScore.innerText = myScore;
+            finalOpScore.innerText = opScore;
+            finalOpName.innerText = opName;
+            pointsGainedText.innerText = `+${pointsGained}`;
+            
+            if (isPremiumValid(userData) && pointsGained > 0) {
+                pointsGainedText.innerHTML += ' <span class="text-xs text-green-600">(x2 مميز)</span>';
+            }
+            
+            resultScreen.classList.remove('hidden');
         }
-    }
-    
-    const resultScreen = document.getElementById('result-screen');
-    const iconContainer = document.getElementById('result-icon-container');
-    const title = document.getElementById('result-title');
-    const resultMsg = document.getElementById('result-msg');
-    const finalMyScore = document.getElementById('final-my-score');
-    const finalOpScore = document.getElementById('final-op-score');
-    const finalOpName = document.getElementById('final-op-name');
-    const pointsGainedText = document.getElementById('result-points-gained-text');
-    
-    iconContainer.innerText = icon;
-    title.innerText = msg;
-    resultMsg.innerText = "لقد قمت بأداء رائع";
-    finalMyScore.innerText = myScore;
-    finalOpScore.innerText = opScore;
-    finalOpName.innerText = opName;
-    pointsGainedText.innerText = `+${pointsGained}`;
-    
-    if (isPremiumValid(userData) && pointsGained > 0) {
-        pointsGainedText.innerHTML += ' <span class="text-xs text-green-600">(x2 مميز)</span>';
-    }
-    
-    resultScreen.classList.remove('hidden');
-}
 
         window.closeResultScreen = async () => {
-     isExitingGame = true;
-     
-     // أوقف جميع المؤقتات والحماية
-     stopFreezeProtection();
-     
-     if (matchListenerUnsubscribe) { 
-         matchListenerUnsubscribe(); 
-         matchListenerUnsubscribe = null; 
-     }
-     if(roomListenerUnsubscribe) {
-         roomListenerUnsubscribe();
-         roomListenerUnsubscribe = null;
-     }
-     clearInterval(gameTimer); 
-     clearTimeout(aiTimeoutId);
-     
-     document.getElementById('result-screen').classList.add('hidden');
-     document.getElementById('game-overlay').classList.add('hidden');
-     document.getElementById('searching-ui').classList.add('hidden');
-     document.getElementById('searching-ui').style.display = 'none';
-
-     currentMatchId = null; 
-     localMatchData = null; 
-     hasAnsweredCurrentQ = false;
-     document.getElementById('challenge-active-card').classList.remove('hidden');
-     
-     if(currentUser) {
-         try {
-             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-             if(userDoc.exists()) { 
-                 userData = userDoc.data(); 
-                 checkAIRemaining();
-                 setupHeaderUI(); 
-                 setupProfileUI(); 
+             isExitingGame = true;
+             if (matchListenerUnsubscribe) { 
+                 matchListenerUnsubscribe(); 
+                 matchListenerUnsubscribe = null; 
              }
-             loadLeaderboard();
-         } catch (error) {
-             console.error("Error reloading user data:", error);
-         }
-     }
-     switchTab('challenges');
-     setTimeout(() => { isExitingGame = false; }, 500);
-};
+             if(roomListenerUnsubscribe) {
+                 roomListenerUnsubscribe();
+                 roomListenerUnsubscribe = null;
+             }
+             clearInterval(gameTimer); 
+             clearTimeout(aiTimeoutId);
+             document.getElementById('result-screen').classList.add('hidden');
+             document.getElementById('game-overlay').classList.add('hidden');
+             document.getElementById('searching-ui').classList.add('hidden');
+             document.getElementById('searching-ui').style.display = 'none';
+
+             currentMatchId = null; 
+             localMatchData = null; 
+             hasAnsweredCurrentQ = false;
+             document.getElementById('challenge-active-card').classList.remove('hidden');
+             if(currentUser) {
+                 const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                 if(userDoc.exists()) { 
+                     userData = userDoc.data(); 
+                     checkAIRemaining();
+                     setupHeaderUI(); 
+                     setupProfileUI(); 
+                 }
+                 loadLeaderboard();
+             }
+             switchTab('challenges');
+             setTimeout(() => { isExitingGame = false; }, 500);
+        };
 
         window.openPage = async (screenId) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -5749,435 +5537,269 @@ function stopFreezeProtection() {
             }
         };
         
-        // نظام تشخيص انقطاع المباراة
-let connectionIssuesLog = [];
+        // أضف هذه الدوال في بداية الـ script بعد المتغيرات
+let networkDisconnectTimeout = null;
+let opponentDisconnected = false;
+let myDisconnectTime = null;
 
-// دالة لتسجيل المشاكل
-function logConnectionIssue(type, details) {
-    const issue = {
-        id: Date.now(),
-        type: type,
-        details: details,
-        timestamp: new Date().toISOString(),
-        matchId: currentMatchId,
-        gameMode: currentGameMode,
-        userUid: currentUser?.uid
-    };
+// مراقبة حالة الإنترنت
+function setupNetworkMonitoring() {
+    // مراقبة انقطاع الإنترنت
+    window.addEventListener('online', handleNetworkRestored);
+    window.addEventListener('offline', handleNetworkLost);
     
-    connectionIssuesLog.unshift(issue); // إضافة في البداية
-    if (connectionIssuesLog.length > 50) connectionIssuesLog.pop(); // حفظ آخر 50 مشكلة فقط
+    // مراقبة نشاط اللاعب الآخر
+    startOpponentActivityCheck();
+}
+
+// عندما ينقطع الإنترنت
+function handleNetworkLost() {
+    console.log("🔴 انقطع الإنترنت");
+    myDisconnectTime = Date.now();
     
-    // حفظ في localStorage للتحليل لاحقاً
-    localStorage.setItem('connection_issues_log', JSON.stringify(connectionIssuesLog.slice(0, 20)));
-    
-    console.log(`🔴 [ISSUE] ${type}:`, details);
-    
-    // إذا كانت المشكلة حرجة، عرض نافذة التشخيص تلقائياً
-    if (type === 'MATCH_FROZEN' || type === 'PLAYER_DISCONNECTED') {
-        setTimeout(() => {
-            if (document.getElementById('game-overlay') && 
-                !document.getElementById('game-overlay').classList.contains('hidden')) {
-                showDiagnosticModal(type);
+    // إذا كانت هناك مباراة نشطة
+    if (currentGameMode === 'online' && currentMatchId && document.getElementById('game-overlay') && 
+        !document.getElementById('game-overlay').classList.contains('hidden')) {
+        
+        // بعد 5 ثواني من الانقطاع، إنهاء المباراة
+        networkDisconnectTimeout = setTimeout(() => {
+            if (!navigator.onLine) {
+                endMatchDueToDisconnection(true); // أنا الذي انقطعت
             }
-        }, 3000);
+        }, 5000);
     }
 }
 
-// دالة لعرض نافذة التشخيص
-function showDiagnosticModal(issueType = null) {
-    const modal = document.getElementById('connection-diagnostic-modal');
-    modal.classList.remove('hidden');
+// عند عودة الإنترنت
+function handleNetworkRestored() {
+    console.log("🟢 عاد الإنترنت");
+    if (networkDisconnectTimeout) {
+        clearTimeout(networkDisconnectTimeout);
+        networkDisconnectTimeout = null;
+    }
     
-    document.getElementById('diagnostic-timestamp').textContent = 
-        new Date().toLocaleTimeString('ar-EG');
-    
-    // إذا كان هناك نوع محدد، قم بالتشخيص الفوري
-    if (issueType) {
-        analyzeIssue(issueType);
-    } else {
-        runQuickDiagnostic();
+    // إذا كنت في مباراة وانقطعت لأكثر من 10 ثواني
+    if (myDisconnectTime && (Date.now() - myDisconnectTime) > 10000) {
+        if (currentMatchId && currentGameMode === 'online') {
+            endMatchDueToDisconnection(true);
+        }
     }
 }
 
-// دالة لإغلاق نافذة التشخيص
-function closeDiagnosticModal() {
-    document.getElementById('connection-diagnostic-modal').classList.add('hidden');
-}
-
-// دالة التشخيص السريع
-function runQuickDiagnostic() {
-    const resultDiv = document.getElementById('diagnostic-result');
-    const fixesDiv = document.getElementById('quick-fixes');
-    
-    resultDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin text-2xl"></i><p class="mt-2">جاري التشخيص...</p></div>';
-    fixesDiv.innerHTML = '';
-    
-    setTimeout(async () => {
-        const diagnostics = await performDiagnostics();
-        displayDiagnosticResults(diagnostics);
-    }, 1000);
-}
-
-// دالة التشخيص الكامل
-function runFullDiagnostic() {
-    const resultDiv = document.getElementById('diagnostic-result');
-    const fixesDiv = document.getElementById('quick-fixes');
-    
-    resultDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin text-2xl"></i><p class="mt-2">جاري الفحص الكامل...</p></div>';
-    fixesDiv.innerHTML = '';
-    
-    setTimeout(async () => {
-        const diagnostics = await performFullDiagnostics();
-        displayDiagnosticResults(diagnostics);
-    }, 2000);
-}
-
-// دالة لإجراء الفحوصات
-async function performDiagnostics() {
-    const diagnostics = [];
-    
-    // 1. فحص الاتصال بالإنترنت
-    diagnostics.push({
-        name: 'الاتصال بالإنترنت',
-        status: navigator.onLine ? '✅ جيد' : '❌ مقطوع',
-        severity: navigator.onLine ? 'low' : 'critical',
-        solution: navigator.onLine ? null : 'تحقق من اتصال WiFi أو البيانات الخلوية'
-    });
-    
-    // 2. فحص Firestore
-    try {
-        const testDoc = await getDoc(doc(db, "system_settings", "test"));
-        diagnostics.push({
-            name: 'اتصال قاعدة البيانات',
-            status: '✅ نشط',
-            severity: 'low',
-            solution: null
-        });
-    } catch (error) {
-        diagnostics.push({
-            name: 'اتصال قاعدة البيانات',
-            status: `❌ فشل (${error.code})`,
-            severity: 'critical',
-            solution: 'مشكلة في السيرفر، جاري إعادة الاتصال تلقائياً'
-        });
-    }
-    
-    // 3. فحص حالة المباراة الحالية
-    if (currentMatchId) {
+// مراقبة نشاط اللاعب الآخر
+function startOpponentActivityCheck() {
+    setInterval(async () => {
+        if (currentGameMode !== 'online' || !currentMatchId || opponentDisconnected) return;
+        
         try {
             const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
-            diagnostics.push({
-                name: 'حالة المباراة',
-                status: matchDoc.exists() ? '✅ موجودة' : '❌ محذوفة',
-                severity: matchDoc.exists() ? 'low' : 'high',
-                solution: matchDoc.exists() ? null : 'تم حذف المباراة من السيرفر'
-            });
+            if (!matchDoc.exists()) return;
             
-            if (matchDoc.exists()) {
-                const matchData = matchDoc.data();
-                const lastActive = matchData.lastActivity || 0;
-                const inactiveTime = Date.now() - lastActive;
+            const matchData = matchDoc.data();
+            const lastActive = matchData.lastActivity || 0;
+            const inactiveTime = Date.now() - lastActive;
+            
+            // إذا مر أكثر من 25 ثانية دون نشاط من الخصم
+            if (inactiveTime > 25000 && matchData.status === 'active') {
+                console.log("⚠️ الخصم غير نشط لمدة", Math.round(inactiveTime/1000), "ثانية");
                 
-                diagnostics.push({
-                    name: 'نشاط المباراة',
-                    status: inactiveTime < 30000 ? '✅ نشطة' : `⚠️ خاملة (${Math.round(inactiveTime/1000)} ثانية)`,
-                    severity: inactiveTime < 30000 ? 'low' : 'high',
-                    solution: inactiveTime >= 30000 ? 'المباراة متوقفة، جاري إعادة التشغيل' : null
-                });
+                // تحقق إذا كان الخصم قد أجاب أم لا
+                if (matchData.answersCount === 0 || matchData.answersCount === 1) {
+                    // إذا مر أكثر من 40 ثانية، إنهاء المباراة
+                    if (inactiveTime > 40000) {
+                        opponentDisconnected = true;
+                        endMatchDueToDisconnection(false); // الخصم انقطع
+                    }
+                }
             }
         } catch (error) {
-            diagnostics.push({
-                name: 'حالة المباراة',
-                status: '❌ خطأ في التحقق',
-                severity: 'high',
-                solution: 'فشل في قراءة بيانات المباراة'
-            });
+            console.error("Error checking opponent:", error);
         }
-    }
-    
-    // 4. فحص حالة المستمع
-    diagnostics.push({
-        name: 'مستمع التحديثات',
-        status: matchListenerUnsubscribe ? '✅ نشط' : '❌ غير نشط',
-        severity: matchListenerUnsubscribe ? 'low' : 'high',
-        solution: !matchListenerUnsubscribe ? 'جاري إعادة تشغيل المستمع' : null
-    });
-    
-    return diagnostics;
+    }, 10000); // تحقق كل 10 ثواني
 }
 
-// دالة للتشخيص الكامل
-async function performFullDiagnostics() {
-    const quickDiagnostics = await performDiagnostics();
-    
-    // فحوصات إضافية
-    const additionalChecks = [];
-    
-    // 1. فحص الذاكرة
-    if (performance.memory) {
-        const usedMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
-        const totalMB = Math.round(performance.memory.totalJSHeapSize / 1048576);
-        const memoryUsage = (usedMB / totalMB) * 100;
-        
-        additionalChecks.push({
-            name: 'استخدام الذاكرة',
-            status: memoryUsage < 80 ? `✅ ${usedMB}MB/${totalMB}MB` : `⚠️ عالي (${Math.round(memoryUsage)}%)`,
-            severity: memoryUsage < 80 ? 'low' : 'medium',
-            solution: memoryUsage >= 80 ? 'إعادة تحميل الصفحة قد تحسن الأداء' : null
-        });
-    }
-    
-    // 2. فحص سجل المشاكل
-    const recentIssues = connectionIssuesLog.filter(issue => 
-        Date.now() - new Date(issue.timestamp).getTime() < 300000 // آخر 5 دقائق
-    );
-    
-    additionalChecks.push({
-        name: 'المشاكل الحديثة',
-        status: recentIssues.length === 0 ? '✅ لا توجد' : `⚠️ ${recentIssues.length} مشكلة`,
-        severity: recentIssues.length === 0 ? 'low' : 'medium',
-        solution: recentIssues.length > 0 ? 'تم تسجيل مشاكل مؤخراً' : null
-    });
-    
-    // 3. فحص وقت تحميل الصفحة
-    const pageLoadTime = performance.timing ? 
-        performance.timing.loadEventEnd - performance.timing.navigationStart : 0;
-    
-    additionalChecks.push({
-        name: 'أداء التطبيق',
-        status: pageLoadTime < 3000 ? '✅ جيد' : `⚠️ بطيء (${Math.round(pageLoadTime/1000)} ثانية)`,
-        severity: pageLoadTime < 3000 ? 'low' : 'medium',
-        solution: pageLoadTime >= 3000 ? 'اتصال الإنترنت قد يكون بطيئاً' : null
-    });
-    
-    return [...quickDiagnostics, ...additionalChecks];
-}
-
-// دالة لعرض نتائج التشخيص
-function displayDiagnosticResults(diagnostics) {
-    const resultDiv = document.getElementById('diagnostic-result');
-    const fixesDiv = document.getElementById('quick-fixes');
-    
-    let html = '<h3 class="text-lg font-bold text-white mb-3">📊 نتائج التشخيص:</h3>';
-    
-    diagnostics.forEach(d => {
-        const color = d.severity === 'critical' ? 'text-red-400' : 
-                     d.severity === 'high' ? 'text-orange-400' : 
-                     d.severity === 'medium' ? 'text-yellow-400' : 'text-green-400';
-        
-        html += `
-            <div class="flex justify-between items-center p-2 border-b border-gray-700">
-                <span class="font-bold">${d.name}</span>
-                <span class="${color} font-bold">${d.status}</span>
-            </div>
-        `;
-    });
-    
-    resultDiv.innerHTML = html;
-    
-    // عرض الحلول
-    const solutions = diagnostics.filter(d => d.solution).map(d => d.solution);
-    if (solutions.length > 0) {
-        let fixesHtml = '';
-        solutions.forEach((solution, index) => {
-            fixesHtml += `
-                <div class="bg-gray-700 bg-opacity-50 p-3 rounded-lg">
-                    <p class="text-sm"><span class="text-yellow-400">${index + 1}.</span> ${solution}</p>
-                </div>
-            `;
-        });
-        
-        // إضافة أزرار الحلول
-        fixesHtml += `
-            <div class="grid grid-cols-2 gap-3 mt-4">
-                <button onclick="applyQuickFix('reconnect')" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-bold text-sm">
-                    <i class="fas fa-redo ml-1"></i> إعادة الاتصال
-                </button>
-                <button onclick="applyQuickFix('restart_match')" class="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-sm">
-                    <i class="fas fa-play ml-1"></i> إعادة المباراة
-                </button>
-            </div>
-        `;
-        
-        fixesDiv.innerHTML = fixesHtml;
-    } else {
-        fixesDiv.innerHTML = `
-            <div class="bg-green-900 bg-opacity-30 p-4 rounded-lg text-center">
-                <i class="fas fa-check-circle text-green-400 text-2xl"></i>
-                <p class="text-green-300 font-bold mt-2">كل الأنظمة تعمل بشكل طبيعي ✅</p>
-            </div>
-        `;
-    }
-}
-
-// دالة لتحليل مشكلة محددة
-function analyzeIssue(issueType) {
-    const resultDiv = document.getElementById('diagnostic-result');
-    const fixesDiv = document.getElementById('quick-fixes');
-    
-    let analysis = '';
-    let solutions = [];
-    
-    switch(issueType) {
-        case 'MATCH_FROZEN':
-            analysis = 'المباراة توقفت عن الاستجابة. الأسباب المحتملة:';
-            solutions = [
-                'فقدان اتصال أحد اللاعبين بالإنترنت',
-                'مشكلة في تحديث قاعدة البيانات',
-                'خطأ في مزامنة answersCount',
-                'توقف مؤقت في معالجة السؤال'
-            ];
-            break;
-            
-        case 'PLAYER_DISCONNECTED':
-            analysis = 'انقطع اتصال اللاعب المنافس. الأسباب:';
-            solutions = [
-                'اللاعب أغلق التطبيق',
-                'مشكلة في اتصال الإنترنت',
-                'توقف التطبيق عن العمل',
-                'تم حذف المباراة من السيرفر'
-            ];
-            break;
-            
-        case 'TIMEOUT_EXCEEDED':
-            analysis = 'انتهى الوقت دون إجابة. الأسباب:';
-            solutions = [
-                'اللاعب لم يختر إجابة',
-                'مشكلة في عرض خيارات الإجابة',
-                'خطأ في عداد الوقت'
-            ];
-            break;
-            
-        default:
-            analysis = 'مشكلة غير محددة في المباراة';
-            solutions = ['جاري التحقق من النظام...'];
-    }
-    
-    resultDiv.innerHTML = `
-        <div class="bg-red-900 bg-opacity-30 p-4 rounded-lg">
-            <h3 class="text-xl font-bold text-red-300">🔴 ${issueType}</h3>
-            <p class="text-gray-300 mt-2">${analysis}</p>
-            <ul class="mt-3 space-y-1">
-                ${solutions.map(s => `<li class="text-gray-400">• ${s}</li>`).join('')}
-            </ul>
-        </div>
-    `;
-    
-    // عرض أزرار الحلول المناسبة
-    let fixesHtml = '';
-    if (issueType === 'MATCH_FROZEN' || issueType === 'PLAYER_DISCONNECTED') {
-        fixesHtml = `
-            <div class="space-y-3">
-                <button onclick="forceAdvanceQuestion()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 rounded-lg font-bold">
-                    <i class="fas fa-forward ml-1"></i> تخطي إلى السؤال التالي
-                </button>
-                <button onclick="forceEndMatch()" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-bold">
-                    <i class="fas fa-flag ml-1"></i> إنهاء المباراة الآن
-                </button>
-                <button onclick="reconnectToMatch()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold">
-                    <i class="fas fa-wifi ml-1"></i> محاولة إعادة الاتصال
-                </button>
-            </div>
-        `;
-    }
-    
-    fixesDiv.innerHTML = fixesHtml;
-}
-
-// دوال الحلول السريعة
-function applyQuickFix(fixType) {
-    switch(fixType) {
-        case 'reconnect':
-            if (currentMatchId && matchListenerUnsubscribe) {
-                matchListenerUnsubscribe();
-                setTimeout(() => listenToMatch(currentMatchId), 1000);
-                showBeautifulAlert('info', 'جاري إعادة الاتصال', '...جاري إعادة الاتصال بالمباراة');
-            }
-            break;
-            
-        case 'restart_match':
-            if (confirm('هل تريد إعادة تشغيل المباراة؟ سيتم خصم 5 نقاط.')) {
-                forceEndMatch();
-            }
-            break;
-    }
-    closeDiagnosticModal();
-}
-
-// دالة لإجبار التقدم للسؤال التالي
-async function forceAdvanceQuestion() {
-    if (!currentMatchId) return;
-    
-    try {
-        await updateDoc(doc(db, "match_queue", currentMatchId), { 
-            currentIdx: increment(1), 
-            answersCount: 0,
-            lastActivity: Date.now()
-        });
-        
-        showBeautifulAlert('success', 'تم التقدم', 'تم الانتقال للسؤال التالي بنجاح');
-        logConnectionIssue('MANUAL_ADVANCE', 'المسؤول أجبر التقدم للسؤال التالي');
-        
-    } catch (error) {
-        console.error("Force advance error:", error);
-        showBeautifulAlert('error', 'خطأ', 'فشل في التقدم');
-    }
-}
-
-// دالة لإجبار إنهاء المباراة
-async function forceEndMatch() {
-    if (!currentMatchId) return;
-    
-    try {
-        // حذف المباراة من قاعدة البيانات
-        await deleteDoc(doc(db, "match_queue", currentMatchId));
-        
-        // خصم 5 نقاط
-        if (currentUser) {
-            await updateDoc(doc(db, "users", currentUser.uid), {
-                points: increment(-5)
-            });
-            userData.points -= 5;
-            setupHeaderUI();
-        }
-        
-        showBeautifulAlert('warning', 'تم الإنهاء', 'تم إنهاء المباراة وخصم 5 نقاط');
-        logConnectionIssue('FORCE_END', 'تم إنهاء المباراة قسراً');
-        
-        // العودة للصفحة الرئيسية
-        closeResultScreen();
-        
-    } catch (error) {
-        console.error("Force end error:", error);
-        showBeautifulAlert('error', 'خطأ', 'فشل في إنهاء المباراة');
-    }
-}
-
-// دالة لإعادة الاتصال بالمباراة
-async function reconnectToMatch() {
-    if (!currentMatchId) return;
+// دالة لإنهاء المباراة بسبب انقطاع اتصال
+async function endMatchDueToDisconnection(isMyDisconnect) {
+    if (!currentMatchId || currentGameMode !== 'online') return;
     
     try {
         const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
+        if (!matchDoc.exists()) return;
         
-        if (matchDoc.exists()) {
-            // إعادة تشغيل المستمع
-            if (matchListenerUnsubscribe) matchListenerUnsubscribe();
-            listenToMatch(currentMatchId);
+        const matchData = matchDoc.data();
+        const isP1 = matchData.player1.uid === currentUser.uid;
+        const opponentId = isP1 ? matchData.player2.uid : matchData.player1.uid;
+        
+        // إذا أنا الذي انقطعت
+        if (isMyDisconnect) {
+            // خصم 10 نقاط مني
+            await updateDoc(doc(db, "users", currentUser.uid), {
+                points: increment(-10)
+            });
+            userData.points -= 10;
+            setupHeaderUI();
             
-            showBeautifulAlert('success', 'تمت إعادة الاتصال', 'تمت إعادة الاتصال بالمباراة بنجاح');
-        } else {
-            showBeautifulAlert('error', 'المباراة محذوفة', 'تم حذف المباراة من السيرفر');
-            closeResultScreen();
+            // منح 10 نقاط للخصم (إذا لم يكن AI)
+            if (opponentId !== 'AI_BOT') {
+                await updateDoc(doc(db, "users", opponentId), {
+                    points: increment(10)
+                });
+            }
+            
+            // عرض النتيجة لي
+            showDisconnectResult(true, matchData);
+            
+        } else { // إذا الخصم انقطع
+            // منح 10 نقاط لي
+            await updateDoc(doc(db, "users", currentUser.uid), {
+                points: increment(10)
+            });
+            userData.points += 10;
+            setupHeaderUI();
+            
+            // خصم 10 نقاط من الخصم
+            await updateDoc(doc(db, "users", opponentId), {
+                points: increment(-10)
+            });
+            
+            // عرض النتيجة لي
+            showDisconnectResult(false, matchData);
         }
         
+        // حذف المباراة من قاعدة البيانات
+        await deleteDoc(doc(db, "match_queue", currentMatchId));
+        
+        // تسجيل الحدث
+        logConnectionIssue('DISCONNECTION_END', {
+            disconnectedPlayer: isMyDisconnect ? 'me' : 'opponent',
+            matchId: currentMatchId,
+            scores: { player1: matchData.player1.score, player2: matchData.player2.score }
+        });
+        
     } catch (error) {
-        console.error("Reconnect error:", error);
-        showBeautifulAlert('error', 'خطأ', 'فشل في إعادة الاتصال');
+        console.error("❌ خطأ في إنهاء المباراة بسبب انقطاع:", error);
     }
 }
 
+// دالة لعرض نتيجة انقطاع الاتصال
+function showDisconnectResult(isMyDisconnect, matchData) {
+    clearInterval(gameTimer);
+    document.getElementById('game-overlay').classList.add('hidden');
+    document.getElementById('withdraw-game-btn').classList.add('hidden');
+    
+    const resultScreen = document.getElementById('result-screen');
+    const iconContainer = document.getElementById('result-icon-container');
+    const title = document.getElementById('result-title');
+    const msg = document.getElementById('result-msg');
+    const finalMyScore = document.getElementById('final-my-score');
+    const finalOpScore = document.getElementById('final-op-score');
+    const finalOpName = document.getElementById('final-op-name');
+    const pointsGained = document.getElementById('result-points-gained-text');
+    
+    if (isMyDisconnect) {
+        // أنا الذي انقطعت
+        iconContainer.innerText = "😢";
+        title.innerText = "انقطع الاتصال";
+        msg.innerText = "انقطع اتصالك بالإنترنت";
+        finalMyScore.innerText = "0";
+        finalOpScore.innerText = "10";
+        finalOpName.innerText = "الخصم";
+        pointsGained.innerText = "-10";
+    } else {
+        // الخصم انقطع
+        iconContainer.innerText = "🏆";
+        title.innerText = "فوز!";
+        msg.innerText = "انقطع اتصال الخصم";
+        finalMyScore.innerText = "10";
+        finalOpScore.innerText = "0";
+        finalOpName.innerText = "الخصم";
+        pointsGained.innerText = "+10";
+    }
+    
+    resultScreen.classList.remove('hidden');
+    
+    // إضافة زر للعودة
+    const container = document.querySelector('.result-container');
+    if (!container.querySelector('#back-btn')) {
+        const backBtn = document.createElement('button');
+        backBtn.id = 'back-btn';
+        backBtn.className = 'beautiful-btn mt-4';
+        backBtn.innerHTML = '<i class="fas fa-home"></i> العودة للرئيسية';
+        backBtn.onclick = closeResultScreen;
+        container.appendChild(backBtn);
+    }
+}
 
+async function handleTimeOut() {
+    if (currentGameMode !== 'online' || !currentMatchId) return;
+    
+    try {
+        const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
+        if (!matchDoc.exists()) {
+            logConnectionIssue('TIMEOUT_MATCH_MISSING', { matchId: currentMatchId });
+            return;
+        }
+        
+        const matchData = matchDoc.data();
+        const isP1 = matchData.player1.uid === currentUser.uid;
+        
+        console.log("⏰ انتهى الوقت، معالجة فورية");
+        
+        // تسجيل المشكلة
+        logConnectionIssue('TIMEOUT_EXCEEDED', {
+            matchId: currentMatchId,
+            player: isP1 ? 'player1' : 'player2',
+            currentIdx: matchData.currentIdx,
+            answersCount: matchData.answersCount
+        });
+        
+        // إذا لم يجب اللاعب بعد
+        if (!hasAnsweredCurrentQ) {
+            // عرض الإجابة الصحيحة
+            const answerButtons = document.querySelectorAll('#answers-container button');
+            answerButtons.forEach(btn => {
+                if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) {
+                    btn.classList.add('answer-correct');
+                } else {
+                    btn.classList.add('answer-neutral');
+                }
+            });
+            
+            document.getElementById('answers-container').classList.add('pointer-events-none');
+            document.getElementById('waiting-msg').classList.remove('hidden');
+            
+            hasAnsweredCurrentQ = true;
+        }
+        
+        // زيادة answersCount
+        await updateDoc(doc(db, "match_queue", currentMatchId), {
+            answersCount: increment(1),
+            lastActivity: Date.now(),
+            timeoutOccurred: true
+        });
+        
+        // إذا كان المضيف، الانتقال فوري بعد 1 ثانية
+        if (isP1) {
+            setTimeout(async () => {
+                try {
+                    await updateDoc(doc(db, "match_queue", currentMatchId), {
+                        currentIdx: increment(1),
+                        answersCount: 0,
+                        lastActivity: Date.now()
+                    });
+                    console.log("⚡ تم الانتقال للسؤال التالي بعد انتهاء الوقت");
+                } catch (error) {
+                    console.error("Error advancing after timeout:", error);
+                }
+            }, 1000);
+        }
+        
+    } catch (error) {
+        console.error("❌ خطأ في معالجة انتهاء الوقت:", error);
+        logConnectionIssue('TIMEOUT_HANDLE_ERROR', { error: error.message });
+    }
+}
+        
     </script>
 </body>
 </html>
