@@ -947,6 +947,26 @@
             .input-box { font-size: 1.1rem; }
             .auth-overlay > div { max-width: 500px; }
         }
+        
+        .quick-alert {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    z-index: 10000;
+    font-weight: bold;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { top: 50px; opacity: 0; }
+    to { top: 100px; opacity: 1; }
+}
+
     </style>
 </head>
 <body>
@@ -2110,6 +2130,9 @@
         let selectedQType = null;
         let currentMatchId = null;
         let gameTimer = null;
+let isNetworkMonitoringActive = false;
+let gameConnectionTimeout = null;
+let quickDisconnectCheck = false;
         let currentGameTimer = null;
         let hasAnsweredCurrentQ = false;
         let allAdminQuestions = []; 
@@ -3292,22 +3315,20 @@ let isNetworkOnline = navigator.onLine;
         function listenToMatch(id) {
     if(matchListenerUnsubscribe) matchListenerUnsubscribe(); 
     
-    // مهلة اتصال قصيرة
+    // ⚡ مهلة أقصر
     const connectionTimeout = setTimeout(() => {
-        if (document.getElementById('game-overlay').classList.contains('hidden') && 
-            document.getElementById('searching-ui').style.display !== 'none') {
-            console.log("⏱️ مهلة الاتصال - إعادة المحاولة");
-            cancelSearch();
-            showBeautifulAlert('warning', 'اتصال بطيء', 'جاري إعادة الاتصال...');
+        if (document.getElementById('game-overlay').classList.contains('hidden')) {
+            console.log("⏱️ مهلة الاتصال القصيرة");
+            showBeautifulAlert('info', 'جاري التوصيل', 'يتم الاتصال بالخصم...');
         }
-    }, 10000); // 10 ثواني كحد أقصى
+    }, 8000); // 8 ثواني فقط
     
     matchListenerUnsubscribe = onSnapshot(doc(db, "match_queue", id), async (snap) => {
-        clearTimeout(connectionTimeout); // إلغاء المهلة
+        clearTimeout(connectionTimeout);
         
         if(isExitingGame) return;
         if(!snap.exists()) {
-            console.log("المباراة حذفت - إنهاء فوري");
+            console.log("المباراة حذفت - إنهاء");
             if (currentGameMode === 'online') {
                 closeResultScreen();
             }
@@ -3316,30 +3337,196 @@ let isNetworkOnline = navigator.onLine;
         
         const d = snap.data();
         
-        // معالجة سريعة للمباراة النشطة
+        // ⚡ معالجة المباراة النشطة بسرعة
         if(d.status === 'active') {
-            if (document.getElementById('game-overlay').classList.contains('hidden') && 
-                !document.getElementById('vs-screen').classList.contains('flex')) {
-                
-                // عرض فوري بدون انتظار
+            // ⚡ عرض مباشر بدون أنيميشن إذا كانت المباراة جارية
+            if (document.getElementById('game-overlay').classList.contains('hidden')) {
+                console.log("🚀 بدء المباراة الفوري");
                 document.getElementById('game-overlay').classList.remove('hidden');
                 document.getElementById('withdraw-game-btn').classList.remove('hidden');
                 renderGame(d);
             } else {
+                // ⚡ تحديث سريع
                 renderGame(d);
             }
         }
     }, (error) => {
-        console.error("❌ خطأ في الاستماع للمباراة:", error);
+        console.error("❌ خطأ في الاستماع:", error);
         clearTimeout(connectionTimeout);
         
         if (currentGameMode === 'online') {
-            showBeautifulAlert('error', 'خطأ اتصال', 'فقد الاتصال بالسيرفر');
-            cancelSearch();
+            showBeautifulAlert('warning', 'فقد الاتصال', 'تم فقد الاتصال، جاري إعادة التوصيل...');
         }
     });
 }
         
+        // ⚡ تخطي سريع للسؤال
+async function forceNextQuestionQuick() {
+    if (!currentMatchId || currentGameMode !== 'online') return;
+    
+    try {
+        const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
+        if (!matchDoc.exists()) return;
+        
+        const matchData = matchDoc.data();
+        if (matchData.player1.uid === currentUser.uid) {
+            // ⚡ تحديث سريع
+            await updateDoc(doc(db, "match_queue", currentMatchId), {
+                currentIdx: increment(1),
+                answersCount: 0,
+                lastActivity: Date.now()
+            });
+            console.log("⚡ تخطي سريع للسؤال");
+        }
+    } catch (error) {
+        console.error("❌ خطأ في التخطي:", error);
+    }
+}
+
+// ⚡ معالجة فورية لانتهاء الوقت
+async function handleTimeoutQuick() {
+    console.log("⏰ انتهى الوقت - معالجة فورية");
+    
+    if (currentGameMode === 'online' && currentMatchId && !hasAnsweredCurrentQ) {
+        hasAnsweredCurrentQ = true;
+        
+        // ⚡ تحديث قاعدة البيانات فوراً
+        try {
+            await updateDoc(doc(db, "match_queue", currentMatchId), {
+                answersCount: increment(1),
+                lastActivity: Date.now(),
+                timeout: true
+            });
+            
+            console.log("✅ تم تسجيل انتهاء الوقت");
+            
+            // ⚡ الانتقال بعد 1 ثانية
+            setTimeout(() => {
+                if (matchData.player1.uid === currentUser.uid) {
+                    forceNextQuestionQuick();
+                }
+            }, 1000);
+            
+        } catch (error) {
+            console.error("❌ خطأ في معالجة الوقت:", error);
+        }
+    }
+}
+
+// ⚡ فوز فوري
+async function handleImmediateWin(reason) {
+    console.log("🎉 فوز فوري:", reason);
+    
+    // إيقاف المؤقتات
+    if (window.currentGameTimer) {
+        clearInterval(window.currentGameTimer);
+        window.currentGameTimer = null;
+    }
+    
+    if (currentMatchId) {
+        try {
+            // حذف المباراة أولاً
+            await deleteDoc(doc(db, "match_queue", currentMatchId));
+            
+            // إضافة النقاط
+            await updateDoc(doc(db, "users", currentUser.uid), {
+                points: increment(10)
+            });
+            
+            userData.points += 10;
+            setupHeaderUI();
+            
+            // عرض النتيجة
+            showQuickResult(true, reason);
+            
+        } catch (error) {
+            console.error("❌ خطأ في الفوز الفوري:", error);
+            showQuickResult(true, reason);
+        }
+    }
+}
+
+// ⚡ خسارة فورية
+async function handleImmediateLoss(reason) {
+    console.log("😢 خسارة فورية:", reason);
+    
+    // إيقاف المؤقتات
+    if (window.currentGameTimer) {
+        clearInterval(window.currentGameTimer);
+        window.currentGameTimer = null;
+    }
+    
+    if (currentMatchId) {
+        try {
+            // حذف المباراة
+            await deleteDoc(doc(db, "match_queue", currentMatchId));
+            
+            // خصم النقاط
+            await updateDoc(doc(db, "users", currentUser.uid), {
+                points: increment(-10)
+            });
+            
+            userData.points -= 10;
+            setupHeaderUI();
+            
+            // عرض النتيجة
+            showQuickResult(false, reason);
+            
+        } catch (error) {
+            console.error("❌ خطأ في الخسارة الفورية:", error);
+            showQuickResult(false, reason);
+        }
+    }
+}
+
+// ⚡ عرض نتيجة سريعة
+function showQuickResult(isWin, reason) {
+    document.getElementById('game-overlay').classList.add('hidden');
+    document.getElementById('withdraw-game-btn').classList.add('hidden');
+    
+    const resultScreen = document.getElementById('result-screen');
+    const iconContainer = document.getElementById('result-icon-container');
+    const title = document.getElementById('result-title');
+    const msg = document.getElementById('result-msg');
+    const finalMyScore = document.getElementById('final-my-score');
+    const finalOpScore = document.getElementById('final-op-score');
+    const pointsGained = document.getElementById('result-points-gained-text');
+    
+    if (isWin) {
+        iconContainer.innerText = "⚡";
+        title.innerText = "فوز فوري!";
+        msg.innerText = reason;
+        finalMyScore.innerText = "10";
+        finalOpScore.innerText = "0";
+        pointsGained.innerText = "+10";
+    } else {
+        iconContainer.innerText = "😢";
+        title.innerText = "خسارة فورية";
+        msg.innerText = reason;
+        finalMyScore.innerText = "0";
+        finalOpScore.innerText = "10";
+        pointsGained.innerText = "-10";
+    }
+    
+    resultScreen.classList.remove('hidden');
+}
+
+// ⚡ محاولة بديلة للتحديث
+async function tryFallbackUpdate() {
+    if (!currentMatchId) return;
+    
+    try {
+        // محاولة مباشرة
+        await updateDoc(doc(db, "match_queue", currentMatchId), {
+            lastActivity: Date.now()
+        });
+        console.log("✅ تم التحديث البديل");
+    } catch (error) {
+        console.error("❌ فشل التحديث البديل:", error);
+    }
+}
+
+
         function showVSAnimation(p1, p2) {
             return new Promise(resolve => {
                 document.getElementById('searching-ui').classList.add('hidden');
@@ -3368,180 +3555,225 @@ let isNetworkOnline = navigator.onLine;
         function renderGame(data) {
     if (isExitingGame) return;
     const totalQs = data.questions.length;
+    
+    // ⚡ تحسين: الانتقال الفوري للنهاية
     if(!data.questions || data.currentIdx >= totalQs) { 
-        // الانتقال السريع للنهاية
-        setTimeout(() => endGame(data), 100);
+        setTimeout(() => endGame(data), 50); // 50 مللي فقط!
         return; 
     }
     
-    // 🔥 نظام مراقبة النشاط السريع 🔥
+    // ⚡ فحص سريع لنشاط الخصم
     const lastActiveTime = data.lastActivity || 0;
     const currentTime = Date.now();
+    const inactiveTime = currentTime - lastActiveTime;
     
-    // إذا مر أكثر من 10 ثواني دون نشاط، الانتقال فوري
-    if (currentGameMode === 'online' && (currentTime - lastActiveTime) > 10000) {
-        console.log("🚀 الانتقال الفوري بسبب عدم النشاط");
-        if(data.player1.uid === currentUser.uid) {
-            updateDoc(doc(db, "match_queue", currentMatchId), { 
-                currentIdx: increment(1), 
-                answersCount: 0,
-                lastActivity: Date.now()
-            }).catch(e => console.error("Update error:", e));
+    // ⚡ إذا مر أكثر من 8 ثواني (أسرع)
+    if (currentGameMode === 'online' && inactiveTime > 8000) {
+        console.log("⚡ خمول الخصم - محاولة تخطي");
+        
+        // إذا كان المضيف، يتخطى السؤال
+        if(data.player1.uid === currentUser.uid && data.answersCount < 2) {
+            console.log("🎯 المضيف يتخطى السؤال بسبب خمول الخصم");
+            setTimeout(() => {
+                forceNextQuestionQuick();
+            }, 1000);
         }
         return;
     }
     
-    // إذا كان كلا اللاعبين قد أجابا، الانتقال فوري
+    // ⚡ إذا أجاب الاثنان، الانتقال فوري
     if (currentGameMode === 'online' && data.answersCount >= 2) {
-        console.log("✅ كلا اللاعبين أجابا، الانتقال الفوري");
+        console.log("✅ كلا اللاعبين أجابا - الانتقال الفوري");
         setTimeout(() => {
             if(data.player1.uid === currentUser.uid) {
-                updateDoc(doc(db, "match_queue", currentMatchId), { 
-                    currentIdx: increment(1), 
-                    answersCount: 0,
-                    lastActivity: Date.now()
-                }).catch(e => console.error("Auto-advance error:", e));
+                forceNextQuestionQuick();
             }
-        }, 500); // انتظار 0.5 ثانية فقط بدلاً من 1.5
+        }, 300); // 0.3 ثانية فقط!
         return;
     }
     
     const q = data.questions[data.currentIdx];
     if (!q) { 
-        endGame(data); 
+        setTimeout(() => endGame(data), 50);
         return; 
     }
     
-    if (currentGameMode === 'online') {
-        const isP1 = data.player1.uid === currentUser.uid;
-        document.getElementById('p1-name').innerText = userData.name;
-        document.getElementById('game-p1-img').src = userData.photo;
-        document.getElementById('p2-name').innerText = isP1 ? data.player2.name : data.player1.name;
-        document.getElementById('game-p2-img').src = isP1 ? data.player2.photo : data.player1.photo;
-        document.getElementById('game-my-score').innerText = isP1 ? data.player1.score : data.player2.score;
-        document.getElementById('game-op-score').innerText = isP1 ? data.player2.score : data.player1.score;
-    } else {
-        document.getElementById('p1-name').innerText = userData.name;
-        document.getElementById('game-p1-img').src = userData.photo;
-        document.getElementById('p2-name').innerText = data.player2.name;
-        document.getElementById('game-p2-img').src = data.player2.photo;
-        document.getElementById('game-my-score').innerText = data.player1.score;
-        document.getElementById('game-op-score').innerText = data.player2.score;
-    }
-
+    // ⚡ تحديث واجهة اللاعبين بشكل منفصل عن الأنيميشن
+    updatePlayerUI(data);
+    
     const qTextEl = document.getElementById('q-text');
+    
+    // ⚡ تحسين: تحديث السؤال فقط إذا تغير
     if(qTextEl.innerText !== q.question) {
         hasAnsweredCurrentQ = false;
         userAnsweredCorrectly = false;
         currentQuestionCorrectAnswer = null;
         clearTimeout(aiTimeoutId); 
+        
+        // ⚡ إعادة تعيين واجهة الإجابات
         document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
         document.getElementById('waiting-msg').classList.add('hidden');
         document.getElementById('ai-thinking-msg').classList.add('hidden');
         
-        // 🔥 **العداد الذكي الجديد** 🔥
-        // تأكد من إيقاف أي timer سابق
-        if (window.currentGameTimer) {
-            clearInterval(window.currentGameTimer);
-            window.currentGameTimer = null;
-        }
+        // ⚡ التحديث الفوري للنص
+        qTextEl.innerText = q.question;
+        document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
         
-        // تعريف المتغيرات بشكل صحيح
-        let timeLeft = 15;
-        document.getElementById('game-timer').innerText = timeLeft;
+        // ⚡ إنشاء الإجابات
+        createAnswers(q, data);
         
-        // إنشاء الـ timer الجديد
-        window.currentGameTimer = setInterval(() => {
-            if (isExitingGame) { 
-                clearInterval(window.currentGameTimer); 
-                window.currentGameTimer = null;
-                return; 
-            }
-            
-            // 🔥 التحقق من الإنترنت 🔥
-            if (!navigator.onLine) {
-                console.log("⏸️ العداد متوقف - الإنترنت منقطع");
-                return; // توقف العداد
-            }
-            
-            timeLeft--;
-            document.getElementById('game-timer').innerText = timeLeft;
-            
-            if(timeLeft <= 0) { 
-                clearInterval(window.currentGameTimer);
-                window.currentGameTimer = null;
-                console.log("⏰ العداد وصل 0، الانتقال فوري");
-                
-                // إذا لم يجب، معالجة تلقائية
-                if(!hasAnsweredCurrentQ) {
-                    console.log("لم يجب اللاعب بعد، معالجة time-out");
-                    
-                    // عرض الإجابة الصحيحة
-                    const answerButtons = document.querySelectorAll('#answers-container button');
-                    answerButtons.forEach(btn => {
-                        btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
-                        if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) {
-                            btn.classList.add('answer-correct');
-                        } else {
-                            btn.classList.add('answer-neutral');
-                        }
-                    });
-                    
-                    document.getElementById('answers-container').classList.add('pointer-events-none');
-                    
-                    if (currentGameMode === 'online') {
-                        document.getElementById('waiting-msg').classList.remove('hidden');
-                    }
-                    
-                    hasAnsweredCurrentQ = true;
-                    
-                    // معالجة الـ timeout
-                    handleTimeoutImmediate();
-                    
-                    // الانتقال فوري للسؤال التالي بعد 1 ثانية
-                    setTimeout(() => {
-                        if(currentGameMode === 'online' && currentMatchId) {
-                            console.log("⚡ الانتقال الفوري للسؤال التالي");
-                            forceNextQuestionImmediate();
-                        } else if (currentGameMode === 'ai') {
-                            handleAINextTurn();
-                        }
-                    }, 1000);
-                } else {
-                    console.log("اللاعب قد أجاب بالفعل");
-                    if (currentGameMode === 'ai') {
-                        handleAINextTurn();
-                    }
-                }
-            }
-        }, 1000);
+        // ⚡ بدء المؤقت
+        startGameTimer(15);
+    }
+}
+
+// ⚡ دالة جديدة: تحديث واجهة اللاعبين بسرعة
+function updatePlayerUI(data) {
+    if (currentGameMode === 'online') {
+        const isP1 = data.player1.uid === currentUser.uid;
         
-        // تخزين الـ timer العام
-        gameTimer = window.currentGameTimer;
+        // ⚡ تحديث مباشر بدون تحقق
+        const p1Name = document.getElementById('p1-name');
+        const p2Name = document.getElementById('p2-name');
+        const myScore = document.getElementById('game-my-score');
+        const opScore = document.getElementById('game-op-score');
+        
+        if (p1Name) p1Name.innerText = userData.name;
+        if (p2Name) p2Name.innerText = isP1 ? data.player2.name : data.player1.name;
+        if (myScore) myScore.innerText = isP1 ? data.player1.score : data.player2.score;
+        if (opScore) opScore.innerText = isP1 ? data.player2.score : data.player1.score;
+        
+        // ⚡ تحديث الصور
+        const p1Img = document.getElementById('game-p1-img');
+        const p2Img = document.getElementById('game-p2-img');
+        if (p1Img) p1Img.src = userData.photo;
+        if (p2Img) p2Img.src = isP1 ? data.player2.photo : data.player1.photo;
+    }
+}
+
+// ⚡ دالة جديدة: بدء المؤقت الذكي
+function startGameTimer(seconds) {
+    // إيقاف أي timer سابق
+    if (window.currentGameTimer) {
+        clearInterval(window.currentGameTimer);
+        window.currentGameTimer = null;
     }
     
-    document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
-    qTextEl.innerText = q.question;
-    const div = document.getElementById('answers-container');
-    if(div.children.length === 0 || div.getAttribute('data-curr-q') !== q.question) {
-        div.setAttribute('data-curr-q', q.question);
-        div.innerHTML = '';
-        let ansList = [];
-        if(q.type === 'mcq') ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
-        else ansList = [{ txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }];
+    let timeLeft = seconds;
+    const timerEl = document.getElementById('game-timer');
+    if (timerEl) timerEl.innerText = timeLeft;
+    
+    window.currentGameTimer = setInterval(() => {
+        // ⚡ التحقق من الإنترنت أولاً
+        if (!navigator.onLine) {
+            console.log("⏸️ المؤقت متوقف - الإنترنت منقطع");
+            clearInterval(window.currentGameTimer);
+            window.currentGameTimer = null;
+            return;
+        }
         
-        const correctAns = ansList.find(ans => ans.isCorrect);
-        if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
+        timeLeft--;
+        if (timerEl) timerEl.innerText = timeLeft;
+        
+        if(timeLeft <= 0) { 
+            clearInterval(window.currentGameTimer);
+            window.currentGameTimer = null;
+            handleTimeoutQuick();
+        }
+    }, 1000);
+}
 
-        ansList.sort(() => 0.5 - Math.random());
-        ansList.forEach(ansObj => {
-            const btn = document.createElement('button');
-            btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
-            btn.innerText = ansObj.txt;
-            btn.dataset.value = ansObj.value;
-            btn.onclick = () => { if(hasAnsweredCurrentQ) return; submitGameAnswer(ansObj, q, data); };
-            div.appendChild(btn);
-        });
+// ⚡ دالة جديدة: إنشاء الإجابات
+function createAnswers(q, data) {
+    const div = document.getElementById('answers-container');
+    div.innerHTML = '';
+    
+    let ansList = [];
+    if(q.type === 'mcq') {
+        ansList = q.answers.map((txt, idx) => ({ 
+            txt, 
+            isCorrect: idx === q.correct, 
+            value: idx 
+        }));
+    } else {
+        ansList = [
+            { txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, 
+            { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }
+        ];
+    }
+    
+    const correctAns = ansList.find(ans => ans.isCorrect);
+    if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
+
+    // ⚡ ترتيب عشوائي سريع
+    ansList.sort(() => Math.random() - 0.5);
+    
+    ansList.forEach(ansObj => {
+        const btn = document.createElement('button');
+        btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
+        btn.innerText = ansObj.txt;
+        btn.dataset.value = ansObj.value;
+        btn.onclick = () => { 
+            if(hasAnsweredCurrentQ) return; 
+            submitGameAnswerQuick(ansObj, q, data); 
+        };
+        div.appendChild(btn);
+    });
+}
+
+// ⚡ دالة إرسال الإجابة السريعة
+async function submitGameAnswerQuick(ansObj, q, matchData) {
+    if(hasAnsweredCurrentQ || isExitingGame) return;
+    
+    hasAnsweredCurrentQ = true;
+    userAnsweredCorrectly = ansObj && ansObj.isCorrect;
+    
+    // ⚡ تحديث الواجهة فوراً
+    const answerButtons = document.querySelectorAll('#answers-container button');
+    answerButtons.forEach(btn => {
+        btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
+        if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) {
+            btn.classList.add('answer-correct');
+        } else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) {
+            btn.classList.add('answer-wrong');
+        } else {
+            btn.classList.add('answer-neutral');
+        }
+    });
+    
+    document.getElementById('answers-container').classList.add('pointer-events-none');
+
+    if (currentGameMode === 'online') {
+        document.getElementById('waiting-msg').classList.remove('hidden');
+        
+        // ⚡ تحديث فوري للنقاط
+        const isP1 = matchData.player1.uid === currentUser.uid;
+        if (!currentMatchId) return;
+        
+        try {
+            // ⚡ تحديث سريع في قاعدة البيانات
+            await updateDoc(doc(db, "match_queue", currentMatchId), {
+                answersCount: increment(1),
+                lastActivity: Date.now(),
+                ...(ansObj && ansObj.isCorrect ? {
+                    [isP1 ? 'player1.score' : 'player2.score']: increment(1)
+                } : {})
+            });
+            
+            console.log("✅ تم تسجيل الإجابة بنجاح");
+            
+        } catch (error) {
+            console.error("❌ خطأ في تسجيل الإجابة:", error);
+            // ⚡ محاولة بديلة
+            tryFallbackUpdate();
+        }
+    } else {
+        // معالجة الذكاء الاصطناعي
+        if(ansObj && ansObj.isCorrect) {
+            localMatchData.player1.score += 1;
+            document.getElementById('game-my-score').innerText = localMatchData.player1.score;
+        }
+        triggerAIResponse();
     }
 }
         
@@ -5684,61 +5916,162 @@ let networkDisconnectTimeout = null;
 let opponentDisconnected = false;
 let myDisconnectTime = null;
 
-// دالة لبدء مراقبة الشبكة
+// نظام مراقبة الشبكة المحسن
 function setupNetworkMonitoring() {
-    console.log("🌐 بدء مراقبة الشبكة...");
+    console.log("🌐 بدء نظام مراقبة الشبكة الذكي...");
+    isNetworkMonitoringActive = true;
+    
+    // إلغاء أي مهلات سابقة
+    if (networkDisconnectTimeout) {
+        clearTimeout(networkDisconnectTimeout);
+        networkDisconnectTimeout = null;
+    }
+    
+    if (gameConnectionTimeout) {
+        clearTimeout(gameConnectionTimeout);
+        gameConnectionTimeout = null;
+    }
     
     // مراقبة حالة الإنترنت
-    window.addEventListener('online', handleNetworkRestored);
-    window.addEventListener('offline', handleNetworkLost);
+    window.addEventListener('online', handleNetworkRestoredFast);
+    window.addEventListener('offline', handleNetworkLostFast);
     
-    // مراقبة نشاط الخصم كل 3 ثواني
-    startOpponentActivityCheck();
+    // مراقبة نشاط الخصم كل 2 ثانية (أسرع)
+    startQuickOpponentCheck();
 }
 
-// مراقبة نشاط الخصم
-function startOpponentActivityCheck() {
-    if (networkCheckInterval) clearInterval(networkCheckInterval);
+// مراقبة سريعة للخصم
+function startQuickOpponentCheck() {
+    if (networkDisconnectTimeout) {
+        clearTimeout(networkDisconnectTimeout);
+    }
     
-    networkCheckInterval = setInterval(() => {
+    networkDisconnectTimeout = setInterval(async () => {
         if (currentGameMode !== 'online' || !currentMatchId || opponentDisconnected) return;
         
         try {
-            getDoc(doc(db, "match_queue", currentMatchId)).then(matchDoc => {
-                if (!matchDoc.exists()) return;
+            const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
+            if (!matchDoc.exists()) {
+                console.log("⚠️ المباراة محذوفة أثناء المراقبة");
+                return;
+            }
+            
+            const matchData = matchDoc.data();
+            const lastActive = matchData.lastActivity || 0;
+            const inactiveTime = Date.now() - lastActive;
+            
+            // ⚡ فحص سريع: إذا مر أكثر من 12 ثانية (أسرع)
+            if (inactiveTime > 12000 && matchData.status === 'active') {
+                console.log("⚡ اكتشاف خمول الخصم: " + Math.round(inactiveTime/1000) + " ثانية");
                 
-                const matchData = matchDoc.data();
-                const lastActive = matchData.lastActivity || 0;
-                const inactiveTime = Date.now() - lastActive;
-                
-                // إذا مر أكثر من 15 ثانية، فوز فوري
-                if (inactiveTime > 15000 && matchData.status === 'active') {
-                    console.log("⚡ فوز فوري بسبب انقطاع الخصم!");
+                // التحقق من أن الخصم لم يجب على السؤال الحالي
+                if (matchData.answersCount < 2) {
+                    console.log("🎯 الخصم متأخر في الإجابة - فوز فوري");
                     opponentDisconnected = true;
-                    
-                    const isP1 = matchData.player1.uid === currentUser.uid;
-                    const opponentId = isP1 ? matchData.player2.uid : matchData.player1.uid;
-                    
-                    // فوز فوري +10 نقاط
-                    updateDoc(doc(db, "users", currentUser.uid), {
-                        points: increment(10)
-                    }).then(() => {
-                        userData.points += 10;
-                        setupHeaderUI();
-                        
-                        // حذف المباراة
-                        deleteDoc(doc(db, "match_queue", currentMatchId)).then(() => {
-                            showImmediateWin("انقطع اتصال الخصم!");
-                        });
-                    });
+                    await handleImmediateWin("تأخر الخصم في الإجابة");
                 }
-            }).catch(error => {
-                console.error("Error checking opponent:", error);
-            });
+            }
+            
+            // ⚡ فحص انقطاع كامل: 25 ثانية
+            if (inactiveTime > 25000 && matchData.status === 'active') {
+                console.log("🔴 انقطاع تام للخصم - فوز فوري!");
+                opponentDisconnected = true;
+                await handleImmediateWin("انقطع اتصال الخصم");
+            }
+            
         } catch (error) {
-            console.error("Error in opponent check:", error);
+            console.error("❌ خطأ في مراقبة الخصم:", error);
         }
-    }, 3000); // التحقق كل 3 ثواني
+    }, 2000); // التحقق كل 2 ثانية (أسرع)
+}
+
+// معالجة سريعة لانقطاع الإنترنت
+async function handleNetworkLostFast() {
+    console.log("🔴 اكتشاف انقطاع الإنترنت فوراً");
+    
+    if (!isNetworkMonitoringActive) return;
+    
+    myDisconnectTime = Date.now();
+    
+    // إذا كنت في مباراة نشطة
+    if (currentGameMode === 'online' && currentMatchId && 
+        document.getElementById('game-overlay') && 
+        !document.getElementById('game-overlay').classList.contains('hidden')) {
+        
+        console.log("🔴 معالجة انقطاع الإنترنت في المباراة النشطة");
+        
+        // ⚡ إيقاف العداد فوراً
+        if (window.currentGameTimer) {
+            clearInterval(window.currentGameTimer);
+            window.currentGameTimer = null;
+            console.log("⏸️ تم إيقاف العداد فوراً");
+        }
+        
+        // ⚡ عرض رسالة فورية
+        showQuickDisconnectMessage();
+        
+        // ⚡ الانتظار 3 ثواني فقط (أقل من السابق)
+        const disconnectTimer = setTimeout(async () => {
+            if (!navigator.onLine && currentMatchId) {
+                console.log("🔴 تأكيد الانقطاع المستمر - معالجة فورية");
+                await handleImmediateLoss("انقطع اتصالك بالإنترنت");
+            }
+        }, 3000); // 3 ثواني فقط!
+        
+        // حفظ المرجع لإلغائه إذا عاد الإنترنت
+        window.disconnectTimer = disconnectTimer;
+    }
+}
+
+// معالجة سريعة لعودة الإنترنت
+function handleNetworkRestoredFast() {
+    console.log("🟢 عودة الإنترنت - استئناف سريع");
+    
+    // إلغاء مؤقت الانقطاع إذا كان نشطاً
+    if (window.disconnectTimer) {
+        clearTimeout(window.disconnectTimer);
+        window.disconnectTimer = null;
+    }
+    
+    // إخفاء رسالة الانقطاع
+    hideDisconnectMessage();
+    
+    // إذا كنت في مباراة
+    if (currentGameMode === 'online' && currentMatchId) {
+        // تحديث النشاط في قاعدة البيانات
+        updateDoc(doc(db, "match_queue", currentMatchId), {
+            lastActivity: Date.now()
+        }).catch(e => console.error("خطأ في تحديث النشاط:", e));
+        
+        // إذا كان العداد متوقفاً، إعادة تشغيله
+        if (!window.currentGameTimer && document.getElementById('game-timer')) {
+            const currentTime = parseInt(document.getElementById('game-timer').innerText) || 15;
+            if (currentTime > 0) {
+                startGameTimer(currentTime);
+            }
+        }
+    }
+}
+
+// عرض رسالة انقطاع سريعة
+function showQuickDisconnectMessage() {
+    // إنشاء رسالة انقطاع سريعة
+    let disconnectMsg = document.getElementById('quick-disconnect-msg');
+    if (!disconnectMsg) {
+        disconnectMsg = document.createElement('div');
+        disconnectMsg.id = 'quick-disconnect-msg';
+        disconnectMsg.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg z-[1000] shadow-lg animate-pulse';
+        disconnectMsg.innerHTML = '<i class="fas fa-wifi-slash ml-2"></i> انقطع الاتصال - جاري إعادة التوصيل...';
+        document.body.appendChild(disconnectMsg);
+    }
+}
+
+// إخفاء رسالة الانقطاع
+function hideDisconnectMessage() {
+    const disconnectMsg = document.getElementById('quick-disconnect-msg');
+    if (disconnectMsg) {
+        disconnectMsg.remove();
+    }
 }
 
 // عندما ينقطع الإنترنت
