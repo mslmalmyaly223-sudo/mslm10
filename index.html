@@ -2120,7 +2120,8 @@
         let currentRoomId = null;
         let isRoomHost = false;
         let roomReadyState = false;
-        
+        let lastNetworkCheck = Date.now();
+let opponentDisconnectTime = null;
         let isExitingGame = false;
         let currentGameMode = 'online'; 
         let localMatchData = null; 
@@ -2129,7 +2130,8 @@
         let userAnsweredCorrectly = false; 
         let leaderboardOffset = 0;
         let allLeaderboardUsers = [];
-
+let networkCheckInterval = null;
+let isNetworkOnline = navigator.onLine;
         let premiumInterval = null;
         const BADGES_LIST = ["سجاج", "سجاجة", "دكتور", "دكتورة", "كسلان", "كسولة", "شطور", "شطورة", "نايم", "نايمة", "نعسان", "نعسانة", "ماكو واهس", "مهندس", "مهندسة", "واحد عراق", "صگاركم", "صگارتكم", "فستقة", "المحامي", "المحامية"];
         const BACKGROUNDS_LIST = [
@@ -2156,93 +2158,93 @@
         let uploadSubject = null;
 
         onAuthStateChanged(auth, async (user) => {
-            const intro = document.getElementById('intro-screen');
-            const authScreen = document.getElementById('auth-screen');
-            const mainApp = document.getElementById('main-app');
-            const banScreen = document.getElementById('ban-screen');
+    const intro = document.getElementById('intro-screen');
+    const authScreen = document.getElementById('auth-screen');
+    const mainApp = document.getElementById('main-app');
+    const banScreen = document.getElementById('ban-screen');
 
-            if (user) {
+    if (user) {
         currentUser = user;
         console.log("تم تسجيل الدخول بنجاح، UID:", user.uid);
         
-        // أضف هذا السطر ↓
+        // 🔥 أضف هذا السطر 🔥
         setupNetworkMonitoring(); // تشغيل مراقبة الشبكة
 
-                try {
-                    const docSnap = await getDoc(doc(db, "users", user.uid));
-                    if (docSnap.exists()) {
-                        userData = docSnap.data();
-                        console.log("تم تحميل بيانات المستخدم:", userData.name);
+        try {
+            const docSnap = await getDoc(doc(db, "users", user.uid));
+            if (docSnap.exists()) {
+                userData = docSnap.data();
+                console.log("تم تحميل بيانات المستخدم:", userData.name);
 
-                        if (userData.isBanned === true) {
-    banScreen.classList.remove('hidden');
-    await signOut(auth);
-    localStorage.setItem('device_banned', 'true');
-    return;
-}
-
-if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN_EMAIL) {
-    banScreen.classList.remove('hidden');
-    await signOut(auth);
-    return;
-}
-
-                        await updateDoc(doc(db, "users", user.uid), { 
-                            lastActive: serverTimestamp(),
-                            lastLogin: new Date().toISOString()
-                        });
-                        
-                        setupProfileUI();
-                        setupHeaderUI();
-                        setupAdminUI();
-                        checkDailyReward();
-                        checkAIRemaining();
-                        checkPremiumStatus();
-                        if(userData.email === ADMIN_EMAIL) checkAdminNotifications();
-                        checkPendingQuestionsNotification();
-
-                        if (userData.grade) {
-                            document.getElementById('grade-selector-card').classList.add('hidden');
-                            document.getElementById('challenge-active-card').classList.remove('hidden');
-                            document.getElementById('header-grade-badge').innerText = getGradeName(userData.grade);
-                            document.getElementById('header-grade-badge').classList.remove('hidden');
-                            populateSubjects(userData.grade, 'challenge-subject');
-                        } else {
-                            document.getElementById('grade-selector-card').classList.remove('hidden');
-                            document.getElementById('challenge-active-card').classList.add('hidden');
-                            document.getElementById('header-grade-badge').classList.add('hidden');
-                        }
-                        
-                        setTimeout(() => {
-                            intro.classList.add('hidden');
-                            authScreen.classList.add('hidden');
-                            mainApp.classList.remove('hidden');
-                            if(!document.querySelector('.screen.active')) switchTab('challenges');
-                            startWeeklyCountdown();
-                        }, 2500);
-                        
-                    } else {
-                        console.log("المستخدم غير موجود في قاعدة البيانات، تسجيل الخروج...");
-                        await signOut(auth);
-                        location.reload();
-                    }
-                } catch(e) { 
-                    console.error("Auth Data Error:", e); 
-                    showBeautifulAlert('error', 'خطأ', 'حدث خطأ في تحميل البيانات');
+                if (userData.isBanned === true) {
+                    banScreen.classList.remove('hidden');
                     await signOut(auth);
-                    location.reload();
+                    localStorage.setItem('device_banned', 'true');
+                    return;
                 }
-            } else {
-                console.log("المستخدم غير مسجل دخول");
+
+                if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN_EMAIL) {
+                    banScreen.classList.remove('hidden');
+                    await signOut(auth);
+                    return;
+                }
+
+                await updateDoc(doc(db, "users", user.uid), { 
+                    lastActive: serverTimestamp(),
+                    lastLogin: new Date().toISOString()
+                });
+                
+                setupProfileUI();
+                setupHeaderUI();
+                setupAdminUI();
+                checkDailyReward();
+                checkAIRemaining();
+                checkPremiumStatus();
+                if(userData.email === ADMIN_EMAIL) checkAdminNotifications();
+                checkPendingQuestionsNotification();
+
+                if (userData.grade) {
+                    document.getElementById('grade-selector-card').classList.add('hidden');
+                    document.getElementById('challenge-active-card').classList.remove('hidden');
+                    document.getElementById('header-grade-badge').innerText = getGradeName(userData.grade);
+                    document.getElementById('header-grade-badge').classList.remove('hidden');
+                    populateSubjects(userData.grade, 'challenge-subject');
+                } else {
+                    document.getElementById('grade-selector-card').classList.remove('hidden');
+                    document.getElementById('challenge-active-card').classList.add('hidden');
+                    document.getElementById('header-grade-badge').classList.add('hidden');
+                }
+                
                 setTimeout(() => {
                     intro.classList.add('hidden');
-                    mainApp.classList.add('hidden');
-                    banScreen.classList.add('hidden');
-                    authScreen.classList.remove('hidden');
-                    window.switchAuthTab('login');
-                }, 2000);
+                    authScreen.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                    if(!document.querySelector('.screen.active')) switchTab('challenges');
+                    startWeeklyCountdown();
+                }, 2500);
+                
+            } else {
+                console.log("المستخدم غير موجود في قاعدة البيانات، تسجيل الخروج...");
+                await signOut(auth);
+                location.reload();
             }
-        });
+        } catch(e) { 
+            console.error("Auth Data Error:", e); 
+            showBeautifulAlert('error', 'خطأ', 'حدث خطأ في تحميل البيانات');
+            await signOut(auth);
+            location.reload();
+        }
+    } else {
+        console.log("المستخدم غير مسجل دخول");
+        setTimeout(() => {
+            intro.classList.add('hidden');
+            mainApp.classList.add('hidden');
+            banScreen.classList.add('hidden');
+            authScreen.classList.remove('hidden');
+            window.switchAuthTab('login');
+        }, 2000);
+    }
+});
 
         async function compressImage(file) {
             return new Promise((resolve) => {
@@ -3288,30 +3290,55 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         }
 
         function listenToMatch(id) {
-            if(matchListenerUnsubscribe) matchListenerUnsubscribe(); 
-            matchListenerUnsubscribe = onSnapshot(doc(db, "match_queue", id), async (snap) => {
-                if(isExitingGame) return;
-                if(!snap.exists()) {
-                    if (currentGameMode === 'online') {
-                        console.log("المباراة حذفت من السيرفر");
-                        return;
-                    }
-                    return;
-                }
-                const d = snap.data();
-                
-                if(d.status === 'active') {
-                    if (document.getElementById('game-overlay').classList.contains('hidden') && !document.getElementById('vs-screen').classList.contains('flex')) {
-                         await showVSAnimation(d.player1, d.player2);
-                         document.getElementById('game-overlay').classList.remove('hidden');
-                         document.getElementById('withdraw-game-btn').classList.remove('hidden');
-                         renderGame(d);
-                    } else {
-                         renderGame(d);
-                    }
-                }
-            });
+    if(matchListenerUnsubscribe) matchListenerUnsubscribe(); 
+    
+    // مهلة اتصال قصيرة
+    const connectionTimeout = setTimeout(() => {
+        if (document.getElementById('game-overlay').classList.contains('hidden') && 
+            document.getElementById('searching-ui').style.display !== 'none') {
+            console.log("⏱️ مهلة الاتصال - إعادة المحاولة");
+            cancelSearch();
+            showBeautifulAlert('warning', 'اتصال بطيء', 'جاري إعادة الاتصال...');
         }
+    }, 10000); // 10 ثواني كحد أقصى
+    
+    matchListenerUnsubscribe = onSnapshot(doc(db, "match_queue", id), async (snap) => {
+        clearTimeout(connectionTimeout); // إلغاء المهلة
+        
+        if(isExitingGame) return;
+        if(!snap.exists()) {
+            console.log("المباراة حذفت - إنهاء فوري");
+            if (currentGameMode === 'online') {
+                closeResultScreen();
+            }
+            return;
+        }
+        
+        const d = snap.data();
+        
+        // معالجة سريعة للمباراة النشطة
+        if(d.status === 'active') {
+            if (document.getElementById('game-overlay').classList.contains('hidden') && 
+                !document.getElementById('vs-screen').classList.contains('flex')) {
+                
+                // عرض فوري بدون انتظار
+                document.getElementById('game-overlay').classList.remove('hidden');
+                document.getElementById('withdraw-game-btn').classList.remove('hidden');
+                renderGame(d);
+            } else {
+                renderGame(d);
+            }
+        }
+    }, (error) => {
+        console.error("❌ خطأ في الاستماع للمباراة:", error);
+        clearTimeout(connectionTimeout);
+        
+        if (currentGameMode === 'online') {
+            showBeautifulAlert('error', 'خطأ اتصال', 'فقد الاتصال بالسيرفر');
+            cancelSearch();
+        }
+    });
+}
         
         function showVSAnimation(p1, p2) {
             return new Promise(resolve => {
@@ -3342,17 +3369,18 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
     if (isExitingGame) return;
     const totalQs = data.questions.length;
     if(!data.questions || data.currentIdx >= totalQs) { 
-        endGame(data); 
+        // الانتقال السريع للنهاية
+        setTimeout(() => endGame(data), 100);
         return; 
     }
     
-    // تحسن هنا: إضافة تحقق من lastActivity لمنع التجميد
+    // 🔥 نظام مراقبة النشاط السريع 🔥
     const lastActiveTime = data.lastActivity || 0;
     const currentTime = Date.now();
     
-    // إذا مر أكثر من 30 ثانية دون نشاط، إعادة تعيين
-    if (currentGameMode === 'online' && (currentTime - lastActiveTime) > 30000) {
-        console.log("🔄 إعادة تعيين بسبب عدم النشاط");
+    // إذا مر أكثر من 10 ثواني دون نشاط، الانتقال فوري
+    if (currentGameMode === 'online' && (currentTime - lastActiveTime) > 10000) {
+        console.log("🚀 الانتقال الفوري بسبب عدم النشاط");
         if(data.player1.uid === currentUser.uid) {
             updateDoc(doc(db, "match_queue", currentMatchId), { 
                 currentIdx: increment(1), 
@@ -3363,10 +3391,9 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         return;
     }
     
-    // الكود الأصلي مع تحسين
+    // إذا كان كلا اللاعبين قد أجابا، الانتقال فوري
     if (currentGameMode === 'online' && data.answersCount >= 2) {
-        console.log("✅ كلا اللاعبين أجابا، الانتقال للسؤال التالي");
-        // الانتقال التلقائي بعد إجابة الاثنين
+        console.log("✅ كلا اللاعبين أجابا، الانتقال الفوري");
         setTimeout(() => {
             if(data.player1.uid === currentUser.uid) {
                 updateDoc(doc(db, "match_queue", currentMatchId), { 
@@ -3375,7 +3402,7 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                     lastActivity: Date.now()
                 }).catch(e => console.error("Auto-advance error:", e));
             }
-        }, 1500); // انتظار 1.5 ثانية قبل الانتقال
+        }, 500); // انتظار 0.5 ثانية فقط بدلاً من 1.5
         return;
     }
     
@@ -3412,7 +3439,7 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         document.getElementById('waiting-msg').classList.add('hidden');
         document.getElementById('ai-thinking-msg').classList.add('hidden');
         
-        // 🔥 **هنا الجزء المصحح - العداد الجديد** 🔥
+        // 🔥 **العداد الذكي الجديد** 🔥
         // تأكد من إيقاف أي timer سابق
         if (window.currentGameTimer) {
             clearInterval(window.currentGameTimer);
@@ -3429,6 +3456,12 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                 clearInterval(window.currentGameTimer); 
                 window.currentGameTimer = null;
                 return; 
+            }
+            
+            // 🔥 التحقق من الإنترنت 🔥
+            if (!navigator.onLine) {
+                console.log("⏸️ العداد متوقف - الإنترنت منقطع");
+                return; // توقف العداد
             }
             
             timeLeft--;
@@ -3463,9 +3496,9 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                     hasAnsweredCurrentQ = true;
                     
                     // معالجة الـ timeout
-                    handleTimeOut();
+                    handleTimeoutImmediate();
                     
-                    // الانتقال فوري للسؤال التالي بعد 1.5 ثانية
+                    // الانتقال فوري للسؤال التالي بعد 1 ثانية
                     setTimeout(() => {
                         if(currentGameMode === 'online' && currentMatchId) {
                             console.log("⚡ الانتقال الفوري للسؤال التالي");
@@ -3473,7 +3506,7 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                         } else if (currentGameMode === 'ai') {
                             handleAINextTurn();
                         }
-                    }, 1500);
+                    }, 1000);
                 } else {
                     console.log("اللاعب قد أجاب بالفعل");
                     if (currentGameMode === 'ai') {
@@ -3512,9 +3545,11 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
     }
 }
         
-        // دالة للانتقال الفوري للسؤال التالي بدون انتظار
+// دالة للانتقال الفوري للسؤال التالي بدون انتظار
 async function forceNextQuestionImmediate() {
     if (!currentMatchId || currentGameMode !== 'online') return;
+    
+    console.log("🎯 بدء الانتقال الفوري للسؤال التالي");
     
     try {
         const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
@@ -3529,19 +3564,6 @@ async function forceNextQuestionImmediate() {
         // إذا كان اللاعب هو المضيف، يتحكم بالانتقال
         if (isHost) {
             console.log("🎯 المضيف يتحكم بالانتقال الفوري");
-            
-            // أولاً: تحقق إذا كان answersCount بالفعل 2
-            let currentAnswers = matchData.answersCount || 0;
-            
-            // إذا كان أقل من 2، اجعله 2 (لينتقل فوراً)
-            if (currentAnswers < 2) {
-                await updateDoc(doc(db, "match_queue", currentMatchId), {
-                    answersCount: 2,
-                    lastActivity: Date.now(),
-                    forceAdvanced: true
-                });
-                console.log("تم تغيير answersCount إلى 2");
-            }
             
             // الانتقال للسؤال التالي فوراً
             await updateDoc(doc(db, "match_queue", currentMatchId), {
@@ -5662,148 +5684,130 @@ let networkDisconnectTimeout = null;
 let opponentDisconnected = false;
 let myDisconnectTime = null;
 
-// مراقبة حالة الإنترنت
+// دالة لبدء مراقبة الشبكة
 function setupNetworkMonitoring() {
-    // مراقبة انقطاع الإنترنت
+    console.log("🌐 بدء مراقبة الشبكة...");
+    
+    // مراقبة حالة الإنترنت
     window.addEventListener('online', handleNetworkRestored);
     window.addEventListener('offline', handleNetworkLost);
     
-    // مراقبة نشاط اللاعب الآخر
+    // مراقبة نشاط الخصم كل 3 ثواني
     startOpponentActivityCheck();
+}
+
+// مراقبة نشاط الخصم
+function startOpponentActivityCheck() {
+    if (networkCheckInterval) clearInterval(networkCheckInterval);
+    
+    networkCheckInterval = setInterval(() => {
+        if (currentGameMode !== 'online' || !currentMatchId || opponentDisconnected) return;
+        
+        try {
+            getDoc(doc(db, "match_queue", currentMatchId)).then(matchDoc => {
+                if (!matchDoc.exists()) return;
+                
+                const matchData = matchDoc.data();
+                const lastActive = matchData.lastActivity || 0;
+                const inactiveTime = Date.now() - lastActive;
+                
+                // إذا مر أكثر من 15 ثانية، فوز فوري
+                if (inactiveTime > 15000 && matchData.status === 'active') {
+                    console.log("⚡ فوز فوري بسبب انقطاع الخصم!");
+                    opponentDisconnected = true;
+                    
+                    const isP1 = matchData.player1.uid === currentUser.uid;
+                    const opponentId = isP1 ? matchData.player2.uid : matchData.player1.uid;
+                    
+                    // فوز فوري +10 نقاط
+                    updateDoc(doc(db, "users", currentUser.uid), {
+                        points: increment(10)
+                    }).then(() => {
+                        userData.points += 10;
+                        setupHeaderUI();
+                        
+                        // حذف المباراة
+                        deleteDoc(doc(db, "match_queue", currentMatchId)).then(() => {
+                            showImmediateWin("انقطع اتصال الخصم!");
+                        });
+                    });
+                }
+            }).catch(error => {
+                console.error("Error checking opponent:", error);
+            });
+        } catch (error) {
+            console.error("Error in opponent check:", error);
+        }
+    }, 3000); // التحقق كل 3 ثواني
 }
 
 // عندما ينقطع الإنترنت
 function handleNetworkLost() {
-    console.log("🔴 انقطع الإنترنت");
-    myDisconnectTime = Date.now();
+    console.log("🔴 انقطع الإنترنت - معالجة فورية");
+    isNetworkOnline = false;
     
-    // إذا كانت هناك مباراة نشطة
-    if (currentGameMode === 'online' && currentMatchId && document.getElementById('game-overlay') && 
+    // إذا كان هناك timer نشط، أوقفه
+    if (window.currentGameTimer) {
+        clearInterval(window.currentGameTimer);
+        window.currentGameTimer = null;
+        console.log("⏸️ تم إيقاف العداد بسبب انقطاع الإنترنت");
+    }
+    
+    // إذا كنت في مباراة
+    if (currentGameMode === 'online' && currentMatchId && 
+        document.getElementById('game-overlay') && 
         !document.getElementById('game-overlay').classList.contains('hidden')) {
         
-        // بعد 5 ثواني من الانقطاع، إنهاء المباراة
-        networkDisconnectTimeout = setTimeout(() => {
-            if (!navigator.onLine) {
-                endMatchDueToDisconnection(true); // أنا الذي انقطعت
-            }
-        }, 5000);
-    }
-}
-
-// عند عودة الإنترنت
-function handleNetworkRestored() {
-    console.log("🟢 عاد الإنترنت");
-    if (networkDisconnectTimeout) {
-        clearTimeout(networkDisconnectTimeout);
-        networkDisconnectTimeout = null;
-    }
-    
-    // إذا كنت في مباراة وانقطعت لأكثر من 10 ثواني
-    if (myDisconnectTime && (Date.now() - myDisconnectTime) > 10000) {
-        if (currentMatchId && currentGameMode === 'online') {
-            endMatchDueToDisconnection(true);
-        }
-    }
-}
-
-// مراقبة نشاط اللاعب الآخر
-function startOpponentActivityCheck() {
-    setInterval(async () => {
-        if (currentGameMode !== 'online' || !currentMatchId || opponentDisconnected) return;
+        console.log("🔴 معالجة انقطاع الإنترنت في المباراة النشطة");
         
-        try {
-            const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
-            if (!matchDoc.exists()) return;
-            
-            const matchData = matchDoc.data();
-            const lastActive = matchData.lastActivity || 0;
-            const inactiveTime = Date.now() - lastActive;
-            
-            // إذا مر أكثر من 25 ثانية دون نشاط من الخصم
-            if (inactiveTime > 25000 && matchData.status === 'active') {
-                console.log("⚠️ الخصم غير نشط لمدة", Math.round(inactiveTime/1000), "ثانية");
+        // خسارة فورية بعد 5 ثواني من الانقطاع
+        setTimeout(() => {
+            if (!navigator.onLine && currentMatchId) {
+                console.log("🔴 تأكيد الانقطاع - خسارة فورية");
                 
-                // تحقق إذا كان الخصم قد أجاب أم لا
-                if (matchData.answersCount === 0 || matchData.answersCount === 1) {
-                    // إذا مر أكثر من 40 ثانية، إنهاء المباراة
-                    if (inactiveTime > 40000) {
-                        opponentDisconnected = true;
-                        endMatchDueToDisconnection(false); // الخصم انقطع
+                // خسارة فورية
+                updateDoc(doc(db, "users", currentUser.uid), {
+                    points: increment(-10)
+                }).then(() => {
+                    userData.points -= 10;
+                    setupHeaderUI();
+                    showImmediateLoss("انقطع اتصالك بالإنترنت");
+                    
+                    // حذف المباراة
+                    if (currentMatchId) {
+                        deleteDoc(doc(db, "match_queue", currentMatchId));
                     }
-                }
-            }
-        } catch (error) {
-            console.error("Error checking opponent:", error);
-        }
-    }, 10000); // تحقق كل 10 ثواني
-}
-
-// دالة لإنهاء المباراة بسبب انقطاع اتصال
-async function endMatchDueToDisconnection(isMyDisconnect) {
-    if (!currentMatchId || currentGameMode !== 'online') return;
-    
-    try {
-        const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
-        if (!matchDoc.exists()) return;
-        
-        const matchData = matchDoc.data();
-        const isP1 = matchData.player1.uid === currentUser.uid;
-        const opponentId = isP1 ? matchData.player2.uid : matchData.player1.uid;
-        
-        // إذا أنا الذي انقطعت
-        if (isMyDisconnect) {
-            // خصم 10 نقاط مني
-            await updateDoc(doc(db, "users", currentUser.uid), {
-                points: increment(-10)
-            });
-            userData.points -= 10;
-            setupHeaderUI();
-            
-            // منح 10 نقاط للخصم (إذا لم يكن AI)
-            if (opponentId !== 'AI_BOT') {
-                await updateDoc(doc(db, "users", opponentId), {
-                    points: increment(10)
+                }).catch(error => {
+                    console.error("Error updating points:", error);
                 });
             }
-            
-            // عرض النتيجة لي
-            showDisconnectResult(true, matchData);
-            
-        } else { // إذا الخصم انقطع
-            // منح 10 نقاط لي
-            await updateDoc(doc(db, "users", currentUser.uid), {
-                points: increment(10)
-            });
-            userData.points += 10;
-            setupHeaderUI();
-            
-            // خصم 10 نقاط من الخصم
-            await updateDoc(doc(db, "users", opponentId), {
-                points: increment(-10)
-            });
-            
-            // عرض النتيجة لي
-            showDisconnectResult(false, matchData);
-        }
-        
-        // حذف المباراة من قاعدة البيانات
-        await deleteDoc(doc(db, "match_queue", currentMatchId));
-        
-        // تسجيل الحدث
-        logConnectionIssue('DISCONNECTION_END', {
-            disconnectedPlayer: isMyDisconnect ? 'me' : 'opponent',
-            matchId: currentMatchId,
-            scores: { player1: matchData.player1.score, player2: matchData.player2.score }
-        });
-        
-    } catch (error) {
-        console.error("❌ خطأ في إنهاء المباراة بسبب انقطاع:", error);
+        }, 5000); // انتظار 5 ثواني فقط
     }
 }
 
-// دالة لعرض نتيجة انقطاع الاتصال
-function showDisconnectResult(isMyDisconnect, matchData) {
-    clearInterval(gameTimer);
+// عندما يعود الإنترنت
+function handleNetworkRestored() {
+    console.log("🟢 عاد الإنترنت - استئناف اللعبة");
+    isNetworkOnline = true;
+    
+    // إذا كنت في مباراة وكان العداد متوقفاً
+    if (currentGameMode === 'online' && currentMatchId && 
+        document.getElementById('game-overlay') && 
+        !document.getElementById('game-overlay').classList.contains('hidden') &&
+        !window.currentGameTimer) {
+        
+        console.log("🟢 محاولة استئناف اللعبة...");
+        // يمكنك إضافة منطق لاستئناف اللعبة هنا إذا أردت
+    }
+}
+
+// دالة لعرض الفوز الفوري
+function showImmediateWin(reason) {
+    if (window.currentGameTimer) {
+        clearInterval(window.currentGameTimer);
+        window.currentGameTimer = null;
+    }
+    
     document.getElementById('game-overlay').classList.add('hidden');
     document.getElementById('withdraw-game-btn').classList.add('hidden');
     
@@ -5813,82 +5817,98 @@ function showDisconnectResult(isMyDisconnect, matchData) {
     const msg = document.getElementById('result-msg');
     const finalMyScore = document.getElementById('final-my-score');
     const finalOpScore = document.getElementById('final-op-score');
-    const finalOpName = document.getElementById('final-op-name');
     const pointsGained = document.getElementById('result-points-gained-text');
     
-    if (isMyDisconnect) {
-        // أنا الذي انقطعت
-        iconContainer.innerText = "😢";
-        title.innerText = "انقطع الاتصال";
-        msg.innerText = "انقطع اتصالك بالإنترنت";
-        finalMyScore.innerText = "0";
-        finalOpScore.innerText = "10";
-        finalOpName.innerText = "الخصم";
-        pointsGained.innerText = "-10";
-    } else {
-        // الخصم انقطع
-        iconContainer.innerText = "🏆";
-        title.innerText = "فوز!";
-        msg.innerText = "انقطع اتصال الخصم";
-        finalMyScore.innerText = "10";
-        finalOpScore.innerText = "0";
-        finalOpName.innerText = "الخصم";
-        pointsGained.innerText = "+10";
-    }
+    iconContainer.innerText = "⚡";
+    title.innerText = "فوز فوري!";
+    msg.innerText = reason;
+    finalMyScore.innerText = "10";
+    finalOpScore.innerText = "0";
+    pointsGained.innerText = "+10";
     
     resultScreen.classList.remove('hidden');
+}
+
+// دالة لعرض الخسارة الفورية
+function showImmediateLoss(reason) {
+    if (window.currentGameTimer) {
+        clearInterval(window.currentGameTimer);
+        window.currentGameTimer = null;
+    }
     
-    // إضافة زر للعودة
-    const container = document.querySelector('.result-container');
-    if (!container.querySelector('#back-btn')) {
-        const backBtn = document.createElement('button');
-        backBtn.id = 'back-btn';
-        backBtn.className = 'beautiful-btn mt-4';
-        backBtn.innerHTML = '<i class="fas fa-home"></i> العودة للرئيسية';
-        backBtn.onclick = closeResultScreen;
-        container.appendChild(backBtn);
+    document.getElementById('game-overlay').classList.add('hidden');
+    document.getElementById('withdraw-game-btn').classList.add('hidden');
+    
+    const resultScreen = document.getElementById('result-screen');
+    const iconContainer = document.getElementById('result-icon-container');
+    const title = document.getElementById('result-title');
+    const msg = document.getElementById('result-msg');
+    const finalMyScore = document.getElementById('final-my-score');
+    const finalOpScore = document.getElementById('final-op-score');
+    const pointsGained = document.getElementById('result-points-gained-text');
+    
+    iconContainer.innerText = "😢";
+    title.innerText = "خسارة فورية";
+    msg.innerText = reason;
+    finalMyScore.innerText = "0";
+    finalOpScore.innerText = "10";
+    pointsGained.innerText = "-10";
+    
+    resultScreen.classList.remove('hidden');
+}
+
+// دالة جديدة للمعالجة الفورية لانتهاء الوقت
+function handleTimeoutImmediate() {
+    console.log("⏰ معالجة فورية لانتهاء الوقت");
+    
+    if (currentGameMode === 'online' && currentMatchId) {
+        // إرسال الإجابة تلقائياً (خطأ)
+        const answerButtons = document.querySelectorAll('#answers-container button');
+        if (answerButtons.length > 0 && !hasAnsweredCurrentQ) {
+            hasAnsweredCurrentQ = true;
+            
+            // اختيار إجابة عشوائية (خطأ)
+            const randomIndex = Math.floor(Math.random() * answerButtons.length);
+            const randomButton = answerButtons[randomIndex];
+            
+            // تمييز الإجابة كخطأ
+            answerButtons.forEach(btn => {
+                btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
+                if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) {
+                    btn.classList.add('answer-correct');
+                } else {
+                    btn.classList.add('answer-neutral');
+                }
+            });
+            randomButton.classList.add('answer-wrong');
+            
+            document.getElementById('answers-container').classList.add('pointer-events-none');
+            
+            // تحديث قاعدة البيانات فوراً
+            getDoc(doc(db, "match_queue", currentMatchId)).then(matchDoc => {
+                if (!matchDoc.exists()) return;
+                
+                const matchData = matchDoc.data();
+                const isP1 = matchData.player1.uid === currentUser.uid;
+                
+                updateDoc(doc(db, "match_queue", currentMatchId), {
+                    answersCount: increment(1),
+                    lastActivity: Date.now(),
+                    timeoutOccurred: true,
+                    timeoutPlayer: isP1 ? 'player1' : 'player2'
+                }).then(() => {
+                    console.log("✅ تم تسجيل انتهاء الوقت");
+                }).catch(error => {
+                    console.error("❌ خطأ في تسجيل انتهاء الوقت:", error);
+                });
+            }).catch(error => {
+                console.error("❌ خطأ في جلب بيانات المباراة:", error);
+            });
+        }
     }
 }
 
-async function handleTimeOut() {
-    if (currentGameMode !== 'online' || !currentMatchId) return;
-    
-    try {
-        const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
-        if (!matchDoc.exists()) {
-            logConnectionIssue('TIMEOUT_MATCH_MISSING', { matchId: currentMatchId });
-            return;
-        }
-        
-        const matchData = matchDoc.data();
-        const isP1 = matchData.player1.uid === currentUser.uid;
-        
-        console.log("⏰ معالجة انتهاء الوقت للاعب:", isP1 ? "Player 1" : "Player 2");
-        
-        // تسجيل المشكلة
-        logConnectionIssue('TIMEOUT_EXCEEDED', {
-            matchId: currentMatchId,
-            player: isP1 ? 'player1' : 'player2',
-            currentIdx: matchData.currentIdx,
-            answersCount: matchData.answersCount
-        });
-        
-        // زيادة answersCount
-        await updateDoc(doc(db, "match_queue", currentMatchId), {
-            answersCount: increment(1),
-            lastActivity: Date.now(),
-            timeoutOccurred: true,
-            timeoutPlayer: isP1 ? 'player1' : 'player2'
-        });
-        
-        console.log("✅ تم تسجيل timeout بنجاح");
-        
-    } catch (error) {
-        console.error("❌ خطأ في معالجة انتهاء الوقت:", error);
-        logConnectionIssue('TIMEOUT_HANDLE_ERROR', { error: error.message });
-    }
-}
-        
+
     </script>
 </body>
 </html>
