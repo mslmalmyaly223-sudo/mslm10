@@ -972,6 +972,12 @@
             .input-box { font-size: 1.1rem; }
             .auth-overlay > div { max-width: 500px; }
         }
+        
+        @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
     </style>
 </head>
 <body>
@@ -2315,6 +2321,69 @@
                 }, 2000);
             }
         });
+        
+        // دالة لتحليل وتفسير أخطاء Firebase
+function getDetailedFirebaseError(error) {
+    const errorCode = error.code || '';
+    const errorMessage = error.message || '';
+    
+    console.error("Firebase Error Details:", {
+        code: errorCode,
+        message: errorMessage,
+        fullError: error
+    });
+    
+    // تحليل كود الخطأ وإرجاع رسالة عربية مفصلة
+    switch(errorCode) {
+        case 'permission-denied':
+            return 'تم رفض الصلاحية: ليس لديك إذن للوصول إلى هذه البيانات. قد يكون بسبب قواعد الأمان.';
+            
+        case 'unavailable':
+            return 'الخدمة غير متاحة: قد يكون هناك مشكلة في اتصال الإنترنت أو الخادم.';
+            
+        case 'failed-precondition':
+            return 'شرط مسبق فشل: قد يكون هناك تعارض في البيانات أو حالة غير صالحة.';
+            
+        case 'not-found':
+            return 'العنصر غير موجود: البيانات التي تحاول الوصول إليها تم حذفها أو غير موجودة.';
+            
+        case 'already-exists':
+            return 'العنصر موجود بالفعل: تحاول إنشاء عنصر موجود مسبقاً.';
+            
+        case 'resource-exhausted':
+            return 'تم استنفاد الموارد: تجاوزت الحد المسموح به من الطلبات. حاول لاحقاً.';
+            
+        case 'cancelled':
+            return 'تم إلغاء العملية: تم إلغاء العملية قبل اكتمالها.';
+            
+        case 'data-loss':
+            return 'فقدان البيانات: هناك مشكلة في البيانات المخزنة.';
+            
+        case 'deadline-exceeded':
+            return 'تجاوز المهلة: تجاوزت العملية الوقت المسموح به.';
+            
+        case 'internal':
+            return 'خطأ داخلي: حدث خطأ غير متوقع في الخادم.';
+            
+        case 'invalid-argument':
+            return 'معامل غير صالح: البيانات المرسلة غير صحيحة أو غير مكتملة.';
+            
+        case 'out-of-range':
+            return 'خارج النطاق: القيمة المقدمة خارج النطاق المسموح به.';
+            
+        case 'unauthenticated':
+            return 'غير مصادق: يجب تسجيل الدخول أولاً للقيام بهذه العملية.';
+            
+        case 'storage/unauthorized':
+            return 'غير مصرح: ليس لديك إذن للوصول إلى هذا الملف.';
+            
+        case 'storage/canceled':
+            return 'تم الإلغاء: تم إلغاء عملية الرفع.';
+            
+        default:
+            return `خطأ: ${errorMessage} (كود: ${errorCode})`;
+    }
+}
 
         async function compressImage(file) {
             return new Promise((resolve) => {
@@ -5165,84 +5234,87 @@
         };
 
         window.createFriendRoom = function() {
-            document.getElementById('friend-match-modal').classList.add('hidden');
-            document.getElementById('create-room-modal').classList.remove('hidden');
-            
-            // Populate subjects for room creation
-            const subjectSelect = document.getElementById('room-subject');
-            subjectSelect.innerHTML = '<option value="">اختر المادة</option>';
-            if (userData.grade && subjects[userData.grade]) {
-                subjects[userData.grade].forEach(sub => {
-                    subjectSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
-                });
-            }
-            
-            // Reset question type buttons
-            roomQuestionType = 'mcq';
-            document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-600 font-bold transition`;
-            document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold transition`;
-        };
+    document.getElementById('friend-match-modal').classList.add('hidden');
+    document.getElementById('create-room-modal').classList.remove('hidden');
+    
+    // إعادة تعيين المتغيرات
+    roomQuestionType = 'mcq';
+    roomSubject = '';
+    isRoomOwner = false;
+    isReady = false;
+    
+    // Populate subjects for room creation
+    const subjectSelect = document.getElementById('room-subject');
+    subjectSelect.innerHTML = '<option value="">اختر المادة</option>';
+    if (userData.grade && subjects[userData.grade]) {
+        subjects[userData.grade].forEach(sub => {
+            subjectSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+        });
+    }
+    
+    // Reset question type buttons
+    roomQuestionType = 'mcq';
+    document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-600 font-bold transition`;
+    document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold transition`;
+};
 
-        window.closeCreateRoomModal = function() {
-            document.getElementById('create-room-modal').classList.add('hidden');
-        };
-
-        window.setRoomQuestionType = function(type) {
-            roomQuestionType = type;
-            document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 font-bold transition ${type==='mcq'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
-            document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 font-bold transition ${type==='tf'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
-        };
-
-        window.confirmCreateRoom = async function() {
-            roomSubject = document.getElementById('room-subject').value;
-            
-            if (!roomSubject) {
-                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة');
-                return;
-            }
-            
-            if (!roomQuestionType) {
-                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار نوع الأسئلة');
-                return;
-            }
-            
-            document.getElementById('create-room-modal').classList.add('hidden');
-            
-            try {
-                // Generate room ID
-                const roomId = Math.floor(10000000 + Math.random() * 90000000).toString();
-                currentRoomId = roomId;
-                isRoomOwner = true;
-                isReady = false;
-                
-                // Create room in database
-                await setDoc(doc(db, "rooms", roomId), {
-                    roomId: roomId,
-                    ownerId: currentUser.uid,
-                    ownerName: userData.name,
-                    ownerPhoto: userData.photo,
-                    ownerGrade: userData.grade,
-                    player2Id: null,
-                    player2Name: null,
-                    player2Photo: null,
-                    player2Grade: null,
-                    subject: roomSubject,
-                    questionType: roomQuestionType,
-                    player1Ready: false,
-                    player2Ready: false,
-                    status: 'waiting',
-                    createdAt: serverTimestamp(),
-                    expiresAt: Timestamp.fromDate(new Date(Date.now() + 10 * 60 * 1000)) // 10 minutes
-                });
-                
-                // Show room lobby
-                showRoomLobby(roomId);
-                
-            } catch (error) {
-                console.error("Error creating room:", error);
-                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إنشاء الغرفة');
-            }
-        };
+window.confirmCreateRoom = async function() {
+    roomSubject = document.getElementById('room-subject').value;
+    
+    if (!roomSubject) {
+        showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة');
+        return;
+    }
+    
+    if (!roomQuestionType) {
+        showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار نوع الأسئلة');
+        return;
+    }
+    
+    document.getElementById('create-room-modal').classList.add('hidden');
+    
+    try {
+        // Generate room ID
+        const roomId = Math.floor(10000000 + Math.random() * 90000000).toString();
+        currentRoomId = roomId;
+        isRoomOwner = true;
+        isReady = false;
+        
+        // وقت الانتهاء (10 دقائق من الآن)
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+        
+        // Create room in database
+        await setDoc(doc(db, "rooms", roomId), {
+            roomId: roomId,
+            ownerId: currentUser.uid,
+            ownerName: userData.name,
+            ownerPhoto: userData.photo,
+            ownerGrade: userData.grade,
+            player2Id: null,
+            player2Name: null,
+            player2Photo: null,
+            player2Grade: null,
+            subject: roomSubject,
+            questionType: roomQuestionType,
+            player1Ready: false,
+            player2Ready: false,
+            status: 'waiting',
+            createdAt: serverTimestamp(),
+            expiresAt: Timestamp.fromDate(expiresAt), // وقت انتهاء متزامن للجميع
+            lastUpdated: serverTimestamp()
+        });
+        
+        // Show room lobby
+        showRoomLobby(roomId);
+        
+        showBeautifulAlert('success', 'تم إنشاء الغرفة', `رقم الغرفة: ${roomId}\nشارك هذا الرقم مع صديقك للانضمام`);
+        
+    } catch (error) {
+        console.error("Error creating room:", error);
+        const detailedError = getDetailedFirebaseError(error);
+        showBeautifulAlert('error', 'خطأ في إنشاء الغرفة', `❌ ${detailedError}`);
+    }
+};
 
         window.joinFriendRoom = async function() {
             const roomId = document.getElementById('room-id-input').value.trim();
@@ -5313,32 +5385,36 @@
         }
 
         function showRoomLobby(roomId) {
-            // Hide all screens and show room lobby
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('room-lobby-screen').classList.remove('hidden');
-            document.getElementById('room-lobby-screen').classList.add('active');
-            
-            // Setup room display
-            document.getElementById('room-id-display').textContent = roomId;
-            
-            // Setup room controls
-            if (isRoomOwner) {
-                document.getElementById('delete-btn').classList.remove('hidden');
-                document.getElementById('leave-btn').classList.add('hidden');
-            } else {
-                document.getElementById('delete-btn').classList.add('hidden');
-                document.getElementById('leave-btn').classList.remove('hidden');
-            }
-            
-            // Start room listener
-            startRoomListener(roomId);
-            
-            // Start room timer
-            startRoomTimer();
-            
-            // Start internet check
-            startInternetCheck();
-        }
+    // Hide all screens and show room lobby
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('room-lobby-screen').classList.remove('hidden');
+    document.getElementById('room-lobby-screen').classList.add('active');
+    
+    // Setup room display
+    document.getElementById('room-id-display').textContent = roomId;
+    
+    // Setup room controls
+    if (isRoomOwner) {
+        document.getElementById('delete-btn').classList.remove('hidden');
+        document.getElementById('leave-btn').classList.add('hidden');
+        document.getElementById('ready-btn-text').textContent = 'جاهز';
+    } else {
+        document.getElementById('delete-btn').classList.add('hidden');
+        document.getElementById('leave-btn').classList.remove('hidden');
+        document.getElementById('ready-btn-text').textContent = 'جاهز';
+    }
+    
+    // إعادة تعيين حالة الجاهزية
+    isReady = false;
+    
+    // Start room listener
+    startRoomListener(roomId);
+    
+    // Start internet check
+    startInternetCheck();
+    
+    // سيكون المؤقت يبدأ من الدالة startRoomListener بعد جلب بيانات الغرفة
+}
 
         function startRoomListener(roomId) {
     if (roomListenerUnsubscribe) {
@@ -5368,28 +5444,78 @@
         updateReadyButton(roomData);
         
         // Check if both players are ready and game should start IMMEDIATELY
-        if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiting') {
-            // Start the game immediately without delay
-            console.log("Both players ready! Starting game immediately...");
-            
-            try {
-                // Update status and start game immediately
-                await updateDoc(doc(db, "rooms", roomId), {
-                    status: 'playing',
-                    gameStartedAt: serverTimestamp(),
-                    currentQuestionIndex: 0,
-                    player1Score: 0,
-                    player2Score: 0
-                });
-                
-                // Start the game directly
-                startFriendGame(roomData);
-                
-            } catch (error) {
-                console.error("Error starting game:", error);
-                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في بدء المباراة');
-            }
+        // Check if both players are ready and game should start IMMEDIATELY
+if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiting') {
+    // Start the game immediately without delay
+    console.log("Both players ready! Starting game immediately...");
+    
+    try {
+        // التحقق من صحة البيانات قبل البدء
+        if (!roomData.subject) {
+            throw new Error("المادة غير محددة");
         }
+        
+        if (!roomData.questionType) {
+            throw new Error("نوع الأسئلة غير محدد");
+        }
+        
+        if (!roomData.ownerGrade && !roomData.player2Grade) {
+            throw new Error("المرحلة الدراسية غير محددة");
+        }
+        
+        // إيقاف مؤقت الغرفة
+        if (roomTimerInterval) {
+            clearInterval(roomTimerInterval);
+            roomTimerInterval = null;
+        }
+        
+        // Update status and start game immediately
+        await updateDoc(doc(db, "rooms", roomId), {
+            status: 'playing',
+            gameStartedAt: serverTimestamp(),
+            currentQuestionIndex: 0,
+            player1Score: 0,
+            player2Score: 0,
+            lastUpdated: serverTimestamp()
+        });
+        
+        // Start the game directly
+        startFriendGame(roomData);
+        
+    } catch (error) {
+        console.error("Error starting game:", error);
+        
+        // إظهار رسالة خطأ مفصلة
+        let errorMessage = '';
+        
+        if (error.message.includes('المادة غير محددة')) {
+            errorMessage = '❌ خطأ: لم يتم تحديد المادة. يرجى إنشاء غرفة جديدة.';
+        } else if (error.message.includes('نوع الأسئلة غير محدد')) {
+            errorMessage = '❌ خطأ: لم يتم تحديد نوع الأسئلة. يرجى إنشاء غرفة جديدة.';
+        } else if (error.message.includes('المرحلة الدراسية غير محددة')) {
+            errorMessage = '❌ خطأ: المرحلة الدراسية غير محددة. يرجى تحديد مرحلتك أولاً.';
+        } else if (error.code) {
+            errorMessage = `❌ خطأ تقني: ${getDetailedFirebaseError(error)}`;
+        } else {
+            errorMessage = `❌ خطأ: ${error.message}`;
+        }
+        
+        showBeautifulAlert('error', 'فشل بدء المباراة', errorMessage);
+        
+        // إعادة تعيين حالة الجاهزية في حالة الخطأ
+        try {
+            const field = isRoomOwner ? 'player1Ready' : 'player2Ready';
+            await updateDoc(doc(db, "rooms", roomId), {
+                [field]: false
+            });
+        } catch (resetError) {
+            console.error("Error resetting ready status:", resetError);
+        }
+    }
+}
+
+// تحديث المؤقت عند استلام بيانات الغرفة
+updateRoomTimerDisplay(calculateTimeLeft(roomData.expiresAt));
         
         // Check if game is already playing
         if (roomData.status === 'playing' && !document.getElementById('game-overlay').classList.contains('hidden')) {
@@ -5451,26 +5577,82 @@
             }
         }
 
-        function startRoomTimer() {
-            if (roomTimerInterval) clearInterval(roomTimerInterval);
+        function startRoomTimer(roomData = null) {
+    if (roomTimerInterval) clearInterval(roomTimerInterval);
+    
+    // حساب الوقت المتبقي من وقت انتهاء الغرفة
+    let timeLeft = 600; // 10 دقائق كقيمة افتراضية
+    
+    if (roomData && roomData.expiresAt) {
+        const expiryTime = roomData.expiresAt.toDate();
+        const now = new Date();
+        timeLeft = Math.max(0, Math.floor((expiryTime - now) / 1000));
+    }
+    
+    // تحديث العداد أولاً
+    updateRoomTimerDisplay(timeLeft);
+    
+    roomTimerInterval = setInterval(async () => {
+        timeLeft--;
+        
+        if (timeLeft <= 0) {
+            clearInterval(roomTimerInterval);
             
-            let timeLeft = 10 * 60; // 10 minutes in seconds
-            
-            roomTimerInterval = setInterval(() => {
-                timeLeft--;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(roomTimerInterval);
-                    // Room expired, delete it
-                    deleteRoom();
-                    return;
+            // إغلاق الغرفة تلقائياً عند انتهاء الوقت
+            if (currentRoomId) {
+                try {
+                    // تأكد من أن الغرفة ما زالت موجودة
+                    const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
+                    if (roomDoc.exists()) {
+                        const roomData = roomDoc.data();
+                        
+                        // فقط إذا كانت الغرفة في حالة انتظار
+                        if (roomData.status === 'waiting') {
+                            await deleteDoc(doc(db, "rooms", currentRoomId));
+                            
+                            // إظهار رسالة للجميع
+                            showBeautifulAlert('warning', 'انتهى الوقت', 'انتهت مهلة الغرفة (10 دقائق) وتم إغلاقها تلقائياً');
+                            
+                            // الخروج من الغرفة
+                            cleanupRoom();
+                            setTimeout(() => {
+                                switchTab('challenges');
+                            }, 2000);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error auto-closing room:", error);
                 }
-                
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                document.getElementById('room-timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            }, 1000);
+            }
+            return;
         }
+        
+        // تحديث العرض كل ثانية
+        updateRoomTimerDisplay(timeLeft);
+        
+    }, 1000);
+}
+
+// دالة مساعدة لتحديث عرض المؤقت
+function updateRoomTimerDisplay(timeLeft) {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    const timerElement = document.getElementById('room-timer');
+    if (timerElement) {
+        timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        
+        // تغيير اللون عندما يقل الوقت عن دقيقة
+        if (timeLeft < 60) {
+            timerElement.style.color = '#ef4444';
+            timerElement.style.animation = 'pulse 1s infinite';
+        } else if (timeLeft < 180) {
+            timerElement.style.color = '#f59e0b';
+        } else {
+            timerElement.style.color = '';
+            timerElement.style.animation = '';
+        }
+    }
+}
 
         function startInternetCheck() {
             if (internetCheckInterval) clearInterval(internetCheckInterval);
@@ -5832,6 +6014,17 @@
                 triggerAIResponse();
             }
         };
+        
+        // دالة لحساب الوقت المتبقي من وقت الانتهاء
+function calculateTimeLeft(expiresAt) {
+    if (!expiresAt) return 600; // 10 دقائق افتراضياً
+    
+    const expiryTime = expiresAt.toDate();
+    const now = new Date();
+    const timeLeft = Math.max(0, Math.floor((expiryTime - now) / 1000));
+    
+    return timeLeft;
+}
 
     </script>
 </body>
