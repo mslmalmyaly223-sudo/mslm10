@@ -5068,51 +5068,70 @@
             document.getElementById('play-friend-modal').classList.remove('hidden');
         };
 
-        window.proceedToRoom = async function() {
-            const subject = document.getElementById('room-subject').value;
-            const qtype = document.getElementById('room-qtype').value;
-            
-            if (!subject || !qtype) {
-                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
-                return;
-            }
-            
-            document.getElementById('create-room-modal').classList.add('hidden');
-            
-            const roomId = generateRoomId();
-            currentRoomId = roomId;
-            isRoomCreator = true;
-            
-            const roomData = {
-                id: roomId,
-                creator: currentUser.uid,
-                subject: subject,
-                qtype: qtype,
-                grade: userData.grade,
-                players: {
-                    [currentUser.uid]: {
-                        uid: currentUser.uid,
-                        name: userData.name,
-                        photo: userData.photo,
-                        ready: false,
-                        joinedAt: Date.now()
-                    }
-                },
-                readyCount: 0,
-                playerCount: 1,
-                status: 'waiting',
-                createdAt: Date.now(),
-                expiresAt: Date.now() + 10 * 60 * 1000
-            };
-            
-            try {
-                await set(dbRef(rtdb, `rooms/${roomId}`), roomData);
-                await joinRoomById(roomId);
-            } catch (error) {
-                console.error("Error creating room:", error);
-                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إنشاء الغرفة');
-            }
-        };
+        // نهج جديد: نعتمد فقط على مصفوفة players لحساب كل شيء
+
+window.proceedToRoom = async function() {
+    const subject = document.getElementById('room-subject').value;
+    const qtype = document.getElementById('room-qtype').value;
+    
+    if (!subject || !qtype) {
+        showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
+        return;
+    }
+    
+    document.getElementById('create-room-modal').classList.add('hidden');
+    
+    const roomId = generateRoomId();
+    currentRoomId = roomId;
+    isRoomCreator = true;
+    
+    // هنا هو المفتاح - يجب أن يكون playersCount = 1 فقط
+    const roomData = {
+        id: roomId,
+        creator: currentUser.uid,
+        subject: subject,
+        qtype: qtype,
+        grade: userData.grade,
+        players: {}, // ابدأ بمصفوفة فارغة أولاً
+        readyCount: 0,
+        playersCount: 0, // ابدأ بصفر
+        status: 'waiting',
+        createdAt: Date.now(),
+        lastUpdated: Date.now(),
+        expiresAt: Date.now() + 10 * 60 * 1000
+    };
+    
+    try {
+        // أولاً: أنشئ الغرفة بمعلومات أساسية
+        await set(dbRef(rtdb, `rooms/${roomId}`), roomData);
+        
+        console.log("✅ تم إنشاء الغرفة الأساسية:", roomId);
+        
+        // ثانياً: أضف المنشئ كلاعب
+        await update(dbRef(rtdb, `rooms/${roomId}`), {
+            [`players/${currentUser.uid}`]: {
+                uid: currentUser.uid,
+                name: userData.name,
+                photo: userData.photo,
+                ready: false,
+                joinedAt: Date.now(),
+                lastPing: Date.now()
+            },
+            playersCount: 1 // الآن اجعله 1 بعد إضافة اللاعب
+        });
+        
+        console.log("✅ تم إضافة المنشئ إلى الغرفة");
+        
+        // انتظر قليلاً ثم انضم
+        setTimeout(() => {
+            joinRoomById(roomId);
+        }, 300);
+        
+    } catch (error) {
+        console.error("❌ Error creating room:", error);
+        showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إنشاء الغرفة');
+    }
+};
 
         function generateRoomId() {
             const chars = '0123456789';
@@ -5140,163 +5159,232 @@
         };
 
         async function joinRoomById(roomId) {
-            try {
-                const roomRef = dbRef(rtdb, `rooms/${roomId}`);
-                const snapshot = await get(roomRef);
-                
-                if (!snapshot.exists()) {
-                    showBeautifulAlert('error', 'خطأ', 'الغرفة غير موجودة أو انتهت صلاحيتها');
-                    document.getElementById('finding-room-modal').classList.add('hidden');
-                    document.getElementById('play-friend-modal').classList.remove('hidden');
-                    return;
-                }
-                
-                const roomData = snapshot.val();
-                
-                if (roomData.playerCount >= 2) {
-                    showBeautifulAlert('error', 'خطأ', 'الغرفة ممتلئة');
-                    document.getElementById('finding-room-modal').classList.add('hidden');
-                    document.getElementById('play-friend-modal').classList.remove('hidden');
-                    return;
-                }
-                
-                if (roomData.status !== 'waiting') {
-                    showBeautifulAlert('error', 'خطأ', 'المباراة بدأت بالفعل');
-                    document.getElementById('finding-room-modal').classList.add('hidden');
-                    document.getElementById('play-friend-modal').classList.remove('hidden');
-                    return;
-                }
-                
-                currentRoomId = roomId;
-                isRoomCreator = false;
-                
-                await update(roomRef, {
-                    [`players/${currentUser.uid}`]: {
-                        uid: currentUser.uid,
-                        name: userData.name,
-                        photo: userData.photo,
-                        ready: false,
-                        joinedAt: Date.now()
-                    },
-                    playerCount: roomData.playerCount + 1
-                });
-                
-                document.getElementById('finding-room-modal').classList.add('hidden');
-                setupRoomListener(roomId);
-                
-            } catch (error) {
-                console.error("Error joining room:", error);
-                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في الانضمام إلى الغرفة');
-                document.getElementById('finding-room-modal').classList.add('hidden');
-                document.getElementById('play-friend-modal').classList.remove('hidden');
-            }
+    try {
+        const roomRef = dbRef(rtdb, `rooms/${roomId}`);
+        const snapshot = await get(roomRef);
+        
+        if (!snapshot.exists()) {
+            showBeautifulAlert('error', 'خطأ', 'الغرفة غير موجودة أو انتهت صلاحيتها');
+            document.getElementById('finding-room-modal').classList.add('hidden');
+            document.getElementById('play-friend-modal').classList.remove('hidden');
+            return;
         }
+        
+        const roomData = snapshot.val();
+        console.log("🔍 بيانات الغرفة عند الانضمام:", roomData);
+        
+        // حساب عدد اللاعبين الحقيقي من مصفوفة players
+        const players = roomData.players || {};
+        const actualPlayerCount = Object.keys(players).length;
+        
+        console.log("👥 عدد اللاعبين الحقيقي:", actualPlayerCount, "playersCount الموجود:", roomData.playersCount);
+        
+        // إذا كان هناك بالفعل 2 لاعبين أو أكثر
+        if (actualPlayerCount >= 2) {
+            showBeautifulAlert('error', 'خطأ', 'الغرفة ممتلئة (2 لاعبين)');
+            document.getElementById('finding-room-modal').classList.add('hidden');
+            document.getElementById('play-friend-modal').classList.remove('hidden');
+            return;
+        }
+        
+        if (roomData.status && roomData.status !== 'waiting') {
+            showBeautifulAlert('error', 'خطأ', 'المباراة بدأت بالفعل');
+            document.getElementById('finding-room-modal').classList.add('hidden');
+            document.getElementById('play-friend-modal').classList.remove('hidden');
+            return;
+        }
+        
+        // التحقق مما إذا كان المستخدم موجودًا بالفعل
+        if (players[currentUser.uid]) {
+            console.log("✅ المستخدم موجود بالفعل في الغرفة، الدخول مباشرة...");
+            document.getElementById('finding-room-modal').classList.add('hidden');
+            currentRoomId = roomId;
+            isRoomCreator = false;
+            setupRoomListener(roomId);
+            return;
+        }
+        
+        currentRoomId = roomId;
+        isRoomCreator = roomData.creator === currentUser.uid;
+        
+        // تحديث قاعدة البيانات
+        await update(roomRef, {
+            [`players/${currentUser.uid}`]: {
+                uid: currentUser.uid,
+                name: userData.name,
+                photo: userData.photo,
+                ready: false,
+                joinedAt: Date.now(),
+                lastPing: Date.now()
+            },
+            playersCount: actualPlayerCount + 1, // تحديث بناءً على العدد الحقيقي
+            lastUpdated: Date.now()
+        });
+        
+        console.log("✅ تم الانضمام بنجاح، العدد الجديد:", (actualPlayerCount + 1) + "/" + (roomData.readyCount || 0));
+        
+        document.getElementById('finding-room-modal').classList.add('hidden');
+        setupRoomListener(roomId);
+        
+    } catch (error) {
+        console.error("❌ Error joining room:", error);
+        showBeautifulAlert('error', 'خطأ', `حدث خطأ في الانضمام إلى الغرفة: ${error.message}`);
+        document.getElementById('finding-room-modal').classList.add('hidden');
+        document.getElementById('play-friend-modal').classList.remove('hidden');
+    }
+}
+
 
         function setupRoomListener(roomId) {
-            if (roomListener) roomListener();
-            
-            const roomRef = dbRef(rtdb, `rooms/${roomId}`);
-            roomListener = onValue(roomRef, (snapshot) => {
-                if (!snapshot.exists()) {
-                    showBeautifulAlert('error', 'انتهت الغرفة', 'تم إغلاق الغرفة من قبل المالك');
-                    leaveRoom();
-                    return;
-                }
-                
-                roomData = snapshot.val();
-                updateRoomUI(roomData);
-                
-                if (roomData.status === 'playing') {
-                    startRoomGamePlay();
+    if (roomListener) roomListener();
+    
+    const roomRef = dbRef(rtdb, `rooms/${roomId}`);
+    roomListener = onValue(roomRef, (snapshot) => {
+        if (!snapshot.exists()) {
+            showBeautifulAlert('error', 'انتهت الغرفة', 'تم إغلاق الغرفة من قبل المالك');
+            leaveRoom();
+            return;
+        }
+        
+        roomData = snapshot.val();
+        
+        // تأكد من أن players موجود
+        if (!roomData.players) {
+            console.warn("⚠️ الغرفة بدون players، إصلاح تلقائي...");
+            roomData.players = {};
+        }
+        
+        // تأكد أن المنشئ موجود في players إذا كان هو المستخدم الحالي
+        if (isRoomCreator && !roomData.players[currentUser.uid]) {
+            console.warn("⚠️ المنشئ ليس في players، إضافة تلقائية...");
+            update(roomRef, {
+                [`players/${currentUser.uid}`]: {
+                    uid: currentUser.uid,
+                    name: userData.name,
+                    photo: userData.photo,
+                    ready: false,
+                    joinedAt: Date.now()
                 }
             });
-            
-            startRoomTimer();
-            setupNetworkCheck();
+            return;
         }
+        
+        updateRoomUI(roomData);
+        
+        if (roomData.status === 'playing') {
+            startRoomGamePlay();
+        }
+    });
+    
+    startRoomTimer();
+    setupNetworkCheck();
+}
 
         function updateRoomUI(roomData) {
-            document.getElementById('room-screen').classList.remove('hidden');
-            document.getElementById('room-id-display').textContent = roomData.id;
-            
-            const players = Object.values(roomData.players || {});
-            const player1 = players[0] || null;
-            const player2 = players[1] || null;
-            
-            if (player1) {
-                document.getElementById('player1-avatar').src = player1.photo;
-                document.getElementById('player1-name').textContent = player1.name;
-                document.getElementById('player1-status').textContent = player1.ready ? 'جاهز' : 'بانتظار';
-                document.getElementById('player1-status').className = `player-status ${player1.ready ? 'status-ready' : 'status-waiting'}`;
-                document.getElementById('player1-card').className = `player-card ${player1.ready ? 'ready' : ''}`;
-            }
-            
-            if (player2) {
-                document.getElementById('player2-avatar').src = player2.photo;
-                document.getElementById('player2-name').textContent = player2.name;
-                document.getElementById('player2-status').textContent = player2.ready ? 'جاهز' : 'بانتظار';
-                document.getElementById('player2-status').className = `player-status ${player2.ready ? 'status-ready' : 'status-waiting'}`;
-                document.getElementById('player2-card').className = `player-card ${player2.ready ? 'ready' : ''}`;
-            } else {
-                document.getElementById('player2-avatar').src = 'https://ui-avatars.com/api/?name=مستعد&background=random&size=128';
-                document.getElementById('player2-name').textContent = 'بانتظار لاعب...';
-                document.getElementById('player2-status').textContent = 'بانتظار';
-                document.getElementById('player2-status').className = 'player-status status-waiting';
-                document.getElementById('player2-card').className = 'player-card';
-            }
-            
-            document.getElementById('players-count').innerHTML = `المستخدمين (<span>${roomData.playerCount || 1}</span>/2)`;
-            document.getElementById('ready-count').innerHTML = `جاهز (<span>${roomData.readyCount || 0}</span>/2)`;
-            
-            const readyBtn = document.getElementById('ready-btn');
-            const startBtn = document.getElementById('start-btn');
-            const leaveBtn = document.getElementById('leave-btn');
-            
-            if (isRoomCreator) {
-                document.getElementById('leave-btn-text').textContent = 'حذف الغرفة';
-            } else {
-                document.getElementById('leave-btn-text').textContent = 'مغادرة';
-            }
-            
-            const currentPlayer = roomData.players?.[currentUser.uid];
-            if (currentPlayer) {
-                isReady = currentPlayer.ready || false;
-                readyBtn.innerHTML = isReady ? 
-                    '<i class="fas fa-times"></i><span>إلغاء الجاهزية</span>' : 
-                    '<i class="fas fa-check"></i><span>جاهز</span>';
-            }
-            
-            if (isRoomCreator && roomData.readyCount === 2) {
-                startBtn.classList.remove('hidden');
-                readyBtn.classList.add('hidden');
-            } else {
-                startBtn.classList.add('hidden');
-                readyBtn.classList.remove('hidden');
-            }
-        }
+    document.getElementById('room-screen').classList.remove('hidden');
+    document.getElementById('room-id-display').textContent = roomData.id;
+    
+    const players = Object.values(roomData.players || {});
+    const player1 = players[0] || null;
+    const player2 = players[1] || null;
+    
+    // تحديث واجهة اللاعب الأول
+    if (player1) {
+        document.getElementById('player1-avatar').src = player1.photo;
+        document.getElementById('player1-name').textContent = player1.name;
+        document.getElementById('player1-status').textContent = player1.ready ? 'جاهز' : 'بانتظار';
+        document.getElementById('player1-status').className = `player-status ${player1.ready ? 'status-ready' : 'status-waiting'}`;
+        document.getElementById('player1-card').className = `player-card ${player1.ready ? 'ready' : ''}`;
+    }
+    
+    // تحديث واجهة اللاعب الثاني
+    if (player2) {
+        document.getElementById('player2-avatar').src = player2.photo;
+        document.getElementById('player2-name').textContent = player2.name;
+        document.getElementById('player2-status').textContent = player2.ready ? 'جاهز' : 'بانتظار';
+        document.getElementById('player2-status').className = `player-status ${player2.ready ? 'status-ready' : 'status-waiting'}`;
+        document.getElementById('player2-card').className = `player-card ${player2.ready ? 'ready' : ''}`;
+    } else {
+        // إذا لم يكن هناك لاعب ثاني
+        document.getElementById('player2-avatar').src = 'https://ui-avatars.com/api/?name=مستعد&background=random&size=128';
+        document.getElementById('player2-name').textContent = 'بانتظار لاعب...';
+        document.getElementById('player2-status').textContent = 'بانتظار';
+        document.getElementById('player2-status').className = 'player-status status-waiting';
+        document.getElementById('player2-card').className = 'player-card';
+    }
+    
+    // تحديث العدادات - الأهم!
+    const playersCount = roomData.playersCount || 1;
+    const readyCount = roomData.readyCount || 0;
+    
+    document.getElementById('players-count').innerHTML = 
+        `المستخدمين (<span>${playersCount}</span>/2)`;
+    document.getElementById('ready-count').innerHTML = 
+        `جاهز (<span>${readyCount}</span>/2)`;
+    
+    console.log("تحديث واجهة الغرفة:", playersCount + "/" + readyCount);
+    
+    const readyBtn = document.getElementById('ready-btn');
+    const startBtn = document.getElementById('start-btn');
+    const leaveBtn = document.getElementById('leave-btn');
+    
+    if (isRoomCreator) {
+        document.getElementById('leave-btn-text').textContent = 'حذف الغرفة';
+    } else {
+        document.getElementById('leave-btn-text').textContent = 'مغادرة';
+    }
+    
+    const currentPlayer = roomData.players?.[currentUser.uid];
+    if (currentPlayer) {
+        isReady = currentPlayer.ready || false;
+        readyBtn.innerHTML = isReady ? 
+            '<i class="fas fa-times"></i><span>إلغاء الجاهزية</span>' : 
+            '<i class="fas fa-check"></i><span>جاهز</span>';
+    }
+    
+    // إظهار زر البدء فقط إذا كان:
+    // 1. أنت المنشئ
+    // 2. عدد اللاعبين = 2
+    // 3. عدد المستعدين = 2
+    if (isRoomCreator && playersCount === 2 && readyCount === 2) {
+        startBtn.classList.remove('hidden');
+        readyBtn.classList.add('hidden');
+    } else {
+        startBtn.classList.add('hidden');
+        readyBtn.classList.remove('hidden');
+    }
+}
 
         window.toggleReady = async function() {
-            if (!currentRoomId || !roomData) return;
-            
-            const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
-            const currentPlayer = roomData.players?.[currentUser.uid];
-            
-            if (!currentPlayer) return;
-            
-            const newReadyState = !currentPlayer.ready;
-            
-            try {
-                await update(roomRef, {
-                    [`players/${currentUser.uid}/ready`]: newReadyState,
-                    readyCount: newReadyState ? (roomData.readyCount || 0) + 1 : (roomData.readyCount || 1) - 1
-                });
-                
-                isReady = newReadyState;
-                
-            } catch (error) {
-                console.error("Error updating ready status:", error);
-            }
-        };
+    if (!currentRoomId || !roomData) return;
+    
+    const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
+    const currentPlayer = roomData.players?.[currentUser.uid];
+    
+    if (!currentPlayer) return;
+    
+    const newReadyState = !currentPlayer.ready;
+    
+    try {
+        // تحديث حالة الاستعداد للاعب
+        await update(roomRef, {
+            [`players/${currentUser.uid}/ready`]: newReadyState,
+            // تحديث readyCount فقط (لا تلمس playersCount)
+            readyCount: newReadyState ? 
+                (roomData.readyCount || 0) + 1 : 
+                Math.max((roomData.readyCount || 1) - 1, 0)
+        });
+        
+        isReady = newReadyState;
+        
+        console.log("تم تغيير حالة الاستعداد، العدد:", 
+            roomData.playersCount + "/" + 
+            (newReadyState ? (roomData.readyCount || 0) + 1 : Math.max((roomData.readyCount || 1) - 1, 0)));
+        
+    } catch (error) {
+        console.error("Error updating ready status:", error);
+    }
+};
 
         window.startRoomGame = async function() {
             if (!currentRoomId || !roomData || !isRoomCreator) return;
@@ -5382,47 +5470,48 @@
         }
 
         window.leaveRoom = async function() {
-            if (!currentRoomId) return;
+    if (!currentRoomId) return;
+    
+    if (isRoomCreator) {
+        if (!confirm('هل أنت متأكد من حذف الغرفة؟ سيتم طرد جميع اللاعبين.')) return;
+        
+        try {
+            await remove(dbRef(rtdb, `rooms/${currentRoomId}`));
+        } catch (error) {
+            console.error("Error deleting room:", error);
+        }
+    } else {
+        if (!confirm('هل أنت متأكد من مغادرة الغرفة؟')) return;
+        
+        try {
+            const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
+            const snapshot = await get(roomRef);
             
-            if (isRoomCreator) {
-                if (!confirm('هل أنت متأكد من حذف الغرفة؟ سيتم طرد جميع اللاعبين.')) return;
+            if (snapshot.exists()) {
+                const roomData = snapshot.val();
+                const currentPlayer = roomData.players?.[currentUser.uid];
                 
-                try {
-                    await remove(dbRef(rtdb, `rooms/${currentRoomId}`));
-                } catch (error) {
-                    console.error("Error deleting room:", error);
-                }
-            } else {
-                if (!confirm('هل أنت متأكد من مغادرة الغرفة؟')) return;
+                const updates = {};
+                updates[`players/${currentUser.uid}`] = null;
+                updates.playersCount = Math.max((roomData.playersCount || 1) - 1, 1);
                 
-                try {
-                    const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
-                    const snapshot = await get(roomRef);
-                    
-                    if (snapshot.exists()) {
-                        const roomData = snapshot.val();
-                        const currentPlayer = roomData.players?.[currentUser.uid];
-                        
-                        const updates = {};
-                        updates[`players/${currentUser.uid}`] = null;
-                        updates.playerCount = (roomData.playerCount || 1) - 1;
-                        
-                        if (currentPlayer?.ready) {
-                            updates.readyCount = (roomData.readyCount || 1) - 1;
-                        }
-                        
-                        await update(roomRef, updates);
-                    }
-                } catch (error) {
-                    console.error("Error leaving room:", error);
+                // إذا كان اللاعب مستعداً، قلل readyCount أيضاً
+                if (currentPlayer?.ready) {
+                    updates.readyCount = Math.max((roomData.readyCount || 1) - 1, 0);
                 }
+                
+                await update(roomRef, updates);
             }
-            
-            cleanupRoom();
-            document.getElementById('room-screen').classList.add('hidden');
-            document.getElementById('challenge-active-card').classList.remove('hidden');
-            switchTab('challenges');
-        };
+        } catch (error) {
+            console.error("Error leaving room:", error);
+        }
+    }
+    
+    cleanupRoom();
+    document.getElementById('room-screen').classList.add('hidden');
+    document.getElementById('challenge-active-card').classList.remove('hidden');
+    switchTab('challenges');
+};
 
         window.cancelRoomSearch = function() {
             document.getElementById('finding-room-modal').classList.add('hidden');
