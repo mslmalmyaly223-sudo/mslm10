@@ -395,7 +395,7 @@
             color: #f59e0b;
         }
 
-        .beautiful-alert-info .beautiful-alert-icon {
+        .beautiful-alert.info .beautiful-alert-icon {
             color: #3b82f6;
         }
 
@@ -760,152 +760,155 @@
             50% { opacity: 0.7; }
         }
 
-        .room-overlay {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            z-index: 18000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .room-container {
-            background: white;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 500px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            border: 3px solid #4f46e5;
-        }
-
-        .room-header {
+        .beautiful-btn {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s, opacity 0.2s;
         }
 
-        .room-id {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-family: monospace;
-            font-size: 1.2rem;
-            margin-top: 10px;
-            display: inline-block;
+        .beautiful-btn:hover {
+            opacity: 0.9;
         }
 
-        .room-status {
-            position: absolute;
-            top: 20px;
+        .beautiful-btn:active {
+            transform: scale(0.98);
+        }
+
+        .beautiful-btn.secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+        }
+
+        .withdraw-btn {
+            position: fixed;
+            bottom: 80px;
             left: 20px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
         }
 
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .status-dot.online {
-            background: #10b981;
-            box-shadow: 0 0 10px #10b981;
-        }
-
-        .room-time {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.3);
-            padding: 6px 12px;
+        .room-lobby {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 20px;
             border-radius: 20px;
+            margin: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .room-id {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 1.2rem;
             font-weight: bold;
         }
 
+        .room-timer {
+            background: rgba(239, 68, 68, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f87171;
+        }
+
         .players-container {
-            padding: 20px;
             display: flex;
             justify-content: space-around;
-            gap: 20px;
+            margin: 30px 0;
         }
 
         .player-card {
-            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            border-radius: 16px;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s;
-        }
-
-        .player-card.ready {
-            border-color: #10b981;
-            background: #f0fdf4;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            min-width: 150px;
         }
 
         .player-avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            border: 4px solid white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 3px solid #4f46e5;
             margin-bottom: 10px;
         }
 
         .player-name {
             font-weight: bold;
-            font-size: 1.1rem;
             margin-bottom: 5px;
         }
 
         .player-status {
-            font-size: 0.9rem;
-            padding: 4px 12px;
+            padding: 5px 10px;
             border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: bold;
         }
 
-        .status-waiting {
-            background: #fef3c7;
-            color: #92400e;
+        .status-ready {
+            background: #10b981;
         }
 
-        .status-ready {
-            background: #d1fae5;
-            color: #065f46;
+        .status-waiting {
+            background: #f59e0b;
         }
 
         .room-controls {
-            padding: 20px;
             display: flex;
-            gap: 15px;
-            border-top: 1px solid #e2e8f0;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
         }
 
         .room-btn {
-            flex: 1;
-            padding: 16px;
-            border-radius: 12px;
+            padding: 15px 30px;
+            border-radius: 10px;
             font-weight: bold;
             font-size: 1.1rem;
             border: none;
             cursor: pointer;
-            transition: all 0.3s;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
+            transition: transform 0.2s;
+        }
+
+        .room-btn:active {
+            transform: scale(0.98);
         }
 
         .ready-btn {
@@ -918,32 +921,51 @@
             color: white;
         }
 
-        .start-btn {
+        .delete-btn {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: white;
         }
 
-        .room-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .room-stats {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .room-info {
-            padding: 15px 20px;
-            background: #f1f5f9;
-            border-top: 1px solid #e2e8f0;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #64748b;
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .player-count {
-            display: inline-block;
-            background: #4f46e5;
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .friend-match-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin: 0 5px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
         }
 
         @media (min-width: 768px) {
@@ -993,16 +1015,16 @@
         <p class="text-indigo-300 font-bold mt-10 tracking-widest animate-pulse">جاري بدء التحدي...</p>
     </div>
 
-    <div id="daily-reward-screen" class="fixed inset-0 reward-overlay z-[9000] hidden flex flex-col items-center justify-center p-4">
+    <div id="daily-reward-screen" class="fixed inset-0 reward-overlay z-[9000] hidden flex-col items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative overflow-hidden animate-[slideUp_0.4s_ease-out]">
             <div class="text-center mb-4">
-                <h2 class="text-2xl font-black text-indigo-800">سجل الحضور اليومي 📅</h2>
+                <h2 class="text-2xl font-black text-indigo-800">سجل الحضور اليومي</h2>
             </div>
             <div id="reward-grid-container" class="reward-grid"></div>
             <div class="text-center mt-6">
-                <button onclick="claimReward()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
-                      <span>استلام الهدية</span>
-                      <i class="fas fa-gift animate-bounce"></i>
+                <button onclick="claimReward()" class="beautiful-btn bg-gradient-to-r from-green-500 to-emerald-600">
+                    <span>استلام الهدية</span>
+                    <i class="fas fa-gift animate-bounce"></i>
                 </button>
             </div>
             <button onclick="document.getElementById('daily-reward-screen').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
@@ -1018,7 +1040,7 @@
             <div class="bg-white/90 border border-slate-200 rounded-2xl p-5 mb-6 text-slate-700 font-bold leading-relaxed">
                 <p id="maintenance-msg-display">رسالة الإدارة...</p>
             </div>
-            <button onclick="closeMaintenancePopup()" class="bg-slate-800 text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition shadow-xl w-full flex items-center justify-center gap-2">
+            <button onclick="closeMaintenancePopup()" class="beautiful-btn bg-slate-800">
                 <i class="fas fa-check-circle"></i> حسنا
             </button>
         </div>
@@ -1060,7 +1082,7 @@
 
             <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
                 <div class="mb-4">
-                    <label class="block text-xs font-bold text-gray-500 mb-1 mr-1">البريد الإلكتروني أو المعرف (ID)</label>
+                    <label class="block text-xs font-bold text-gray-500 mb-1 mr-1">البريد الإلكتروني أو المعرف</label>
                     <input type="text" id="login-identifier" placeholder="example@gmail.com أو المعرف" class="input-box" required>
                 </div>
                 <div class="mb-4">
@@ -1089,7 +1111,7 @@
                 </div>
                 <div class="space-y-3">
                     <div><input type="text" id="signup-name" placeholder="الاسم الظاهر" class="input-box" required></div>
-                    <div><input type="email" id="signup-email" placeholder="البريد الإلكتروني (@gmail.com)" class="input-box" required></div>
+                    <div><input type="email" id="signup-email" placeholder="البريد الإلكتروني" class="input-box" required></div>
                     <div><input type="password" id="signup-pass" placeholder="كلمة المرور (6+ أحرف)" class="input-box" required minlength="6"></div>
                 </div>
                 <div class="mt-4 text-xs text-gray-500">
@@ -1100,153 +1122,130 @@
         </div>
     </div>
 
-    <!-- نافذة اختيار نوع اللعب -->
-    <div id="play-friend-modal" class="modal-overlay hidden">
-        <div class="modal-content relative">
-            <button onclick="document.getElementById('play-friend-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
-            </button>
-            <h3 class="font-bold text-lg mb-6 text-indigo-700 text-center">اللعب ضد صديق</h3>
-            
+    <!-- Friend Match Modal -->
+    <div id="friend-match-modal" class="modal-overlay hidden">
+        <div class="modal-content bg-white rounded-3xl p-8 max-w-sm">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-users text-3xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-black text-gray-800">اللعب ضد صديقك</h3>
+            </div>
             <div class="space-y-4">
-                <button onclick="createRoom()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-xl font-bold shadow-lg hover:opacity-90 transition flex items-center justify-center gap-3">
-                    <i class="fas fa-plus-circle text-xl"></i>
-                    <span>إنشاء غرفة جديدة</span>
+                <button onclick="createFriendRoom()" class="beautiful-btn bg-gradient-to-r from-purple-500 to-pink-500">
+                    <i class="fas fa-plus-circle"></i> إنشاء غرفة
                 </button>
-                
-                <div class="relative my-4">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-4 bg-white text-gray-500">أو</span>
-                    </div>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-gray-600 mb-2">أدخل كود الغرفة</label>
-                    <input type="text" id="join-room-code" placeholder="أدخل كود الغرفة" class="input-box text-center font-mono text-lg uppercase" maxlength="8">
-                </div>
-                
-                <button onclick="joinRoom()" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-xl font-bold shadow-lg hover:opacity-90 transition flex items-center justify-center gap-3">
-                    <i class="fas fa-search text-xl"></i>
-                    <span>البحث عن غرفة</span>
+                <button onclick="showJoinRoomModal()" class="beautiful-btn bg-gradient-to-r from-blue-500 to-cyan-500">
+                    <i class="fas fa-search"></i> البحث عن غرفة
                 </button>
             </div>
-            
-            <div class="mt-6 text-center">
-                <button onclick="document.getElementById('play-friend-modal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700 font-medium">رجوع</button>
+            <button onclick="closeFriendMatchModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Join Room Modal -->
+    <div id="join-room-modal" class="modal-overlay hidden">
+        <div class="modal-content bg-white rounded-3xl p-8 max-w-sm">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-door-open text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-black text-gray-800">الدخول إلى غرفة</h3>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-600 mb-2">أدخل رقم الغرفة</label>
+                <input type="text" id="room-id-input" placeholder="رقم الغرفة" class="input-box text-center text-xl font-mono">
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeJoinRoomModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition">إلغاء</button>
+                <button onclick="joinFriendRoom()" class="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-xl font-bold shadow-md hover:opacity-90 transition">دخول</button>
             </div>
         </div>
     </div>
 
-    <!-- نافذة إنشاء غرفة -->
+    <!-- Create Room Modal -->
     <div id="create-room-modal" class="modal-overlay hidden">
-        <div class="modal-content relative">
-            <button onclick="closeCreateRoomModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
-            </button>
-            <h3 class="font-bold text-lg mb-6 text-indigo-700 text-center">إنشاء غرفة جديدة</h3>
-            
-            <form onsubmit="event.preventDefault(); proceedToRoom();">
-                <div class="mb-4">
+        <div class="modal-content bg-white rounded-3xl p-8 max-w-sm">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-gamepad text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-black text-gray-800">إنشاء غرفة جديدة</h3>
+            </div>
+            <div class="space-y-4">
+                <div>
                     <label class="block text-sm font-bold text-gray-600 mb-2">المادة</label>
-                    <select id="room-subject" class="input-box" required>
+                    <select id="room-subject" class="input-box">
                         <option value="">اختر المادة</option>
                     </select>
                 </div>
-
-                <div class="mb-6">
-                    <label class="block text-sm font-bold text-gray-600 mb-2">نوع السؤال</label>
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 mb-2">نوع الأسئلة</label>
                     <div class="grid grid-cols-2 gap-3">
-                        <button type="button" onclick="setRoomQType('mcq')" id="room-btn-mcq" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition">اختيارات</button>
-                        <button type="button" onclick="setRoomQType('tf')" id="room-btn-tf" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition">صح وخطأ</button>
+                        <button type="button" onclick="setRoomQuestionType('mcq')" id="room-btn-mcq" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold transition">اختيارات</button>
+                        <button type="button" onclick="setRoomQuestionType('tf')" id="room-btn-tf" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold transition">صح وخطأ</button>
                     </div>
-                    <input type="hidden" id="room-qtype" required>
                 </div>
-
-                <div class="flex gap-3">
-                    <button type="button" onclick="closeCreateRoomModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
-                        رجوع
-                    </button>
-                    <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-bold shadow-md hover:opacity-90 transition">
-                        التالي
-                    </button>
-                </div>
-            </form>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeCreateRoomModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition">إلغاء</button>
+                <button onclick="confirmCreateRoom()" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-bold shadow-md hover:opacity-90 transition">إنشاء</button>
+            </div>
         </div>
     </div>
 
-    <!-- واجهة الغرفة -->
-    <div id="room-screen" class="room-overlay hidden">
-        <div class="room-container">
+    <!-- Room Lobby Screen -->
+    <div id="room-lobby-screen" class="screen pt-20 hidden">
+        <div class="room-lobby">
             <div class="room-header">
-                <div class="room-status">
-                    <div class="status-dot online"></div>
-                    <span>متصل</span>
+                <div>
+                    <h3 class="text-xl font-bold">غرفة المباراة</h3>
+                    <div class="room-id" id="room-id-display">20482827</div>
                 </div>
-                <h2 class="text-2xl font-black">غرفة المباراة</h2>
-                <div class="room-id" id="room-id-display">جاري التحميل...</div>
-                <div class="room-time" id="room-timer">10:00</div>
+                <div class="room-timer" id="room-timer">10:00</div>
             </div>
-            
-            <div class="players-container">
-                <div class="player-card" id="player1-card">
-                    <img id="player1-avatar" src="" class="player-avatar">
-                    <div class="player-name" id="player1-name">...</div>
-                    <div class="player-status status-waiting" id="player1-status">بانتظار</div>
-                </div>
-                
-                <div class="player-card" id="player2-card">
-                    <img id="player2-avatar" src="" class="player-avatar">
-                    <div class="player-name" id="player2-name">...</div>
-                    <div class="player-status status-waiting" id="player2-status">بانتظار</div>
-                </div>
-            </div>
-            
-            <div class="room-info">
-                <span id="players-count">المستخدمين (<span>1</span>/2)</span>
-                <span class="mx-2">•</span>
-                <span id="ready-count">جاهز (<span>0</span>/2)</span>
-            </div>
-            
-            <div class="room-controls">
-                <button id="ready-btn" onclick="toggleReady()" class="room-btn ready-btn">
-                    <i class="fas fa-check"></i>
-                    <span>جاهز</span>
-                </button>
-                
-                <button id="start-btn" onclick="startRoomGame()" class="room-btn start-btn hidden">
-                    <i class="fas fa-play"></i>
-                    <span>بدء المباراة</span>
-                </button>
-                
-                <button id="leave-btn" onclick="leaveRoom()" class="room-btn leave-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span id="leave-btn-text">مغادرة</span>
-                </button>
-            </div>
-        </div>
-    </div>
 
-    <!-- رسالة انتظار العثور على غرفة -->
-    <div id="finding-room-modal" class="modal-overlay hidden">
-        <div class="modal-content relative text-center">
-            <button onclick="cancelRoomSearch()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
-            </button>
-            
-            <div class="w-24 h-24 rounded-full bg-indigo-50 flex items-center justify-center relative mx-auto mb-6">
-                <div class="absolute inset-0 rounded-full border-4 border-indigo-500 opacity-20 animate-ping"></div>
-                <i class="fas fa-search text-3xl text-indigo-600"></i>
+            <div class="players-container">
+                <div class="player-card">
+                    <img id="room-player1-img" src="" class="player-avatar">
+                    <div class="player-name" id="room-player1-name">المالك</div>
+                    <div class="player-status status-ready" id="room-player1-status">✅</div>
+                </div>
+                
+                <div class="player-card">
+                    <img id="room-player2-img" src="" class="player-avatar">
+                    <div class="player-name" id="room-player2-name">...</div>
+                    <div class="player-status status-waiting" id="room-player2-status">❌</div>
+                </div>
             </div>
-            
-            <h3 class="text-xl font-bold text-gray-800 mb-2">جاري البحث عن غرفة...</h3>
-            <p class="text-gray-600 mb-6" id="search-room-msg">يتم الآن البحث عن غرفة متاحة</p>
-            
-            <button onclick="cancelRoomSearch()" class="text-red-500 font-bold text-sm bg-red-50 px-4 py-2 rounded-full">
-                إلغاء البحث
-            </button>
+
+            <div class="room-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="room-players-count">1/2</div>
+                    <div class="stat-label">عدد اللاعبين</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="room-ready-count">1</div>
+                    <div class="stat-label">جاهزون</div>
+                </div>
+            </div>
+
+            <div class="room-controls">
+                <button onclick="toggleReadyStatus()" class="room-btn ready-btn" id="ready-btn">
+                    <i class="fas fa-check"></i>
+                    <span id="ready-btn-text">جاهز</span>
+                </button>
+                <button onclick="leaveRoom()" class="room-btn leave-btn" id="leave-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    مغادرة
+                </button>
+                <button onclick="deleteRoom()" class="room-btn delete-btn hidden" id="delete-btn">
+                    <i class="fas fa-trash"></i>
+                    حذف الغرفة
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1279,11 +1278,11 @@
                         <option value="6lit">السادس الأدبي</option>
                         <option value="3med">الثالث متوسط</option>
                     </select>
-                    <button onclick="saveUserGrade()" class="btn-main py-3 text-sm">حفظ المرحلة</button>
+                    <button onclick="saveUserGrade()" class="beautiful-btn">حفظ المرحلة</button>
                 </div>
 
                 <div id="challenge-active-card" class="bg-white p-6 rounded-2xl shadow-sm mb-6 hidden">
-                    <h3 class="font-bold text-gray-800 mb-4 border-r-4 border-indigo-500 pr-3">بدء تحدي جديد 🔥</h3>
+                    <h3 class="font-bold text-gray-800 mb-4 border-r-4 border-indigo-500 pr-3">بدء تحدي جديد</h3>
                     <label class="block text-sm font-bold text-gray-600 mb-2">المادة</label>
                     <select id="challenge-subject" class="input-box mb-4 bg-gray-50"></select>
 
@@ -1293,13 +1292,13 @@
                         <button onclick="setQType('tf')" id="btn-tf" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition">صح وخطأ</button>
                     </div>
 
-                    <button onclick="startMatchmaking('ai')" class="btn-main bg-gradient-to-r from-emerald-500 to-green-600 mb-3 h-12">
-                        <i class="fas fa-robot ml-2"></i> ضد الذكاء الاصطناعي
-                        <span id="ai-remaining" class="text-xs bg-white text-green-600 px-2 py-1 rounded-full mr-2">10</span>
+                    <button onclick="startMatchmaking('ai')" class="beautiful-btn bg-gradient-to-r from-emerald-500 to-green-600 mb-3">
+                        <i class="fas fa-robot"></i> ضد الذكاء الاصطناعي
+                        <span id="ai-remaining" class="text-xs bg-white text-green-600 px-2 py-1 rounded-full">10</span>
                     </button>
-                    
-                    <button onclick="openPlayFriendModal()" class="btn-main bg-gradient-to-r from-purple-500 to-pink-600 h-12">
-                        <i class="fas fa-user-friends ml-2"></i> ضد صديقك
+
+                    <button onclick="openFriendMatchModal()" class="friend-match-btn">
+                        <i class="fas fa-user-friends"></i> اللعب ضد صديقك
                     </button>
                 </div>
 
@@ -1347,7 +1346,7 @@
                 <p id="ai-thinking-msg" class="text-center text-green-600 text-sm hidden animate-pulse mt-4 font-bold">الذكاء الاصطناعي يفكر...</p>
             </div>
 
-            <button id="withdraw-game-btn" onclick="withdrawFromGame()" class="w-full bg-red-100 text-red-600 py-3 font-bold border-t border-red-200 hover:bg-red-50 transition flex items-center justify-center gap-2">
+            <button id="withdraw-game-btn" onclick="withdrawFromGame()" class="withdraw-btn">
                 <i class="fas fa-sign-out-alt"></i> انسحاب (-10 نقاط)
             </button>
         </div>
@@ -1378,7 +1377,7 @@
                     <i class="fas fa-gem"></i>
                 </div>
                 
-                <button onclick="closeResultScreen()" class="btn-main mt-6">
+                <button onclick="closeResultScreen()" class="beautiful-btn">
                     <i class="fas fa-home"></i>
                     <span>العودة للصفحة الرئيسية</span>
                 </button>
@@ -1388,7 +1387,7 @@
         <div id="tab-leaderboard" class="screen pt-20">
             <div class="scroll-container px-4">
                 <div class="countdown-container">
-                    <p class="text-xs text-gray-300 mb-1">الجوائز الأسبوعية 🎁 (تنتهي الجمعة 00:00)</p>
+                    <p class="text-xs text-gray-300 mb-1">الجوائز الأسبوعية</p>
                     <div id="weekly-timer" class="timer-digits">00:00:00:00</div>
                 </div>
 
@@ -1400,7 +1399,7 @@
                     <i class="fas fa-trophy text-4xl opacity-50"></i>
                 </div>
                 <div id="leaderboard-list" class="space-y-4 pb-10 flex flex-col"></div>
-                <button id="load-more-leaderboard" onclick="loadMoreLeaderboard()" class="btn-main bg-gray-100 text-gray-600 hidden mt-4 mb-10">
+                <button id="load-more-leaderboard" onclick="loadMoreLeaderboard()" class="beautiful-btn secondary hidden mt-4 mb-10">
                     <i class="fas fa-chevron-down"></i> عرض المزيد
                 </button>
             </div>
@@ -1420,24 +1419,24 @@
                         <form onsubmit="handleScheduleFormSubmit(event)">
                             <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-bold mb-2">المادة</label>
-                                <input type="text" id="subjectName" required placeholder="اسم المادة..." class="input-box">
+                                <input type="text" id="subjectName" required placeholder="اسم المادة" class="input-box">
                             </div>
 
                             <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2">الفصول (الأصعب يأخذ وقتاً أكثر)</label>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">الفصول</label>
                                 <div id="chaptersList" class="space-y-2 max-h-40 overflow-y-auto mb-2"></div>
                                 <button type="button" onclick="addChapterRow()" class="w-full py-2 border-2 border-dashed border-indigo-300 text-indigo-500 rounded-xl hover:bg-indigo-50 text-sm font-bold">+ إضافة فصل</button>
                             </div>
 
                             <div class="mb-4">
                                 <label class="block text-gray-700 text-sm font-bold mb-2">الوقت المتبقي للامتحان (ساعات)</label>
-                                <input type="number" id="totalHours" required min="1" max="999" placeholder="مثال: 10" class="input-box text-center font-bold text-lg">
+                                <input type="number" id="totalHours" required min="1" max="999" placeholder="أدخل عدد الساعات" class="input-box text-center font-bold text-lg">
                             </div>
 
                             <div class="grid grid-cols-3 gap-4 mb-6">
                                 <div>
-                                    <label class="block text-gray-700 text-xs font-bold mb-2">وقت النوم؟</label>
-                                    <select id="needSleep" class="input-box text-sm font-bold" required>
+                                    <label class="block text-gray-700 text-xs font-bold mb-2">وقت النوم</label>
+                                    <select id="needSleep" class="input-box text-sm font-bold">
                                         <option value="">اختر</option>
                                         <option value="yes">احسب وقت النوم</option>
                                         <option value="no">لا تحسبه</option>
@@ -1452,7 +1451,7 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-gray-700 text-xs font-bold mb-2">وقت الدراسة المفضل</label>
+                                    <label class="block text-gray-700 text-xs font-bold mb-2">وقت الدراسة</label>
                                     <select id="studyTimePref" class="input-box text-sm font-bold">
                                         <option value="morning">صباحاً</option>
                                         <option value="evening">مساءً</option>
@@ -1461,7 +1460,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-all text-lg">إنشاء الجدول الآن</button>
+                            <button type="submit" class="beautiful-btn">إنشاء الجدول الآن</button>
                         </form>
                     </div>
                 </section>
@@ -1581,7 +1580,7 @@
                                     <i class="fas fa-user-shield"></i>
                                     <div id="admin-btn-badge" class="btn-dot"></div>
                                 </div>
-                                <span class="font-bold text-red-800">لوحة التحكم الرئيسية</span>
+                                <span class="font-bold text-red-800">لوحة التحكم</span>
                             </div>
                             <i class="fas fa-chevron-left text-red-300"></i>
                         </button>
@@ -1600,7 +1599,7 @@
         <div id="screen-wallet" class="screen pt-20">
             <div class="absolute top-0 w-full h-20 bg-white shadow-sm z-30 flex items-center px-5 gap-4">
                 <button onclick="backToProfile()" class="text-gray-500"><i class="fas fa-arrow-right text-xl"></i></button>
-                <h1 class="font-bold text-lg text-gray-800">محفظتي 💵</h1>
+                <h1 class="font-bold text-lg text-gray-800">محفظتي</h1>
             </div>
             <div class="scroll-container px-5 py-6 text-center">
                 <div class="bg-gradient-to-br from-green-500 to-emerald-700 text-white p-8 rounded-3xl shadow-lg mb-6">
@@ -1608,7 +1607,7 @@
                     <h1 class="text-5xl font-black mb-1">$<span id="wallet-balance">0</span></h1>
                 </div>
                 <div id="withdraw-section" class="hidden">
-                     <a href="https://t.me/mslmh19" target="_blank" class="w-full bg-blue-500 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition flex items-center justify-center gap-2 animate-pulse">
+                     <a href="https://t.me/mslmh19" target="_blank" class="beautiful-btn bg-blue-500">
                         <i class="fab fa-telegram-plane"></i>
                         <span>المطالبة بالأموال الآن</span>
                     </a>
@@ -1625,16 +1624,16 @@
             <div class="scroll-container px-5 py-6">
                 <div id="premium-locked-view">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-yellow-100 mb-6">
-                        <h3 class="font-bold text-gray-800 mb-4 text-center">تفعيل الاشتراك المميز 🔑</h3>
+                        <h3 class="font-bold text-gray-800 mb-4 text-center">تفعيل الاشتراك المميز</h3>
                         <input type="text" id="premium-code-input" placeholder="أدخل كود التفعيل هنا" class="input-box mb-3 text-center font-mono font-bold text-lg tracking-widest text-indigo-700 uppercase">
-                        <button onclick="activatePremiumCode()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-md hover:bg-indigo-700 transition mb-4">تأكيد الكود</button>
+                        <button onclick="activatePremiumCode()" class="beautiful-btn bg-indigo-600 mb-4">تأكيد الكود</button>
                         
                         <div class="flex flex-col gap-2">
-                            <button onclick="window.open('https://t.me/mslmh19', '_blank')" class="w-full bg-blue-500 text-white py-3 rounded-xl font-bold shadow-md hover:bg-blue-600 transition flex items-center justify-center gap-2">
+                            <button onclick="window.open('https://t.me/mslmh19', '_blank')" class="beautiful-btn bg-blue-500">
                                 <i class="fab fa-telegram-plane"></i> احصل على كود التحقق
                             </button>
-                            <button onclick="showPremiumDetails()" class="w-full bg-yellow-50 text-yellow-700 py-3 rounded-xl font-bold border border-yellow-200 hover:bg-yellow-100 transition">
-                                <i class="fas fa-info-circle ml-1"></i> تفاصيل الحساب المميز
+                            <button onclick="showPremiumDetails()" class="beautiful-btn secondary bg-yellow-50 text-yellow-700 border border-yellow-200">
+                                <i class="fas fa-info-circle"></i> تفاصيل الحساب المميز
                             </button>
                         </div>
                     </div>
@@ -1668,44 +1667,44 @@
                         <div class="flex items-center justify-between bg-green-50 p-3 rounded-xl border border-green-200">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-bolt text-green-600"></i>
-                                <span class="font-bold text-sm text-green-800">مضاعفة النقاط (2x)</span>
+                                <span class="font-bold text-sm text-green-800">مضاعفة النقاط</span>
                             </div>
-                            <span class="bg-green-200 text-green-800 text-[10px] px-2 py-1 rounded font-bold">نشط ✅</span>
+                            <span class="bg-green-200 text-green-800 text-[10px] px-2 py-1 rounded font-bold">نشط</span>
                         </div>
                         <div class="flex items-center justify-between bg-emerald-50 p-3 rounded-xl border border-emerald-200">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-dollar-sign text-emerald-600"></i>
-                                <span class="font-bold text-sm text-emerald-800">مضاعفة الأموال (2x)</span>
+                                <span class="font-bold text-sm text-emerald-800">مضاعفة الأموال</span>
                             </div>
-                            <span class="bg-emerald-200 text-emerald-800 text-[10px] px-2 py-1 rounded font-bold">نشط ✅</span>
+                            <span class="bg-emerald-200 text-emerald-800 text-[10px] px-2 py-1 rounded font-bold">نشط</span>
                         </div>
                         <div class="flex items-center justify-between bg-blue-50 p-3 rounded-xl border border-blue-200">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-robot text-blue-600"></i>
-                                <span class="font-bold text-sm text-blue-800">15 محاولة يومية (الذكاء الاصطناعي)</span>
+                                <span class="font-bold text-sm text-blue-800">15 محاولة يومية</span>
                             </div>
-                            <span class="bg-blue-200 text-blue-800 text-[10px] px-2 py-1 rounded font-bold">نشط ✅</span>
+                            <span class="bg-blue-200 text-blue-800 text-[10px] px-2 py-1 rounded font-bold">نشط</span>
                         </div>
                         <div class="flex items-center justify-between bg-purple-50 p-3 rounded-xl border border-purple-200">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-crown text-purple-600"></i>
                                 <span class="font-bold text-sm text-purple-800">علامة توثيق مميزة</span>
                             </div>
-                            <span class="bg-purple-200 text-purple-800 text-[10px] px-2 py-1 rounded font-bold">نشط ✅</span>
+                            <span class="bg-purple-200 text-purple-800 text-[10px] px-2 py-1 rounded font-bold">نشط</span>
                         </div>
                         <div class="flex items-center justify-between bg-pink-50 p-3 rounded-xl border border-pink-200">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-palette text-pink-600"></i>
-                                <span class="font-bold text-sm text-pink-800">خلفية متحركة في التصنيف</span>
+                                <span class="font-bold text-sm text-pink-800">خلفية متحركة</span>
                             </div>
-                            <span class="bg-pink-200 text-pink-800 text-[10px] px-2 py-1 rounded font-bold">نشط ✅</span>
+                            <span class="bg-pink-200 text-pink-800 text-[10px] px-2 py-1 rounded font-bold">نشط</span>
                         </div>
                         <div class="flex items-center justify-between bg-amber-50 p-3 rounded-xl border border-amber-200">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-star text-amber-600"></i>
-                                <span class="font-bold text-sm text-amber-800">أولوية في البحث عن مباريات</span>
+                                <span class="font-bold text-sm text-amber-800">أولوية في البحث</span>
                             </div>
-                            <span class="bg-amber-200 text-amber-800 text-[10px] px-2 py-1 rounded font-bold">نشط ✅</span>
+                            <span class="bg-amber-200 text-amber-800 text-[10px] px-2 py-1 rounded font-bold">نشط</span>
                         </div>
                     </div>
                 </div>
@@ -1715,7 +1714,7 @@
         <div id="screen-admin-hub" class="screen pt-20">
             <div class="absolute top-0 w-full h-20 bg-white shadow-sm z-30 flex items-center px-5 gap-4">
                 <button onclick="backToProfile()" class="text-gray-500"><i class="fas fa-arrow-right text-xl"></i></button>
-                <h1 class="font-bold text-lg text-gray-800">لوحة التحكم الرئيسية</h1>
+                <h1 class="font-bold text-lg text-gray-800">لوحة التحكم</h1>
             </div>
             <div class="scroll-container px-5 py-6">
                 <div class="grid grid-cols-3 gap-3">
@@ -1783,18 +1782,18 @@
                     <div class="mb-6">
                         <label class="block text-xs font-bold text-gray-500 mb-2">مدة الاشتراك</label>
                         <select id="admin-sub-duration" class="input-box mb-3">
-                            <option value="7">أسبوع (7 أيام)</option>
-                            <option value="30">شهر (30 يوم)</option>
-                            <option value="90">3 أشهر (90 يوم)</option>
-                            <option value="180">6 أشهر (180 يوم)</option>
-                            <option value="365">سنة (365 يوم)</option>
+                            <option value="7">أسبوع</option>
+                            <option value="30">شهر</option>
+                            <option value="90">3 أشهر</option>
+                            <option value="180">6 أشهر</option>
+                            <option value="365">سنة</option>
                         </select>
-                        <button onclick="generateSubscriptionCode()" class="btn-main bg-green-600 mb-4">
-                            <i class="fas fa-key ml-2"></i> تكوين وتوليد كود
+                        <button onclick="generateSubscriptionCode()" class="beautiful-btn bg-green-600 mb-4">
+                            <i class="fas fa-key"></i> تكوين وتوليد كود
                         </button>
                         
                         <div id="generated-code-display" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl text-center mt-4">
-                            <p class="text-xs text-green-500 mb-1">الكود الجديد:</p>
+                            <p class="text-xs text-green-500 mb-1">الكود الجديد</p>
                             <h2 class="text-2xl font-mono font-bold text-green-800 select-all" id="gen-code-text">...</h2>
                             <div class="flex justify-center gap-2 mt-3">
                                 <button onclick="copyGenCode()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition flex items-center gap-1">
@@ -1819,8 +1818,8 @@
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-red-100">
                     <h3 class="font-bold text-red-800 mb-3">حذف كود اشتراك</h3>
                     <input type="text" id="admin-delete-code-input" placeholder="أدخل الكود لحذفه" class="input-box mb-4 uppercase">
-                    <button onclick="deleteSubscriptionCode()" class="btn-main bg-red-600 hover:bg-red-700">
-                        <i class="fas fa-trash-alt ml-2"></i> حذف الكود
+                    <button onclick="deleteSubscriptionCode()" class="beautiful-btn bg-red-600">
+                        <i class="fas fa-trash-alt"></i> حذف الكود
                     </button>
                 </div>
             </div>
@@ -1845,8 +1844,8 @@
             </div>
             <div class="scroll-container px-5 py-6">
                 <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-5 shadow-sm">
-                    <h3 class="font-bold text-yellow-800 mb-2">🎁 توزيع الجوائز الأسبوعية</h3>
-                    <button onclick="manualWeeklyDistribution()" class="w-full bg-yellow-500 text-white font-bold py-3 rounded-xl shadow-md hover:bg-yellow-600">توزيع وتصفير الآن</button>
+                    <h3 class="font-bold text-yellow-800 mb-2">توزيع الجوائز الأسبوعية</h3>
+                    <button onclick="manualWeeklyDistribution()" class="beautiful-btn bg-yellow-500">توزيع وتصفير الآن</button>
                 </div>
             </div>
         </div>
@@ -1858,8 +1857,8 @@
             </div>
             <div class="scroll-container px-5 py-6">
                 <div class="flex gap-2 mb-6">
-                    <input type="text" id="admin-user-search" placeholder="ابحث بمعرف المستخدم (ID)" class="input-box">
-                    <button onclick="searchUserForAdmin()" class="btn-main w-auto px-6"><i class="fas fa-search"></i></button>
+                    <input type="text" id="admin-user-search" placeholder="ابحث بمعرف المستخدم" class="input-box">
+                    <button onclick="searchUserForAdmin()" class="beautiful-btn w-auto px-6"><i class="fas fa-search"></i></button>
                 </div>
                 <div id="admin-user-result" class="hidden bg-white p-5 rounded-2xl shadow-md border border-gray-100"></div>
                 
@@ -1887,7 +1886,7 @@
             </div>
             <div class="scroll-container px-5 py-6">
                 <div class="bg-white p-3 rounded-xl mb-4 shadow-sm border border-gray-100">
-                    <p class="text-xs font-bold text-gray-400 mb-2">تصفية حسب:</p>
+                    <p class="text-xs font-bold text-gray-400 mb-2">تصفية حسب</p>
                     <div class="flex gap-2">
                         <select id="admin-filter-grade" class="input-box text-sm p-2" onchange="filterAdminQuestions()">
                             <option value="">كل المراحل</option>
@@ -1944,7 +1943,7 @@
                             </div>
                         </div>
 
-                        <button onclick="goToUploadStep2()" class="btn-main">
+                        <button onclick="goToUploadStep2()" class="beautiful-btn">
                             <i class="fas fa-arrow-left"></i> التالي
                         </button>
                     </div>
@@ -1952,7 +1951,7 @@
                     <div id="upload-step-2-mcq" class="hidden">
                         <div class="mb-4">
                             <label class="block text-sm font-bold text-gray-600 mb-2">نص السؤال</label>
-                            <textarea id="upload-question-text" class="input-box h-24" placeholder="اكتب نص السؤال هنا..." maxlength="500"></textarea>
+                            <textarea id="upload-question-text" class="input-box h-24" placeholder="اكتب نص السؤال هنا" maxlength="500"></textarea>
                         </div>
 
                         <div class="space-y-3 mb-4">
@@ -1980,10 +1979,10 @@
                         </div>
 
                         <div class="flex gap-3">
-                            <button onclick="goToUploadStep1()" class="btn-main bg-gray-100 text-gray-600 flex-1">
+                            <button onclick="goToUploadStep1()" class="beautiful-btn secondary flex-1">
                                 <i class="fas fa-arrow-right"></i> رجوع
                             </button>
-                            <button onclick="submitQuestionMCQ()" class="btn-main flex-1">
+                            <button onclick="submitQuestionMCQ()" class="beautiful-btn flex-1">
                                 <i class="fas fa-paper-plane"></i> إرسال للمراجعة
                             </button>
                         </div>
@@ -1992,7 +1991,7 @@
                     <div id="upload-step-2-tf" class="hidden">
                         <div class="mb-4">
                             <label class="block text-sm font-bold text-gray-600 mb-2">نص السؤال</label>
-                            <textarea id="upload-tf-question" class="input-box h-24" placeholder="اكتب نص السؤال هنا..." maxlength="500"></textarea>
+                            <textarea id="upload-tf-question" class="input-box h-24" placeholder="اكتب نص السؤال هنا" maxlength="500"></textarea>
                         </div>
 
                         <div class="mb-6">
@@ -2004,10 +2003,10 @@
                         </div>
 
                         <div class="flex gap-3">
-                            <button onclick="goToUploadStep1()" class="btn-main bg-gray-100 text-gray-600 flex-1">
+                            <button onclick="goToUploadStep1()" class="beautiful-btn secondary flex-1">
                                 <i class="fas fa-arrow-right"></i> رجوع
                             </button>
-                            <button onclick="submitQuestionTF()" class="btn-main flex-1">
+                            <button onclick="submitQuestionTF()" class="beautiful-btn flex-1">
                                 <i class="fas fa-paper-plane"></i> إرسال للمراجعة
                             </button>
                         </div>
@@ -2042,30 +2041,30 @@
                 <div class="space-y-4 text-right">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-yellow-500 text-indigo-900 flex items-center justify-center font-bold"><i class="fas fa-check"></i></div>
-                        <p class="font-bold">توثيق مميز للحساب (علامة بجانب الاسم).</p>
+                        <p class="font-bold">توثيق مميز للحساب</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-yellow-500 text-indigo-900 flex items-center justify-center font-bold"><i class="fas fa-check"></i></div>
-                        <p class="font-bold">خلفية مميزة متحركة في التصنيف.</p>
+                        <p class="font-bold">خلفية متحركة في التصنيف</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-yellow-500 text-indigo-900 flex items-center justify-center font-bold">2x</div>
-                        <p class="font-bold">نقاط مضاعفة من التحديات.</p>
+                        <p class="font-bold">نقاط مضاعفة من التحديات</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-yellow-500 text-indigo-900 flex items-center justify-center font-bold">$$</div>
-                        <p class="font-bold">أموال مضاعفة عند انتهاء الاسبوع.</p>
+                        <p class="font-bold">أموال مضاعفة</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-yellow-500 text-indigo-900 flex items-center justify-center font-bold">15</div>
-                        <p class="font-bold">15 محاولة يومية في الذكاء الاصطناعي.</p>
+                        <p class="font-bold">15 محاولة يومية</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-yellow-500 text-indigo-900 flex items-center justify-center font-bold"><i class="fas fa-star"></i></div>
-                        <p class="font-bold">أولوية في البحث عن مباريات.</p>
+                        <p class="font-bold">أولوية في البحث</p>
                     </div>
                 </div>
-                <button onclick="document.getElementById('premium-details-modal').classList.add('hidden')" class="mt-8 w-full bg-yellow-500 text-indigo-900 font-bold py-3 rounded-xl hover:bg-yellow-400 transition">فهمت، شكراً</button>
+                <button onclick="document.getElementById('premium-details-modal').classList.add('hidden')" class="beautiful-btn bg-yellow-500 text-indigo-900 mt-8">فهمت، شكراً</button>
             </div>
         </div>
 
@@ -2088,7 +2087,7 @@
         <div id="edit-modal" class="modal-overlay hidden">
             <div class="modal-content relative">
                 <button onclick="document.getElementById('edit-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-                <h3 class="font-bold text-lg mb-4 text-indigo-700 border-b pb-2">تعديل السؤال الشامل</h3>
+                <h3 class="font-bold text-lg mb-4 text-indigo-700 border-b pb-2">تعديل السؤال</h3>
                 <input type="hidden" id="edit-q-id">
                 <label class="block text-xs font-bold text-gray-500 mb-1">نص السؤال</label>
                 <textarea id="edit-q-text" class="input-box h-20 mb-3 text-sm"></textarea>
@@ -2100,14 +2099,14 @@
                      <label class="block text-xs font-bold text-gray-500 mb-1">الخيار 1</label><input type="text" id="edit-ans-0" class="input-box mb-2 p-2 text-sm">
                      <label class="block text-xs font-bold text-gray-500 mb-1">الخيار 2</label><input type="text" id="edit-ans-1" class="input-box mb-2 p-2 text-sm">
                      <label class="block text-xs font-bold text-gray-500 mb-1">الخيار 3</label><input type="text" id="edit-ans-2" class="input-box mb-3 p-2 text-sm">
-                     <label class="block text-xs font-bold text-green-600 mb-1">رقم الإجابة الصحيحة (0, 1, 2)</label>
+                     <label class="block text-xs font-bold text-green-600 mb-1">الإجابة الصحيحة</label>
                      <select id="edit-correct-mcq" class="input-box p-2 text-sm"><option value="0">الخيار 1</option><option value="1">الخيار 2</option><option value="2">الخيار 3</option></select>
                 </div>
                 <div id="edit-tf-fields" class="hidden">
                     <label class="block text-xs font-bold text-green-600 mb-1">الإجابة الصحيحة</label>
                     <select id="edit-correct-tf" class="input-box p-2 text-sm"><option value="true">صح</option><option value="false">خطأ</option></select>
                 </div>
-                <button onclick="saveFullEditQ()" class="btn-main mt-6 bg-indigo-600 text-sm">حفظ التعديلات</button>
+                <button onclick="saveFullEditQ()" class="beautiful-btn bg-indigo-600 text-sm mt-6">حفظ التعديلات</button>
             </div>
         </div>
 
@@ -2116,8 +2115,8 @@
                 <button onclick="document.getElementById('add-subscription-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
                 <h3 class="font-bold text-lg mb-4 text-indigo-700 text-center">إضافة اشتراك</h3>
                 <input type="text" id="add-subscription-code" placeholder="أدخل كود الاشتراك" class="input-box mb-4 text-center font-mono text-lg uppercase">
-                <button onclick="addSubscriptionTime()" class="btn-main bg-green-600 hover:bg-green-700">
-                    <i class="fas fa-plus-circle ml-2"></i> إضافة المدة
+                <button onclick="addSubscriptionTime()" class="beautiful-btn bg-green-600">
+                    <i class="fas fa-plus-circle"></i> إضافة المدة
                 </button>
             </div>
         </div>
@@ -2126,8 +2125,8 @@
             <div class="modal-content relative">
                 <button onclick="document.getElementById('edit-bio-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
                 <h3 class="font-bold text-lg mb-4 text-indigo-700 text-center">تعديل السيرة الذاتية</h3>
-                <textarea id="edit-bio-input" class="input-box h-32 mb-4" placeholder="اكتب نبذة عنك..." maxlength="25"></textarea>
-                <button onclick="saveProfileBio()" class="btn-main bg-indigo-600 hover:bg-indigo-700">حفظ</button>
+                <textarea id="edit-bio-input" class="input-box h-32 mb-4" placeholder="اكتب نبذة عنك" maxlength="25"></textarea>
+                <button onclick="saveProfileBio()" class="beautiful-btn bg-indigo-600">حفظ</button>
             </div>
         </div>
 
@@ -2136,7 +2135,7 @@
                 <button onclick="document.getElementById('edit-name-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
                 <h3 class="font-bold text-lg mb-4 text-indigo-700 text-center">تعديل الاسم</h3>
                 <input type="text" id="edit-name-input" class="input-box mb-4" placeholder="أدخل الاسم الجديد">
-                <button onclick="saveProfileName()" class="btn-main bg-indigo-600 hover:bg-indigo-700">حفظ</button>
+                <button onclick="saveProfileName()" class="beautiful-btn bg-indigo-600">حفظ</button>
             </div>
         </div>
 
@@ -2144,7 +2143,7 @@
             <div id="beautiful-alert-icon" class="beautiful-alert-icon">!</div>
             <h3 id="beautiful-alert-title" class="beautiful-alert-title">تنبيه</h3>
             <p id="beautiful-alert-message" class="beautiful-alert-message">...</p>
-            <button id="beautiful-alert-ok-btn" onclick="document.getElementById('beautiful-alert').classList.add('hidden')" class="beautiful-alert-btn">حسناً</button>
+            <button id="beautiful-alert-ok-btn" class="beautiful-alert-btn">حسناً</button>
         </div>
     </div>
 
@@ -2153,7 +2152,6 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, onSnapshot, query, where, orderBy, limit, deleteDoc, serverTimestamp, increment, getDoc, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
-        import { getDatabase, ref as dbRef, set, get, update, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAfLOjiPiSQW9opdiIgQif3pAp8zsezy58",
@@ -2169,7 +2167,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const rtdb = getDatabase(app);
         const storage = getStorage(app);
         
         const ADMIN_EMAIL = "mslmalmyaly223@gmail.com";
@@ -2194,17 +2191,16 @@
         let userAnsweredCorrectly = false; 
         let leaderboardOffset = 0;
         let allLeaderboardUsers = [];
-        let selectedRoomQType = null;
 
         let premiumInterval = null;
         const BADGES_LIST = ["سجاج", "سجاجة", "دكتور", "دكتورة", "كسلان", "كسولة", "شطور", "شطورة", "نايم", "نايمة", "نعسان", "نعسانة", "ماكو واهس", "مهندس", "مهندسة", "واحد عراق", "صگاركم", "صگارتكم", "فستقة", "المحامي", "المحامية"];
         const BACKGROUNDS_LIST = [
-            { id: 'bg-medical', name: 'طبي (سمائي)', class: 'bg-medical' },
-            { id: 'bg-law', name: 'قانون (جوزي)', class: 'bg-law' },
-            { id: 'bg-edu', name: 'تعليم (أخضر)', class: 'bg-edu' },
-            { id: 'bg-eng', name: 'هندسة (أصفر)', class: 'bg-eng' },
-            { id: 'bg-smart', name: 'ذكي (برتقالي)', class: 'bg-smart' },
-            { id: 'bg-love', name: 'حب (وردي)', class: 'bg-love' }
+            { id: 'bg-medical', name: 'طبي', class: 'bg-medical' },
+            { id: 'bg-law', name: 'قانون', class: 'bg-law' },
+            { id: 'bg-edu', name: 'تعليم', class: 'bg-edu' },
+            { id: 'bg-eng', name: 'هندسة', class: 'bg-eng' },
+            { id: 'bg-smart', name: 'ذكي', class: 'bg-smart' },
+            { id: 'bg-love', name: 'حب', class: 'bg-love' }
         ];
 
         const subjects = {
@@ -2220,17 +2216,19 @@
         let uploadTFAnswer = null;
         let dailyAIRemaining = 10;
         let uploadSubject = null;
-        
-        // متغيرات نظام الغرف
+
+        // Room variables
         let currentRoomId = null;
-        let roomData = null;
-        let roomListener = null;
         let roomTimerInterval = null;
-        let roomTimeLeft = 600; // 10 دقائق بالثواني
-        let isRoomCreator = false;
+        let roomListenerUnsubscribe = null;
+        let isRoomOwner = false;
         let isReady = false;
-        let roomGameStarted = false;
-        let networkCheckInterval = null;
+        let roomQuestionType = 'mcq';
+        let roomSubject = '';
+
+        // Internet check variables
+        let internetCheckInterval = null;
+        let lastInternetCheck = Date.now();
 
         onAuthStateChanged(auth, async (user) => {
             const intro = document.getElementById('intro-screen');
@@ -2458,18 +2456,18 @@
                     distributedBy: 'auto-system'
                 }, { merge: true });
                 
-                console.log("✅ تم التوزيع التلقائي للجوائز وتصفير النقاط بنجاح!");
+                console.log("تم التوزيع التلقائي للجوائز وتصفير النقاط بنجاح!");
                 
                 if (document.getElementById('tab-leaderboard').classList.contains('active')) {
                     loadLeaderboard();
                 }
                 
                 if (userData && userData.email === ADMIN_EMAIL) {
-                    showBeautifulAlert('success', 'تم التوزيع', '✅ تم التوزيع التلقائي للجوائز الأسبوعية وتصفير النقاط!');
+                    showBeautifulAlert('success', 'تم التوزيع', 'تم التوزيع التلقائي للجوائز الأسبوعية وتصفير النقاط!');
                 }
                 
             } catch (error) {
-                console.error("❌ خطأ في التوزيع التلقائي:", error);
+                console.error("خطأ في التوزيع التلقائي:", error);
                 setTimeout(() => {
                     if (!window.retryWeeklyDistribution) {
                         window.retryWeeklyDistribution = true;
@@ -2527,10 +2525,10 @@
             }
             try {
                 await sendPasswordResetEmail(auth, email);
-                showBeautifulAlert('success', 'تم الإرسال', '✅ تم إرسال رابط استعادة كلمة المرور إلى بريدك الإلكتروني.');
+                showBeautifulAlert('success', 'تم الإرسال', 'تم إرسال رابط استعادة كلمة المرور إلى بريدك الإلكتروني.');
                 closeForgotPassword();
             } catch (error) { 
-                showBeautifulAlert('error', 'خطأ', '❌ حدث خطأ: ' + getArabicError(error.code)); 
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ: ' + getArabicError(error.code)); 
             } 
         };
 
@@ -2711,9 +2709,9 @@
             if(adminListenerUnsubscribe) adminListenerUnsubscribe(); 
             if(matchListenerUnsubscribe) matchListenerUnsubscribe();
             if(premiumInterval) clearInterval(premiumInterval);
-            if(roomListener) roomListener();
             if(roomTimerInterval) clearInterval(roomTimerInterval);
-            if(networkCheckInterval) clearInterval(networkCheckInterval);
+            if(roomListenerUnsubscribe) roomListenerUnsubscribe();
+            if(internetCheckInterval) clearInterval(internetCheckInterval);
             signOut(auth);
         };
 
@@ -2980,7 +2978,7 @@
                 const snap = await getDocs(q);
                 
                 if(snap.empty) {
-                    showBeautifulAlert('error', 'خطأ', '❌ الكود غير صحيح أو غير موجود');
+                    showBeautifulAlert('error', 'خطأ', 'الكود غير صحيح أو غير موجود');
                     return;
                 }
                 
@@ -2988,12 +2986,12 @@
                 const codeData = codeDoc.data();
 
                 if(codeData.used) {
-                    showBeautifulAlert('error', 'خطأ', '❌ هذا الكود مستخدم من قبل ولا يمكن استخدامه مرة أخرى');
+                    showBeautifulAlert('error', 'خطأ', 'هذا الكود مستخدم من قبل ولا يمكن استخدامه مرة أخرى');
                     return;
                 }
 
                 if(codeData.isActive === false) {
-                    showBeautifulAlert('error', 'خطأ', '❌ هذا الكود معطل من قبل الإدارة');
+                    showBeautifulAlert('error', 'خطأ', 'هذا الكود معطل من قبل الإدارة');
                     return;
                 }
 
@@ -3028,7 +3026,7 @@
                 userData.dailyAIRemaining = 15;
                 dailyAIRemaining = 15;
 
-                showBeautifulAlert('success', 'مبروك!', `🎉 تم تفعيل الاشتراك المميز لمدة ${durationDays} يوم.\n\nالكود استخدم ولن يعمل مرة أخرى.`);
+                showBeautifulAlert('success', 'مبروك!', `تم تفعيل الاشتراك المميز لمدة ${durationDays} يوم`);
                 checkPremiumStatus();
                 checkAIRemaining();
                 setupHeaderUI();
@@ -3036,13 +3034,13 @@
 
             } catch(e) { 
                 console.error("خطأ في تفعيل الكود:", e);
-                showBeautifulAlert('error', 'خطأ', '❌ حدث خطأ في تفعيل الكود: ' + e.message); 
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في تفعيل الكود: ' + e.message); 
             }
         };
 
         document.getElementById('add-subscription-btn').addEventListener('click', function() {
             if (!isPremiumValid(userData)) {
-                showBeautifulAlert('error', 'خطأ', '❌ يجب أن تكون مشتركاً مميزاً لاستخدام هذه الميزة');
+                showBeautifulAlert('error', 'خطأ', 'يجب أن تكون مشتركاً مميزاً لاستخدام هذه الميزة');
                 return;
             }
             document.getElementById('add-subscription-modal').classList.remove('hidden');
@@ -3060,7 +3058,7 @@
                 const snap = await getDocs(q);
                 
                 if(snap.empty) {
-                    showBeautifulAlert('error', 'خطأ', '❌ الكود غير صحيح أو غير موجود');
+                    showBeautifulAlert('error', 'خطأ', 'الكود غير صحيح أو غير موجود');
                     return;
                 }
                 
@@ -3068,12 +3066,12 @@
                 const codeData = codeDoc.data();
 
                 if(codeData.used) {
-                    showBeautifulAlert('error', 'خطأ', '❌ هذا الكود مستخدم من قبل ولا يمكن استخدامه مرة أخرى');
+                    showBeautifulAlert('error', 'خطأ', 'هذا الكود مستخدم من قبل ولا يمكن استخدامه مرة أخرى');
                     return;
                 }
 
                 if(codeData.isActive === false) {
-                    showBeautifulAlert('error', 'خطأ', '❌ هذا الكود معطل من قبل الإدارة');
+                    showBeautifulAlert('error', 'خطأ', 'هذا الكود معطل من قبل الإدارة');
                     return;
                 }
 
@@ -3103,14 +3101,14 @@
                 
                 userData.premiumExpiry = Timestamp.fromDate(newExpiry);
 
-                showBeautifulAlert('success', 'تمت الإضافة', `🎉 تمت إضافة ${durationDays} يوم لاشتراكك!\n\nالمدة الجديدة: ${newExpiry.toLocaleDateString('ar-EG')}`);
+                showBeautifulAlert('success', 'تمت الإضافة', `تمت إضافة ${durationDays} يوم لاشتراكك!`);
                 checkPremiumStatus();
                 document.getElementById('add-subscription-code').value = "";
                 document.getElementById('add-subscription-modal').classList.add('hidden');
 
             } catch(e) { 
                 console.error("خطأ في إضافة المدة:", e);
-                showBeautifulAlert('error', 'خطأ', '❌ حدث خطأ في إضافة المدة: ' + e.message); 
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إضافة المدة: ' + e.message); 
             }
         };
 
@@ -3137,7 +3135,7 @@
             userData.selectedBadgeColor = color;
             document.getElementById('badge-selector-modal').classList.add('hidden');
             setupProfileUI();
-            showBeautifulAlert('success', 'تم التحديث', 'تم تحديث علامة التوثيق ✅');
+            showBeautifulAlert('success', 'تم التحديث', 'تم تحديث علامة التوثيق');
         }
 
         window.openBgSelector = () => {
@@ -3157,7 +3155,7 @@
              await updateDoc(doc(db, "users", currentUser.uid), { selectedBgTheme: cssClass });
              userData.selectedBgTheme = cssClass;
              document.getElementById('bg-selector-modal').classList.add('hidden');
-             showBeautifulAlert('success', 'تم التحديث', 'تم تحديث خلفية التصنيف ✅');
+             showBeautifulAlert('success', 'تم التحديث', 'تم تحديث خلفية التصنيف');
         }
 
         window.setQType = (t) => {
@@ -3167,12 +3165,12 @@
         };
 
         window.startMatchmaking = async (mode) => {
-            // التحقق من النقاط السالبة
+            // Check if user has negative points
             if (userData.points < 0) {
-                showBeautifulAlert('error', 'نقاط سالبة', '❌ لديك نقاط سالبة. يرجى رفع الأسئلة للحصول على 5 نقاط لكل سؤال يتم قبوله.');
+                showBeautifulAlert('error', 'نقاط سلبية', 'نقاطك سلبية! قم برفع أسئلة للحصول على نقاط (5 نقاط لكل سؤال يتم قبوله)');
                 return;
             }
-            
+
             const sub = document.getElementById('challenge-subject').value;
             if(!sub || !selectedQType) {
                 showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
@@ -3207,7 +3205,9 @@
                 group = `6shared_${sub}`;
             }
 
-            startAIMatch(sub);
+            if (mode === 'ai') {
+                startAIMatch(sub);
+            }
         };
 
         async function startAIMatch(sub) {
@@ -3256,6 +3256,8 @@
             }
             
             let gradeCondition = userData.grade;
+            
+            // Check if this subject is shared between 6sci and 6lit
             if(sharedSubjects.includes(sub) && (userData.grade === '6sci' || userData.grade === '6lit')) {
                 gradeCondition = ['6sci', '6lit'];
             }
@@ -3407,7 +3409,10 @@
                 localMatchData.player1.score += 1;
                 document.getElementById('game-my-score').innerText = localMatchData.player1.score;
             }
-            triggerAIResponse();
+            
+            if (currentGameMode === 'ai') {
+                triggerAIResponse();
+            }
         }
 
         function triggerAIResponse() {
@@ -3434,7 +3439,7 @@
         }
 
         window.withdrawFromGame = async function() {
-            if(!confirm('هل أنت متأكد من الانسحاب من المباراة؟ سيتم خصم 10 نقاط منك ومنحها للخصم.')) return;
+            if(!confirm('هل أنت متأكد من الانسحاب من المباراة؟ سيتم خصم 10 نقاط منك.')) return;
             
             try {
                 let penalty = -10;
@@ -3494,6 +3499,7 @@
             let pointsGained = 0; 
             let msg = ""; 
             let icon = "";
+            
             if (myScore > opScore) { 
                 msg = "فوز ساحق!"; 
                 icon = "🏆"; 
@@ -3501,15 +3507,8 @@
             } else if (myScore < opScore) { 
                 msg = "حظ أوفر!"; 
                 icon = "😢"; 
-                pointsGained = 0;
-                
-                // خصم نصف نقاط الخصم عند الخسارة
-                let pointsToDeduct = Math.floor(opScore / 2);
-                if (pointsToDeduct > 0) {
-                    await updateDoc(doc(db, "users", currentUser.uid), { points: increment(-pointsToDeduct) });
-                    userData.points -= pointsToDeduct;
-                    setupHeaderUI();
-                }
+                // Deduct half of opponent's points when losing
+                pointsGained = -Math.floor(opScore / 2);
             } else { 
                 if(myScore > 0) { 
                     msg = "تعادل إيجابي!"; 
@@ -3526,7 +3525,8 @@
                  pointsGained = pointsGained * 2;
             }
 
-            if(pointsGained > 0) {
+            // Update user points
+            if(pointsGained !== 0) {
                 await updateDoc(doc(db, "users", currentUser.uid), { points: increment(pointsGained) });
                 userData.points += pointsGained;
                 setupHeaderUI();
@@ -3547,7 +3547,15 @@
             finalMyScore.innerText = myScore;
             finalOpScore.innerText = opScore;
             finalOpName.innerText = opName;
-            pointsGainedText.innerText = `+${pointsGained}`;
+            
+            if (pointsGained > 0) {
+                pointsGainedText.innerText = `+${pointsGained}`;
+            } else if (pointsGained < 0) {
+                pointsGainedText.innerText = `${pointsGained}`;
+                pointsGainedText.style.color = '#ef4444';
+            } else {
+                pointsGainedText.innerText = `0`;
+            }
             
             if (isPremiumValid(userData) && pointsGained > 0) {
                 pointsGainedText.innerHTML += ' <span class="text-xs text-green-600">(x2 مميز)</span>';
@@ -3638,7 +3646,7 @@
             userData.name = newName;
             document.getElementById('profile-name-text').innerText = newName;
             document.getElementById('edit-name-modal').classList.add('hidden');
-            showBeautifulAlert('success', 'تم التحديث', 'تم تحديث الاسم ✅');
+            showBeautifulAlert('success', 'تم التحديث', 'تم تحديث الاسم');
         };
 
         window.editProfileBio = () => {
@@ -3655,7 +3663,7 @@
             userData.bio = newBio;
             document.getElementById('profile-bio-text').innerText = newBio || "لا يوجد سيرة ذاتية";
             document.getElementById('edit-bio-modal').classList.add('hidden');
-            showBeautifulAlert('success', 'تم التحديث', 'تم تحديث السيرة الذاتية ✅');
+            showBeautifulAlert('success', 'تم التحديث', 'تم تحديث السيرة الذاتية');
         };
 
         async function loadStatsContent() {
@@ -3672,7 +3680,7 @@
                      if (u.lastActive && u.lastActive.toDate && (now - u.lastActive.toDate()) < 15 * 60 * 1000) activeNow++;
                  });
                  if(activeNow === 0) activeNow = 1; 
-                 div.innerHTML = `<div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">المستخدمين الكلي</p><p class="text-2xl font-bold text-gray-800">${total}</p></div><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600"><i class="fas fa-users"></i></div></div><div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">نشطين الآن</p<p class="text-2xl font-bold text-green-500">${activeNow}</p></div><div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600"><i class="fas fa-wifi"></i></div></div><div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">سجلوا اليوم</p><p class="text-2xl font-bold text-purple-500">${newUsers}</p></div><div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600"><i class="fas fa-user-plus"></i></div></div>`;
+                 div.innerHTML = `<div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">المستخدمين الكلي</p><p class="text-2xl font-bold text-gray-800">${total}</p></div><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600"><i class="fas fa-users"></i></div></div><div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">نشطين الآن</p><p class="text-2xl font-bold text-green-500">${activeNow}</p></div><div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600"><i class="fas fa-wifi"></i></div></div><div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">سجلوا اليوم</p><p class="text-2xl font-bold text-purple-500">${newUsers}</p></div><div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600"><i class="fas fa-user-plus"></i></div></div>`;
              } catch (error) {
                  div.innerHTML = '<p class="text-center text-gray-400">خطأ في تحميل الإحصائيات</p>';
              }
@@ -3709,7 +3717,7 @@
             }
             let html = `<p class="text-xs text-gray-400 mb-2">تم العثور على: ${list.length} سؤال</p>`;
             list.slice(0, 50).forEach(q => { 
-                html += `<div class="bg-white rounded-xl p-3 mb-2 border border-gray-100 shadow-sm flex flex-col gap-2"><div class="flex justify-between items-start"><div><span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold">${q.grade || 'غير محدد'} | ${q.subject}</span><span class="text-xs text-gray-400 ml-2">${q.type==='mcq'?'اختيارات':'صح/خطأ'}</span></div><div class="flex gap-1"><button onclick="openEditModal('${q.id}')" class="bg-blue-100 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold hover:bg-blue-200 transition"><i class="fas fa-edit ml-1"></i>تعديل</button><button onclick="deleteApprovedQ('${q.id}')" class="bg-red-100 text-red-600 px-3 py-1 rounded-lg text-xs font-bold hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></div></div><p class="font-bold text-gray-700 text-sm leading-6 border-r-2 border-indigo-200 pr-2">${q.question}</p></div>`;
+                html += `<div class="bg-white rounded-xl p-3 mb-2 border border-gray-100 shadow-sm flex flex-col gap-2"><div class="flex justify-between items-start"><div><span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold">${q.grade || 'غير محدد'} | ${q.subject}</span><span class="text-xs text-gray-400 ml-2">${q.type==='mcq'?'اختيارات':'صح/خطأ'}</span></div><div class="flex gap-1"><button onclick="openEditModal('${q.id}')" class="bg-blue-100 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold hover:bg-blue-200 transition"><i class="fas fa-edit"></i>تعديل</button><button onclick="deleteApprovedQ('${q.id}')" class="bg-red-100 text-red-600 px-3 py-1 rounded-lg text-xs font-bold hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></div></div><p class="font-bold text-gray-700 text-sm leading-6 border-r-2 border-indigo-200 pr-2">${q.question}</p></div>`;
             });
             div.innerHTML = html;
         };
@@ -3835,7 +3843,7 @@
             leaderboardOffset = 0;
             
             try {
-                const q = query(collection(db, "users"), orderBy("points", "desc"));
+                const q = query(collection(db, "users"), orderBy("points", "desc"), limit(150));
                 const snap = await getDocs(q);
                 allLeaderboardUsers = [];
                 snap.forEach(d => { 
@@ -3844,10 +3852,16 @@
                 
                 allLeaderboardUsers.sort((a, b) => (b.points || 0) - (a.points || 0));
 
+                // Find user's rank (even if not in top 50)
                 const myIndex = allLeaderboardUsers.findIndex(u => u.uid === currentUser.uid);
-                if(myIndex !== -1) document.getElementById('my-rank-text').innerText = "#" + (myIndex + 1);
-                else document.getElementById('my-rank-text').innerText = "#" + (allLeaderboardUsers.length + 1);
+                if(myIndex !== -1) {
+                    document.getElementById('my-rank-text').innerText = "#" + (myIndex + 1);
+                } else {
+                    // If user not in top 150, show >150
+                    document.getElementById('my-rank-text').innerText = "#>150";
+                }
 
+                // Show only first 25 positions
                 renderLeaderboardChunk(0, 25);
                 
                 if (allLeaderboardUsers.length > 25) {
@@ -3866,12 +3880,10 @@
             const div = document.getElementById('leaderboard-list');
             div.innerHTML = '';
             
-            const usersToShow = allLeaderboardUsers.slice(start, Math.min(end, 50));
+            const usersToShow = allLeaderboardUsers.slice(start, end);
             
             usersToShow.forEach((u, index) => {
                 const globalIndex = start + index;
-                if (globalIndex >= 50) return;
-                
                 let frameClass = "frame-rank-common";
                 let crown = "";
                 let rankBadge = `<div class="rank-badge-top">${globalIndex + 1}</div>`;
@@ -3936,7 +3948,7 @@
                                 <p class="text-[10px] text-gray-600">ID: ${u.uniqueId}</p>
                                 <p class="text-[10px] text-gray-500 mt-1">${u.bio || ""}</p>
                                 ${u.isPremium && u.premiumExpiry && u.premiumExpiry.toDate() > new Date() ? 
-                                    `<p class="text-[10px] text-yellow-600 font-bold">👑 مميز</p>` : 
+                                    `<p class="text-[10px] text-yellow-600 font-bold">مميز</p>` : 
                                     ''}
                             </div>
                         </div>
@@ -3952,16 +3964,19 @@
 
         window.loadMoreLeaderboard = function() {
             leaderboardOffset += 25;
-            const nextChunk = allLeaderboardUsers.slice(leaderboardOffset, leaderboardOffset + 25);
-            const usersToShow = nextChunk.filter((_, index) => leaderboardOffset + index < 50);
             
-            if (usersToShow.length === 0) {
+            // Don't show more than 50 positions
+            if (leaderboardOffset >= 50) {
                 document.getElementById('load-more-leaderboard').classList.add('hidden');
                 return;
             }
             
-            usersToShow.forEach((u, index) => {
+            const nextChunk = allLeaderboardUsers.slice(leaderboardOffset, leaderboardOffset + 25);
+            
+            nextChunk.forEach((u, index) => {
                 const globalIndex = leaderboardOffset + index;
+                
+                // Don't show beyond position 50
                 if (globalIndex >= 50) return;
                 
                 let frameClass = "frame-rank-common";
@@ -4008,6 +4023,7 @@
                     </div>`;
             });
             
+            // Hide load more button if we've shown 50 positions
             if (leaderboardOffset + 25 >= 50 || leaderboardOffset + 25 >= allLeaderboardUsers.length) {
                 document.getElementById('load-more-leaderboard').classList.add('hidden');
             }
@@ -4074,7 +4090,7 @@
             const uidInput = document.getElementById('admin-user-search').value.trim();
             const resDiv = document.getElementById('admin-user-result');
             if(!uidInput) {
-                showBeautifulAlert('warning', 'تنبيه', 'أدخل المعرف (ID)');
+                showBeautifulAlert('warning', 'تنبيه', 'أدخل المعرف');
                 return;
             }
             
@@ -4107,13 +4123,12 @@
                     </div>
                     <div class="mb-4 text-right">
                         <p class="text-sm"><span class="font-bold">البريد الإلكتروني:</span> ${uData.email || 'غير معروف'}</p>
-                        <p class="text-sm"><span class="font-bold">كلمة المرور:</span> <span class="text-gray-400">(مشفرة في النظام)</span></p>
                         <p class="text-sm"><span class="font-bold">تاريخ التسجيل:</span> ${createdAt}</p>
                         <p class="text-sm"><span class="font-bold">آخر دخول:</span> ${lastLogin}</p>
                         <p class="text-sm"><span class="font-bold">المرحلة الدراسية:</span> ${uData.grade ? getGradeName(uData.grade) : 'غير محدد'}</p>
                         <p class="text-sm"><span class="font-bold">السيرة الذاتية:</span> ${uData.bio || 'لا يوجد'}</p>
-                        <p class="text-sm"><span class="font-bold">حالة الحظر:</span> ${isBanned ? '🛑 محظور' : '✅ نشط'}</p>
-                        <p class="text-sm"><span class="font-bold">حساب مميز:</span> ${uData.isPremium ? '✅ نعم' : '❌ لا'}</p>
+                        <p class="text-sm"><span class="font-bold">حالة الحظر:</span> ${isBanned ? 'محظور' : 'نشط'}</p>
+                        <p class="text-sm"><span class="font-bold">حساب مميز:</span> ${uData.isPremium ? 'نعم' : 'لا'}</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2 mb-4 text-xs font-bold text-center">
                         <div class="bg-gray-50 p-2 rounded">النقاط: ${uData.points || 0}</div>
@@ -4121,12 +4136,12 @@
                     </div>
                     <div class="mb-4 text-center">
                         <p class="text-sm font-bold ${deserves ? 'text-green-600' : 'text-red-500'}">
-                            ${deserves ? '✅ يستحق السحب' : '❌ لا يستحق السحب'}
+                            ${deserves ? 'يستحق السحب' : 'لا يستحق السحب'}
                         </p>
                         ${deserves ? `<button onclick="resetUserBalance('${docId}')" class="mt-2 bg-yellow-500 text-white px-4 py-2 rounded text-xs font-bold">تصفير الدولارات</button>` : ''}
                     </div>
                     <button onclick="toggleBan('${docId}', ${!isBanned})" class="w-full py-3 rounded-xl font-bold text-white ${isBanned ? 'bg-green-500' : 'bg-red-500'}">
-                        ${isBanned ? 'إلغاء الحظر (فك القيد)' : 'حظر المستخدم نهائياً'}
+                        ${isBanned ? 'إلغاء الحظر' : 'حظر المستخدم'}
                     </button>
                 `;
             } catch (error) {
@@ -4135,7 +4150,7 @@
         };
 
         window.toggleBan = async (docId, shouldBan) => {
-            if(confirm(shouldBan ? "هل أنت متأكد من حظر هذا المستخدم نهائياً؟ لن يتمكن من الدخول مجدداً." : "هل تريد إلغاء الحظر؟")) {
+            if(confirm(shouldBan ? "هل أنت متأكد من حظر هذا المستخدم؟" : "هل تريد إلغاء الحظر؟")) {
                 await updateDoc(doc(db, "users", docId), { isBanned: shouldBan });
                 showBeautifulAlert('success', 'تم', shouldBan ? "تم حظر المستخدم" : "تم إلغاء الحظر");
                 searchUserForAdmin();
@@ -4144,7 +4159,7 @@
         };
 
         window.resetUserBalance = async (docId) => {
-             if(confirm("هل تريد تصفير دولارات هذا المستخدم؟ (يعني أنك دفعت له)")) {
+             if(confirm("هل تريد تصفير دولارات هذا المستخدم؟")) {
                  await updateDoc(doc(db, "users", docId), { balance: 0 });
                  showBeautifulAlert('success', 'تم التصفير', 'تم تصفير الرصيد');
                  searchUserForAdmin();
@@ -4152,7 +4167,7 @@
         };
 
         window.manualWeeklyDistribution = async () => {
-             if(!confirm("⚠️ تحذير: هذا الإجراء سيقوم بتوزيع الجوائز على الـ 10 الأوائل وتصفير نقاط جميع المستخدمين (أعلى 150). هل أنت متأكد؟")) return;
+             if(!confirm("هذا الإجراء سيقوم بتوزيع الجوائز على الـ 10 الأوائل وتصفير نقاط جميع المستخدمين. هل أنت متأكد؟")) return;
              
              const q = query(collection(db, "users"), orderBy("points", "desc"), limit(10));
              const snap = await getDocs(q);
@@ -4178,13 +4193,13 @@
              });
              await resetBatch.commit();
              
-             showBeautifulAlert('success', 'تم التوزيع', '✅ تم توزيع الجوائز وتصفير النقاط بنجاح!');
+             showBeautifulAlert('success', 'تم التوزيع', 'تم توزيع الجوائز وتصفير النقاط!');
         };
 
         window.generateSubscriptionCode = async function() {
             try {
                 if (!currentUser || !userData || userData.email !== ADMIN_EMAIL) {
-                    showBeautifulAlert('error', 'خطأ', '⛔ ليس لديك صلاحية للقيام بهذا الإجراء');
+                    showBeautifulAlert('error', 'خطأ', 'ليس لديك صلاحية للقيام بهذا الإجراء');
                     return;
                 }
 
@@ -4192,7 +4207,7 @@
                 const durationDays = parseInt(durationSelect.value);
                 
                 if (!durationDays || durationDays <= 0) {
-                    showBeautifulAlert('warning', 'تنبيه', '⛔ يرجى تحديد مدة الاشتراك');
+                    showBeautifulAlert('warning', 'تنبيه', 'يرجى تحديد مدة الاشتراك');
                     return;
                 }
 
@@ -4214,7 +4229,7 @@
                 }
                 
                 if (!isUnique) {
-                    showBeautifulAlert('error', 'خطأ', '❌ تعذر إنشاء كود فريد، يرجى المحاولة مرة أخرى');
+                    showBeautifulAlert('error', 'خطأ', 'تعذر إنشاء كود فريد');
                     return;
                 }
 
@@ -4235,24 +4250,24 @@
                 codeText.textContent = code;
                 displayDiv.classList.remove('hidden');
                 
-                showBeautifulAlert('success', 'تم الإنشاء', `✅ تم إنشاء كود اشتراك جديد:\n\nالكود: ${code}\nالمدة: ${durationDays} يوم\n\nالكود يستخدم مرة واحدة فقط!`);
+                showBeautifulAlert('success', 'تم الإنشاء', `تم إنشاء كود اشتراك جديد: ${code}`);
 
             } catch (error) {
                 console.error("خطأ في توليد الكود:", error);
-                showBeautifulAlert('error', 'خطأ', `❌ حدث خطأ في توليد الكود: ${error.message}`);
+                showBeautifulAlert('error', 'خطأ', `حدث خطأ في توليد الكود: ${error.message}`);
             }
         };
 
         window.copyGenCode = function() {
             const codeText = document.getElementById('gen-code-text').textContent;
             if (!codeText || codeText === '...') {
-                showBeautifulAlert('warning', 'تنبيه', '⚠️ لا يوجد كود لعرضه');
+                showBeautifulAlert('warning', 'تنبيه', 'لا يوجد كود لعرضه');
                 return;
             }
             
             navigator.clipboard.writeText(codeText)
                 .then(() => {
-                    showBeautifulAlert('success', 'تم النسخ', '✅ تم نسخ الكود إلى الحافظة!');
+                    showBeautifulAlert('success', 'تم النسخ', 'تم نسخ الكود إلى الحافظة!');
                 })
                 .catch(err => {
                     console.error("خطأ في النسخ:", err);
@@ -4262,7 +4277,7 @@
                     tempInput.select();
                     document.execCommand('copy');
                     document.body.removeChild(tempInput);
-                    showBeautifulAlert('success', 'تم النسخ', '✅ تم نسخ الكود إلى الحافظة!');
+                    showBeautifulAlert('success', 'تم النسخ', 'تم نسخ الكود إلى الحافظة!');
                 });
         };
 
@@ -4271,11 +4286,11 @@
                 const codeInput = document.getElementById('admin-delete-code-input').value.trim().toUpperCase();
                 
                 if (!codeInput) {
-                    showBeautifulAlert('warning', 'تنبيه', '⚠️ يرجى إدخال كود للحذف');
+                    showBeautifulAlert('warning', 'تنبيه', 'يرجى إدخال كود للحذف');
                     return;
                 }
 
-                if (!confirm(`⚠️ هل أنت متأكد من حذف الكود "${codeInput}"؟\n\nهذا الإجراء نهائي ولا يمكن التراجع عنه.`)) {
+                if (!confirm(`هل أنت متأكد من حذف الكود "${codeInput}"؟`)) {
                     return;
                 }
 
@@ -4283,7 +4298,7 @@
                 const querySnapshot = await getDocs(q);
                 
                 if (querySnapshot.empty) {
-                    showBeautifulAlert('error', 'خطأ', '❌ الكود غير موجود في قاعدة البيانات');
+                    showBeautifulAlert('error', 'خطأ', 'الكود غير موجود في قاعدة البيانات');
                     return;
                 }
 
@@ -4291,11 +4306,11 @@
                 await deleteDoc(doc(db, "premium_codes", codeDoc.id));
                 
                 document.getElementById('admin-delete-code-input').value = '';
-                showBeautifulAlert('success', 'تم الحذف', `✅ تم حذف الكود "${codeInput}" بنجاح`);
+                showBeautifulAlert('success', 'تم الحذف', `تم حذف الكود "${codeInput}" بنجاح`);
 
             } catch (error) {
                 console.error("خطأ في حذف الكود:", error);
-                showBeautifulAlert('error', 'خطأ', `❌ حدث خطأ في حذف الكود: ${error.message}`);
+                showBeautifulAlert('error', 'خطأ', `حدث خطأ في حذف الكود: ${error.message}`);
             }
         };
 
@@ -4369,10 +4384,10 @@
                     userData.photo = photoURL;
                     document.getElementById('profile-img').src = photoURL;
                     
-                    showBeautifulAlert('success', 'تم التحديث', 'تم تحديث صورة الملف الشخصي ✅');
+                    showBeautifulAlert('success', 'تم التحديث', 'تم تحديث صورة الملف الشخصي');
                 } catch (error) {
                     console.error("Error updating profile picture:", error);
-                    showBeautifulAlert('error', 'خطأ', '❌ حدث خطأ في رفع الصورة: ' + getArabicError(error.code));
+                    showBeautifulAlert('error', 'خطأ', 'حدث خطأ في رفع الصورة: ' + getArabicError(error.code));
                 }
             }
         };
@@ -4419,16 +4434,15 @@
         window.handleScheduleFormSubmit = function(e) {
             e.preventDefault();
             
-            scheduleData.subject = document.getElementById('subjectName').value;
-            scheduleData.totalHours = parseFloat(document.getElementById('totalHours').value);
-            
-            const needSleepValue = document.getElementById('needSleep').value;
-            if (needSleepValue === "") {
+            const sleepValue = document.getElementById('needSleep').value;
+            if (!sleepValue) {
                 showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار خيار وقت النوم');
                 return;
             }
-            scheduleData.needSleep = needSleepValue === 'yes';
             
+            scheduleData.subject = document.getElementById('subjectName').value;
+            scheduleData.totalHours = parseFloat(document.getElementById('totalHours').value);
+            scheduleData.needSleep = sleepValue === 'yes';
             scheduleData.breakDuration = parseInt(document.getElementById('breakDuration').value);
             scheduleData.studyTimePref = document.getElementById('studyTimePref').value;
             
@@ -4750,7 +4764,7 @@
                     createdAt: serverTimestamp()
                 });
                 
-                showBeautifulAlert('success', 'تم الإرسال', '✅ تم إرسال السؤال للمراجعة. ستتم إضافة 5 نقاط لك بعد قبوله.');
+                showBeautifulAlert('success', 'تم الإرسال', 'تم إرسال السؤال للمراجعة. ستتم إضافة 5 نقاط لك بعد قبوله.');
                 
                 document.getElementById('upload-question-text').value = '';
                 document.getElementById('upload-answer-1').value = '';
@@ -4763,7 +4777,7 @@
                 
             } catch (error) {
                 console.error("Error submitting question:", error);
-                showBeautifulAlert('error', 'خطأ', '❌ حدث خطأ في إرسال السؤال');
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إرسال السؤال');
             }
         };
 
@@ -4797,7 +4811,7 @@
                     createdAt: serverTimestamp()
                 });
                 
-                showBeautifulAlert('success', 'تم الإرسال', '✅ تم إرسال السؤال للمراجعة. ستتم إضافة 5 نقاط لك بعد قبوله.');
+                showBeautifulAlert('success', 'تم الإرسال', 'تم إرسال السؤال للمراجعة. ستتم إضافة 5 نقاط لك بعد قبوله.');
                 
                 document.getElementById('upload-tf-question').value = '';
                 uploadTFAnswer = null;
@@ -4807,7 +4821,7 @@
                 
             } catch (error) {
                 console.error("Error submitting question:", error);
-                showBeautifulAlert('error', 'خطأ', '❌ حدث خطأ في إرسال السؤال');
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إرسال السؤال');
             }
         };
 
@@ -4818,14 +4832,14 @@
                 listDiv.innerHTML = `
                     <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
                         <i class="fas fa-shield-alt text-yellow-500 text-3xl mb-3"></i>
-                        <p class="text-yellow-700 font-bold">⛔ صلاحية محدودة</p>
+                        <p class="text-yellow-700 font-bold">صلاحية محدودة</p>
                         <p class="text-gray-600 text-sm mt-2">هذا القسم مخصص للإدارة فقط</p>
                     </div>
                 `;
                 return;
             }
             
-            listDiv.innerHTML = '<p class="text-center text-gray-400 animate-pulse">📥 جاري تحميل الأسئلة للمراجعة...</p>';
+            listDiv.innerHTML = '<p class="text-center text-gray-400 animate-pulse">جاري تحميل الأسئلة للمراجعة...</p>';
             
             try {
                 const q = query(collection(db, "pending_questions"), where("status", "==", "pending"));
@@ -4835,14 +4849,12 @@
                     listDiv.innerHTML = `
                         <div class="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
                             <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
-                            <p class="text-green-700 font-bold">🎉 كل الأسئلة تمت مراجعتها</p>
+                            <p class="text-green-700 font-bold">كل الأسئلة تمت مراجعتها</p>
                             <p class="text-gray-600 text-sm mt-2">لا توجد أسئلة جديدة</p>
                         </div>
                     `;
                     return;
                 }
-                
-                console.log(`✅ تم العثور على ${snapshot.size} سؤال للمراجعة`);
                 
                 let questions = [];
                 snapshot.forEach(doc => {
@@ -4857,8 +4869,6 @@
                 
                 questions.sort((a, b) => b.timestamp - a.timestamp);
                 
-                console.log("📊 الأسئلة بعد الترتيب:", questions);
-                
                 let html = `
                     <div class="mb-4 p-3 bg-indigo-50 rounded-xl border border-indigo-100">
                         <div class="flex justify-between items-center">
@@ -4867,7 +4877,7 @@
                                 <p class="text-xs text-indigo-500">(من الأحدث للأقدم)</p>
                             </div>
                             <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">
-                                🔄 مرتبة تلقائياً
+                                مرتبة تلقائياً
                             </span>
                         </div>
                     </div>
@@ -4892,7 +4902,7 @@
                                 ${(data.answers || []).map((ans, idx) => `
                                     <div class="upload-question-answer ${idx === data.correct ? 'upload-question-correct' : ''}">
                                         <span class="font-bold">${idx + 1}.</span> ${ans || '...'}
-                                        ${idx === data.correct ? '<span class="text-green-500 text-xs mr-2">✓ صح</span>' : ''}
+                                        ${idx === data.correct ? '<span class="text-green-500 text-xs mr-2">صح</span>' : ''}
                                     </div>
                                 `).join('')}
                             </div>
@@ -4902,7 +4912,7 @@
                             <div class="upload-question-answers mt-3">
                                 <p class="text-xs text-gray-500 mb-2 font-bold">الإجابة الصحيحة:</p>
                                 <div class="upload-question-answer ${data.correct ? 'upload-question-correct' : ''}">
-                                    ${data.correct ? '✅ صح' : '❌ خطأ'}
+                                    ${data.correct ? 'صح' : 'خطأ'}
                                 </div>
                             </div>
                         `;
@@ -4916,10 +4926,10 @@
                                         <span class="upload-question-grade">${data.grade ? getGradeName(data.grade) : 'غير محدد'}</span>
                                         <span class="upload-question-subject" style="background:#10b981">${data.subject || 'غير محدد'}</span>
                                         <span class="upload-question-type">${data.type === 'mcq' ? 'اختيارات' : 'صح/خطأ'}</span>
-                                        ${index === 0 ? '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">🆕 الأحدث</span>' : ''}
+                                        ${index === 0 ? '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">الأحدث</span>' : ''}
                                     </div>
                                     <div class="text-xs text-gray-500" title="${data.createdAt.toISOString()}">
-                                        📅 ${dateStr}
+                                        ${dateStr}
                                     </div>
                                 </div>
                             </div>
@@ -4931,7 +4941,7 @@
                             <div class="mt-4 pt-3 border-t border-gray-100">
                                 <div class="flex justify-between items-center">
                                     <p class="upload-sender text-sm">
-                                        <span class="text-gray-500">📤 مرسل:</span>
+                                        <span class="text-gray-500">مرسل:</span>
                                         <span class="font-bold text-purple-600 mr-2">${data.senderName || data.senderId || 'مجهول'}</span>
                                     </p>
                                     <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
@@ -4964,7 +4974,7 @@
                 listDiv.innerHTML = html;
                 
             } catch (error) {
-                console.error("❌ خطأ في تحميل الأسئلة:", error);
+                console.error("خطأ في تحميل الأسئلة:", error);
                 listDiv.innerHTML = `
                     <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
                         <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
@@ -5033,577 +5043,534 @@
             }
         };
 
-        // نظام الغرف الجديد
-        window.openPlayFriendModal = function() {
-            document.getElementById('play-friend-modal').classList.remove('hidden');
+        // Friend Match Functions
+        window.openFriendMatchModal = function() {
+            document.getElementById('friend-match-modal').classList.remove('hidden');
         };
 
-        window.createRoom = async function() {
-            document.getElementById('play-friend-modal').classList.add('hidden');
+        window.closeFriendMatchModal = function() {
+            document.getElementById('friend-match-modal').classList.add('hidden');
+        };
+
+        window.showJoinRoomModal = function() {
+            document.getElementById('friend-match-modal').classList.add('hidden');
+            document.getElementById('join-room-modal').classList.remove('hidden');
+        };
+
+        window.closeJoinRoomModal = function() {
+            document.getElementById('join-room-modal').classList.add('hidden');
+        };
+
+        window.createFriendRoom = function() {
+            document.getElementById('friend-match-modal').classList.add('hidden');
             document.getElementById('create-room-modal').classList.remove('hidden');
             
+            // Populate subjects for room creation
             const subjectSelect = document.getElementById('room-subject');
             subjectSelect.innerHTML = '<option value="">اختر المادة</option>';
-            
             if (userData.grade && subjects[userData.grade]) {
                 subjects[userData.grade].forEach(sub => {
                     subjectSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
                 });
             }
             
-            selectedRoomQType = null;
-            document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition`;
-            document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition`;
-        };
-
-        window.setRoomQType = function(t) {
-            selectedRoomQType = t;
-            document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 font-bold transition flex-1 ${t==='mcq'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
-            document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 font-bold transition flex-1 ${t==='tf'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
-            document.getElementById('room-qtype').value = t;
+            // Reset question type buttons
+            roomQuestionType = 'mcq';
+            document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-600 font-bold transition`;
+            document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold transition`;
         };
 
         window.closeCreateRoomModal = function() {
             document.getElementById('create-room-modal').classList.add('hidden');
-            document.getElementById('play-friend-modal').classList.remove('hidden');
         };
 
-        // نهج جديد: نعتمد فقط على مصفوفة players لحساب كل شيء
+        window.setRoomQuestionType = function(type) {
+            roomQuestionType = type;
+            document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 font-bold transition ${type==='mcq'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
+            document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 font-bold transition ${type==='tf'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
+        };
 
-window.proceedToRoom = async function() {
-    const subject = document.getElementById('room-subject').value;
-    const qtype = document.getElementById('room-qtype').value;
-    
-    if (!subject || !qtype) {
-        showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
-        return;
-    }
-    
-    document.getElementById('create-room-modal').classList.add('hidden');
-    
-    const roomId = generateRoomId();
-    currentRoomId = roomId;
-    isRoomCreator = true;
-    
-    // هنا هو المفتاح - يجب أن يكون playersCount = 1 فقط
-    const roomData = {
-        id: roomId,
-        creator: currentUser.uid,
-        subject: subject,
-        qtype: qtype,
-        grade: userData.grade,
-        players: {}, // ابدأ بمصفوفة فارغة أولاً
-        readyCount: 0,
-        playersCount: 0, // ابدأ بصفر
-        status: 'waiting',
-        createdAt: Date.now(),
-        lastUpdated: Date.now(),
-        expiresAt: Date.now() + 10 * 60 * 1000
-    };
-    
-    try {
-        // أولاً: أنشئ الغرفة بمعلومات أساسية
-        await set(dbRef(rtdb, `rooms/${roomId}`), roomData);
-        
-        console.log("✅ تم إنشاء الغرفة الأساسية:", roomId);
-        
-        // ثانياً: أضف المنشئ كلاعب
-        await update(dbRef(rtdb, `rooms/${roomId}`), {
-            [`players/${currentUser.uid}`]: {
-                uid: currentUser.uid,
-                name: userData.name,
-                photo: userData.photo,
-                ready: false,
-                joinedAt: Date.now(),
-                lastPing: Date.now()
-            },
-            playersCount: 1 // الآن اجعله 1 بعد إضافة اللاعب
-        });
-        
-        console.log("✅ تم إضافة المنشئ إلى الغرفة");
-        
-        // انتظر قليلاً ثم انضم
-        setTimeout(() => {
-            joinRoomById(roomId);
-        }, 300);
-        
-    } catch (error) {
-        console.error("❌ Error creating room:", error);
-        showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إنشاء الغرفة');
-    }
-};
-
-        function generateRoomId() {
-            const chars = '0123456789';
-            let result = '';
-            for (let i = 0; i < 8; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        window.joinRoom = function() {
-            const roomCode = document.getElementById('join-room-code').value.trim();
-            if (!roomCode) {
-                showBeautifulAlert('warning', 'تنبيه', 'يرجى إدخال كود الغرفة');
+        window.confirmCreateRoom = async function() {
+            roomSubject = document.getElementById('room-subject').value;
+            
+            if (!roomSubject) {
+                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة');
                 return;
             }
             
-            document.getElementById('play-friend-modal').classList.add('hidden');
-            document.getElementById('finding-room-modal').classList.remove('hidden');
-            document.getElementById('search-room-msg').innerText = `جاري الانضمام إلى الغرفة ${roomCode}...`;
-            
-            setTimeout(() => {
-                joinRoomById(roomCode);
-            }, 1000);
-        };
-
-        async function joinRoomById(roomId) {
-    try {
-        const roomRef = dbRef(rtdb, `rooms/${roomId}`);
-        const snapshot = await get(roomRef);
-        
-        if (!snapshot.exists()) {
-            showBeautifulAlert('error', 'خطأ', 'الغرفة غير موجودة أو انتهت صلاحيتها');
-            document.getElementById('finding-room-modal').classList.add('hidden');
-            document.getElementById('play-friend-modal').classList.remove('hidden');
-            return;
-        }
-        
-        const roomData = snapshot.val();
-        console.log("🔍 بيانات الغرفة عند الانضمام:", roomData);
-        
-        // حساب عدد اللاعبين الحقيقي من مصفوفة players
-        const players = roomData.players || {};
-        const actualPlayerCount = Object.keys(players).length;
-        
-        console.log("👥 عدد اللاعبين الحقيقي:", actualPlayerCount, "playersCount الموجود:", roomData.playersCount);
-        
-        // إذا كان هناك بالفعل 2 لاعبين أو أكثر
-        if (actualPlayerCount >= 2) {
-            showBeautifulAlert('error', 'خطأ', 'الغرفة ممتلئة (2 لاعبين)');
-            document.getElementById('finding-room-modal').classList.add('hidden');
-            document.getElementById('play-friend-modal').classList.remove('hidden');
-            return;
-        }
-        
-        if (roomData.status && roomData.status !== 'waiting') {
-            showBeautifulAlert('error', 'خطأ', 'المباراة بدأت بالفعل');
-            document.getElementById('finding-room-modal').classList.add('hidden');
-            document.getElementById('play-friend-modal').classList.remove('hidden');
-            return;
-        }
-        
-        // التحقق مما إذا كان المستخدم موجودًا بالفعل
-        if (players[currentUser.uid]) {
-            console.log("✅ المستخدم موجود بالفعل في الغرفة، الدخول مباشرة...");
-            document.getElementById('finding-room-modal').classList.add('hidden');
-            currentRoomId = roomId;
-            isRoomCreator = false;
-            setupRoomListener(roomId);
-            return;
-        }
-        
-        currentRoomId = roomId;
-        isRoomCreator = roomData.creator === currentUser.uid;
-        
-        // تحديث قاعدة البيانات
-        await update(roomRef, {
-            [`players/${currentUser.uid}`]: {
-                uid: currentUser.uid,
-                name: userData.name,
-                photo: userData.photo,
-                ready: false,
-                joinedAt: Date.now(),
-                lastPing: Date.now()
-            },
-            playersCount: actualPlayerCount + 1, // تحديث بناءً على العدد الحقيقي
-            lastUpdated: Date.now()
-        });
-        
-        console.log("✅ تم الانضمام بنجاح، العدد الجديد:", (actualPlayerCount + 1) + "/" + (roomData.readyCount || 0));
-        
-        document.getElementById('finding-room-modal').classList.add('hidden');
-        setupRoomListener(roomId);
-        
-    } catch (error) {
-        console.error("❌ Error joining room:", error);
-        showBeautifulAlert('error', 'خطأ', `حدث خطأ في الانضمام إلى الغرفة: ${error.message}`);
-        document.getElementById('finding-room-modal').classList.add('hidden');
-        document.getElementById('play-friend-modal').classList.remove('hidden');
-    }
-}
-
-
-        function setupRoomListener(roomId) {
-    if (roomListener) roomListener();
-    
-    const roomRef = dbRef(rtdb, `rooms/${roomId}`);
-    roomListener = onValue(roomRef, (snapshot) => {
-        if (!snapshot.exists()) {
-            showBeautifulAlert('error', 'انتهت الغرفة', 'تم إغلاق الغرفة من قبل المالك');
-            leaveRoom();
-            return;
-        }
-        
-        roomData = snapshot.val();
-        
-        // تأكد من أن players موجود
-        if (!roomData.players) {
-            console.warn("⚠️ الغرفة بدون players، إصلاح تلقائي...");
-            roomData.players = {};
-        }
-        
-        // تأكد أن المنشئ موجود في players إذا كان هو المستخدم الحالي
-        if (isRoomCreator && !roomData.players[currentUser.uid]) {
-            console.warn("⚠️ المنشئ ليس في players، إضافة تلقائية...");
-            update(roomRef, {
-                [`players/${currentUser.uid}`]: {
-                    uid: currentUser.uid,
-                    name: userData.name,
-                    photo: userData.photo,
-                    ready: false,
-                    joinedAt: Date.now()
-                }
-            });
-            return;
-        }
-        
-        updateRoomUI(roomData);
-        
-        if (roomData.status === 'playing') {
-            startRoomGamePlay();
-        }
-    });
-    
-    startRoomTimer();
-    setupNetworkCheck();
-}
-
-        function updateRoomUI(roomData) {
-    document.getElementById('room-screen').classList.remove('hidden');
-    document.getElementById('room-id-display').textContent = roomData.id;
-    
-    const players = Object.values(roomData.players || {});
-    const player1 = players[0] || null;
-    const player2 = players[1] || null;
-    
-    // تحديث واجهة اللاعب الأول
-    if (player1) {
-        document.getElementById('player1-avatar').src = player1.photo;
-        document.getElementById('player1-name').textContent = player1.name;
-        document.getElementById('player1-status').textContent = player1.ready ? 'جاهز' : 'بانتظار';
-        document.getElementById('player1-status').className = `player-status ${player1.ready ? 'status-ready' : 'status-waiting'}`;
-        document.getElementById('player1-card').className = `player-card ${player1.ready ? 'ready' : ''}`;
-    }
-    
-    // تحديث واجهة اللاعب الثاني
-    if (player2) {
-        document.getElementById('player2-avatar').src = player2.photo;
-        document.getElementById('player2-name').textContent = player2.name;
-        document.getElementById('player2-status').textContent = player2.ready ? 'جاهز' : 'بانتظار';
-        document.getElementById('player2-status').className = `player-status ${player2.ready ? 'status-ready' : 'status-waiting'}`;
-        document.getElementById('player2-card').className = `player-card ${player2.ready ? 'ready' : ''}`;
-    } else {
-        // إذا لم يكن هناك لاعب ثاني
-        document.getElementById('player2-avatar').src = 'https://ui-avatars.com/api/?name=مستعد&background=random&size=128';
-        document.getElementById('player2-name').textContent = 'بانتظار لاعب...';
-        document.getElementById('player2-status').textContent = 'بانتظار';
-        document.getElementById('player2-status').className = 'player-status status-waiting';
-        document.getElementById('player2-card').className = 'player-card';
-    }
-    
-    // تحديث العدادات - الأهم!
-    const playersCount = roomData.playersCount || 1;
-    const readyCount = roomData.readyCount || 0;
-    
-    document.getElementById('players-count').innerHTML = 
-        `المستخدمين (<span>${playersCount}</span>/2)`;
-    document.getElementById('ready-count').innerHTML = 
-        `جاهز (<span>${readyCount}</span>/2)`;
-    
-    console.log("تحديث واجهة الغرفة:", playersCount + "/" + readyCount);
-    
-    const readyBtn = document.getElementById('ready-btn');
-    const startBtn = document.getElementById('start-btn');
-    const leaveBtn = document.getElementById('leave-btn');
-    
-    if (isRoomCreator) {
-        document.getElementById('leave-btn-text').textContent = 'حذف الغرفة';
-    } else {
-        document.getElementById('leave-btn-text').textContent = 'مغادرة';
-    }
-    
-    const currentPlayer = roomData.players?.[currentUser.uid];
-    if (currentPlayer) {
-        isReady = currentPlayer.ready || false;
-        readyBtn.innerHTML = isReady ? 
-            '<i class="fas fa-times"></i><span>إلغاء الجاهزية</span>' : 
-            '<i class="fas fa-check"></i><span>جاهز</span>';
-    }
-    
-    // إظهار زر البدء فقط إذا كان:
-    // 1. أنت المنشئ
-    // 2. عدد اللاعبين = 2
-    // 3. عدد المستعدين = 2
-    if (isRoomCreator && playersCount === 2 && readyCount === 2) {
-        startBtn.classList.remove('hidden');
-        readyBtn.classList.add('hidden');
-    } else {
-        startBtn.classList.add('hidden');
-        readyBtn.classList.remove('hidden');
-    }
-}
-
-        window.toggleReady = async function() {
-    if (!currentRoomId || !roomData) return;
-    
-    const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
-    const currentPlayer = roomData.players?.[currentUser.uid];
-    
-    if (!currentPlayer) return;
-    
-    const newReadyState = !currentPlayer.ready;
-    
-    try {
-        // تحديث حالة الاستعداد للاعب
-        await update(roomRef, {
-            [`players/${currentUser.uid}/ready`]: newReadyState,
-            // تحديث readyCount فقط (لا تلمس playersCount)
-            readyCount: newReadyState ? 
-                (roomData.readyCount || 0) + 1 : 
-                Math.max((roomData.readyCount || 1) - 1, 0)
-        });
-        
-        isReady = newReadyState;
-        
-        console.log("تم تغيير حالة الاستعداد، العدد:", 
-            roomData.playersCount + "/" + 
-            (newReadyState ? (roomData.readyCount || 0) + 1 : Math.max((roomData.readyCount || 1) - 1, 0)));
-        
-    } catch (error) {
-        console.error("Error updating ready status:", error);
-    }
-};
-
-        window.startRoomGame = async function() {
-            if (!currentRoomId || !roomData || !isRoomCreator) return;
-            
-            if (roomData.readyCount !== 2) {
-                showBeautifulAlert('warning', 'تنبيه', 'يجب أن يكون كلا اللاعبين جاهزين');
+            if (!roomQuestionType) {
+                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار نوع الأسئلة');
                 return;
             }
+            
+            document.getElementById('create-room-modal').classList.add('hidden');
             
             try {
-                const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
-                await update(roomRef, {
-                    status: 'playing',
-                    startedAt: Date.now()
+                // Generate room ID
+                const roomId = Math.floor(10000000 + Math.random() * 90000000).toString();
+                currentRoomId = roomId;
+                isRoomOwner = true;
+                isReady = false;
+                
+                // Create room in database
+                await setDoc(doc(db, "rooms", roomId), {
+                    roomId: roomId,
+                    ownerId: currentUser.uid,
+                    ownerName: userData.name,
+                    ownerPhoto: userData.photo,
+                    ownerGrade: userData.grade,
+                    player2Id: null,
+                    player2Name: null,
+                    player2Photo: null,
+                    player2Grade: null,
+                    subject: roomSubject,
+                    questionType: roomQuestionType,
+                    player1Ready: false,
+                    player2Ready: false,
+                    status: 'waiting',
+                    createdAt: serverTimestamp(),
+                    expiresAt: Timestamp.fromDate(new Date(Date.now() + 10 * 60 * 1000)) // 10 minutes
                 });
                 
+                // Show room lobby
+                showRoomLobby(roomId);
+                
             } catch (error) {
-                console.error("Error starting game:", error);
-                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في بدء المباراة');
+                console.error("Error creating room:", error);
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إنشاء الغرفة');
             }
         };
 
-        async function startRoomGamePlay() {
-            if (roomGameStarted) return;
-            roomGameStarted = true;
+        window.joinFriendRoom = async function() {
+            const roomId = document.getElementById('room-id-input').value.trim();
             
-            const players = Object.values(roomData.players || {});
-            const player1 = players[0];
-            const player2 = players[1];
+            if (!roomId) {
+                showBeautifulAlert('warning', 'تنبيه', 'يرجى إدخال رقم الغرفة');
+                return;
+            }
             
-            if (!player1 || !player2) return;
-            
-            const isPlayer1 = player1.uid === currentUser.uid;
-            const me = isPlayer1 ? player1 : player2;
-            const opponent = isPlayer1 ? player2 : player1;
-            
-            await showVSAnimation(me, opponent);
-            
-            document.getElementById('room-screen').classList.add('hidden');
-            document.getElementById('game-overlay').classList.remove('hidden');
-            document.getElementById('withdraw-game-btn').classList.remove('hidden');
+            document.getElementById('join-room-modal').classList.add('hidden');
             
             try {
-                const qDocs = await getQuestions(roomData.subject, roomData.qtype);
-                if (qDocs.length === 0) {
-                    showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
+                // Check if room exists
+                const roomDoc = await getDoc(doc(db, "rooms", roomId));
+                if (!roomDoc.exists()) {
+                    showBeautifulAlert('error', 'خطأ', 'الغرفة غير موجودة');
+                    return;
+                }
+                
+                const roomData = roomDoc.data();
+                
+                // Check if room is full
+                if (roomData.player2Id) {
+                    showBeautifulAlert('error', 'خطأ', 'الغرفة ممتلئة');
+                    return;
+                }
+                
+                // Check grade compatibility
+                if (!canJoinRoom(roomData.ownerGrade, userData.grade, roomData.subject)) {
+                    showBeautifulAlert('error', 'خطأ', 'لا يمكنك الانضمام إلى هذه الغرفة بسبب اختلاف المرحلة الدراسية');
+                    return;
+                }
+                
+                currentRoomId = roomId;
+                isRoomOwner = false;
+                isReady = false;
+                
+                // Join room
+                await updateDoc(doc(db, "rooms", roomId), {
+                    player2Id: currentUser.uid,
+                    player2Name: userData.name,
+                    player2Photo: userData.photo,
+                    player2Grade: userData.grade
+                });
+                
+                // Show room lobby
+                showRoomLobby(roomId);
+                
+            } catch (error) {
+                console.error("Error joining room:", error);
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في الانضمام إلى الغرفة');
+            }
+        };
+
+        function canJoinRoom(ownerGrade, playerGrade, subject) {
+            // Same grade always allowed
+            if (ownerGrade === playerGrade) return true;
+            
+            // Shared subjects allowed between 6sci and 6lit
+            if (sharedSubjects.includes(subject)) {
+                if ((ownerGrade === '6sci' && playerGrade === '6lit') || 
+                    (ownerGrade === '6lit' && playerGrade === '6sci')) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        function showRoomLobby(roomId) {
+            // Hide all screens and show room lobby
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('room-lobby-screen').classList.remove('hidden');
+            document.getElementById('room-lobby-screen').classList.add('active');
+            
+            // Setup room display
+            document.getElementById('room-id-display').textContent = roomId;
+            
+            // Setup room controls
+            if (isRoomOwner) {
+                document.getElementById('delete-btn').classList.remove('hidden');
+                document.getElementById('leave-btn').classList.add('hidden');
+            } else {
+                document.getElementById('delete-btn').classList.add('hidden');
+                document.getElementById('leave-btn').classList.remove('hidden');
+            }
+            
+            // Start room listener
+            startRoomListener(roomId);
+            
+            // Start room timer
+            startRoomTimer();
+            
+            // Start internet check
+            startInternetCheck();
+        }
+
+        function startRoomListener(roomId) {
+            if (roomListenerUnsubscribe) {
+                roomListenerUnsubscribe();
+            }
+            
+            roomListenerUnsubscribe = onSnapshot(doc(db, "rooms", roomId), async (doc) => {
+                if (!doc.exists()) {
+                    // Room deleted
                     leaveRoom();
                     return;
                 }
                 
-                const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
+                const roomData = doc.data();
                 
-                localMatchData = {
-                    status: 'active',
-                    grade: userData.grade,
-                    player1: {
-                        uid: player1.uid,
-                        name: player1.name,
-                        score: 0,
-                        photo: player1.photo,
-                        grade: userData.grade
-                    },
-                    player2: {
-                        uid: player2.uid,
-                        name: player2.name,
-                        score: 0,
-                        photo: player2.photo,
-                        grade: userData.grade
-                    },
-                    questions: shuffledQs,
-                    currentIdx: 0,
-                    answersCount: 0,
-                    roomId: currentRoomId
-                };
+                // Update player 1 info
+                document.getElementById('room-player1-img').src = roomData.ownerPhoto;
+                document.getElementById('room-player1-name').textContent = roomData.ownerName + (isRoomOwner ? ' (أنت)' : '');
+                document.getElementById('room-player1-status').textContent = roomData.player1Ready ? '✅' : '❌';
+                document.getElementById('room-player1-status').className = `player-status ${roomData.player1Ready ? 'status-ready' : 'status-waiting'}`;
                 
-                renderGame(localMatchData);
-                
-            } catch (error) {
-                console.error("Error starting room game:", error);
-                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في بدء المباراة');
-                leaveRoom();
-            }
-        }
-
-        window.leaveRoom = async function() {
-    if (!currentRoomId) return;
-    
-    if (isRoomCreator) {
-        if (!confirm('هل أنت متأكد من حذف الغرفة؟ سيتم طرد جميع اللاعبين.')) return;
-        
-        try {
-            await remove(dbRef(rtdb, `rooms/${currentRoomId}`));
-        } catch (error) {
-            console.error("Error deleting room:", error);
-        }
-    } else {
-        if (!confirm('هل أنت متأكد من مغادرة الغرفة؟')) return;
-        
-        try {
-            const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
-            const snapshot = await get(roomRef);
-            
-            if (snapshot.exists()) {
-                const roomData = snapshot.val();
-                const currentPlayer = roomData.players?.[currentUser.uid];
-                
-                const updates = {};
-                updates[`players/${currentUser.uid}`] = null;
-                updates.playersCount = Math.max((roomData.playersCount || 1) - 1, 1);
-                
-                // إذا كان اللاعب مستعداً، قلل readyCount أيضاً
-                if (currentPlayer?.ready) {
-                    updates.readyCount = Math.max((roomData.readyCount || 1) - 1, 0);
+                // Update player 2 info
+                if (roomData.player2Id) {
+                    document.getElementById('room-player2-img').src = roomData.player2Photo;
+                    document.getElementById('room-player2-name').textContent = roomData.player2Name + (!isRoomOwner ? ' (أنت)' : '');
+                    document.getElementById('room-player2-status').textContent = roomData.player2Ready ? '✅' : '❌';
+                    document.getElementById('room-player2-status').className = `player-status ${roomData.player2Ready ? 'status-ready' : 'status-waiting'}`;
+                } else {
+                    document.getElementById('room-player2-img').src = '';
+                    document.getElementById('room-player2-name').textContent = '...';
+                    document.getElementById('room-player2-status').textContent = '❌';
+                    document.getElementById('room-player2-status').className = 'player-status status-waiting';
                 }
                 
-                await update(roomRef, updates);
-            }
-        } catch (error) {
-            console.error("Error leaving room:", error);
+                // Update room stats
+                const playerCount = roomData.player2Id ? 2 : 1;
+                const readyCount = (roomData.player1Ready ? 1 : 0) + (roomData.player2Ready ? 1 : 0);
+                document.getElementById('room-players-count').textContent = `${playerCount}/2`;
+                document.getElementById('room-ready-count').textContent = readyCount;
+                
+                // Update ready button
+                if (isRoomOwner) {
+                    document.getElementById('ready-btn-text').textContent = roomData.player1Ready ? 'غير جاهز' : 'جاهز';
+                } else {
+                    document.getElementById('ready-btn-text').textContent = roomData.player2Ready ? 'غير جاهز' : 'جاهز';
+                }
+                
+                // Check if both players are ready
+                if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiting') {
+                    // Start the game
+                    await updateDoc(doc(db, "rooms", roomId), {
+                        status: 'playing',
+                        gameStartedAt: serverTimestamp()
+                    });
+                    
+                    startFriendGame(roomData);
+                }
+                
+                // Check if game is already playing
+                if (roomData.status === 'playing') {
+                    // Show game screen
+                    startFriendGame(roomData);
+                }
+            });
         }
-    }
-    
-    cleanupRoom();
-    document.getElementById('room-screen').classList.add('hidden');
-    document.getElementById('challenge-active-card').classList.remove('hidden');
-    switchTab('challenges');
-};
-
-        window.cancelRoomSearch = function() {
-            document.getElementById('finding-room-modal').classList.add('hidden');
-            document.getElementById('play-friend-modal').classList.remove('hidden');
-        };
 
         function startRoomTimer() {
             if (roomTimerInterval) clearInterval(roomTimerInterval);
             
+            let timeLeft = 10 * 60; // 10 minutes in seconds
+            
             roomTimerInterval = setInterval(() => {
-                if (roomTimeLeft <= 0) {
+                timeLeft--;
+                
+                if (timeLeft <= 0) {
                     clearInterval(roomTimerInterval);
-                    if (isRoomCreator) {
-                        remove(dbRef(rtdb, `rooms/${currentRoomId}`));
-                    }
-                    showBeautifulAlert('info', 'انتهت الغرفة', 'انتهت مدة الغرفة (10 دقائق)');
-                    leaveRoom();
+                    // Room expired, delete it
+                    deleteRoom();
                     return;
                 }
                 
-                roomTimeLeft--;
-                const minutes = Math.floor(roomTimeLeft / 60);
-                const seconds = roomTimeLeft % 60;
-                document.getElementById('room-timer').textContent = 
-                    `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('room-timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
             }, 1000);
         }
 
-        function setupNetworkCheck() {
-            if (networkCheckInterval) clearInterval(networkCheckInterval);
+        function startInternetCheck() {
+            if (internetCheckInterval) clearInterval(internetCheckInterval);
             
-            networkCheckInterval = setInterval(async () => {
-                if (!currentRoomId || !roomData) return;
+            internetCheckInterval = setInterval(async () => {
+                const now = Date.now();
+                lastInternetCheck = now;
                 
-                try {
-                    const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
-                    const snapshot = await get(roomRef);
-                    
-                    if (!snapshot.exists()) {
-                        clearInterval(networkCheckInterval);
-                        return;
-                    }
-                    
-                    const currentRoomData = snapshot.val();
-                    const players = Object.values(currentRoomData.players || {});
-                    
-                    players.forEach(async (player) => {
-                        if (player.uid === currentUser.uid) return;
-                        
-                        const lastSeen = Date.now() - player.joinedAt;
-                        if (lastSeen > 10000) {
-                            showBeautifulAlert('warning', 'انقطع الاتصال', `انقطع اتصال ${player.name}. جاري استبداله بالذكاء الاصطناعي...`);
-                            
-                            const updates = {};
-                            updates[`players/${player.uid}/isAI`] = true;
-                            updates[`players/${player.uid}/name`] = 'ذكاء اصطناعي (35%)';
-                            updates[`players/${player.uid}/photo`] = 'https://cdn-icons-png.flaticon.com/512/4712/4712027.png';
-                            
-                            await update(roomRef, updates);
-                        }
-                    });
-                    
-                } catch (error) {
-                    console.error("Network check error:", error);
+                // Check if user is offline
+                if (!navigator.onLine) {
+                    // User is offline, handle disconnection
+                    await handleDisconnection();
                 }
-            }, 2000);
+            }, 2000); // Check every 2 seconds
         }
 
-        function cleanupRoom() {
-            if (roomListener) {
-                roomListener();
-                roomListener = null;
-            }
+        async function handleDisconnection() {
+            if (!currentRoomId) return;
             
+            // User disconnected, replace with AI
+            try {
+                const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
+                if (!roomDoc.exists()) return;
+                
+                const roomData = roomDoc.data();
+                
+                // Determine which player disconnected
+                if (roomData.ownerId === currentUser.uid) {
+                    // Owner disconnected, replace with AI
+                    await updateDoc(doc(db, "rooms", currentRoomId), {
+                        ownerId: 'AI_BOT',
+                        ownerName: 'الذكاء الاصطناعي (بديل)',
+                        ownerPhoto: 'https://cdn-icons-png.flaticon.com/512/4712/4712027.png',
+                        player1Ready: true
+                    });
+                } else if (roomData.player2Id === currentUser.uid) {
+                    // Player 2 disconnected, replace with AI
+                    await updateDoc(doc(db, "rooms", currentRoomId), {
+                        player2Id: 'AI_BOT',
+                        player2Name: 'الذكاء الاصطناعي (بديل)',
+                        player2Photo: 'https://cdn-icons-png.flaticon.com/512/4712/4712027.png',
+                        player2Ready: true
+                    });
+                }
+                
+                // Show message
+                showBeautifulAlert('warning', 'انقطاع اتصال', 'تم استبدالك بالذكاء الاصطناعي بسبب انقطاع الاتصال');
+                
+            } catch (error) {
+                console.error("Error handling disconnection:", error);
+            }
+        }
+
+        window.toggleReadyStatus = async function() {
+            if (!currentRoomId) return;
+            
+            try {
+                const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
+                if (!roomDoc.exists()) return;
+                
+                const roomData = roomDoc.data();
+                const field = isRoomOwner ? 'player1Ready' : 'player2Ready';
+                const newStatus = !roomData[field];
+                
+                await updateDoc(doc(db, "rooms", currentRoomId), {
+                    [field]: newStatus
+                });
+                
+                isReady = newStatus;
+                
+            } catch (error) {
+                console.error("Error toggling ready status:", error);
+            }
+        };
+
+        window.leaveRoom = async function() {
+            if (!currentRoomId) return;
+            
+            if (confirm('هل تريد مغادرة الغرفة؟')) {
+                try {
+                    const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
+                    if (roomDoc.exists()) {
+                        const roomData = roomDoc.data();
+                        
+                        if (isRoomOwner) {
+                            // Owner leaves, delete room
+                            await deleteDoc(doc(db, "rooms", currentRoomId));
+                        } else {
+                            // Player 2 leaves, remove from room
+                            await updateDoc(doc(db, "rooms", currentRoomId), {
+                                player2Id: null,
+                                player2Name: null,
+                                player2Photo: null,
+                                player2Grade: null,
+                                player2Ready: false
+                            });
+                        }
+                    }
+                    
+                    cleanupRoom();
+                    switchTab('challenges');
+                    
+                } catch (error) {
+                    console.error("Error leaving room:", error);
+                }
+            }
+        };
+
+        window.deleteRoom = async function() {
+            if (!currentRoomId) return;
+            
+            if (confirm('هل تريد حذف الغرفة؟')) {
+                try {
+                    await deleteDoc(doc(db, "rooms", currentRoomId));
+                    cleanupRoom();
+                    switchTab('challenges');
+                    
+                } catch (error) {
+                    console.error("Error deleting room:", error);
+                }
+            }
+        };
+
+        function cleanupRoom() {
             if (roomTimerInterval) {
                 clearInterval(roomTimerInterval);
                 roomTimerInterval = null;
             }
             
-            if (networkCheckInterval) {
-                clearInterval(networkCheckInterval);
-                networkCheckInterval = null;
+            if (roomListenerUnsubscribe) {
+                roomListenerUnsubscribe();
+                roomListenerUnsubscribe = null;
+            }
+            
+            if (internetCheckInterval) {
+                clearInterval(internetCheckInterval);
+                internetCheckInterval = null;
             }
             
             currentRoomId = null;
-            roomData = null;
-            isRoomCreator = false;
+            isRoomOwner = false;
             isReady = false;
-            roomGameStarted = false;
-            roomTimeLeft = 600;
         }
+
+        async function startFriendGame(roomData) {
+            // Hide room lobby
+            document.getElementById('room-lobby-screen').classList.add('hidden');
+            
+            // Determine opponent
+            const isPlayer1 = (isRoomOwner && roomData.ownerId === currentUser.uid) || 
+                             (!isRoomOwner && roomData.player2Id === currentUser.uid);
+            
+            const opponent = isPlayer1 ? 
+                { 
+                    uid: roomData.player2Id, 
+                    name: roomData.player2Name, 
+                    photo: roomData.player2Photo 
+                } : 
+                { 
+                    uid: roomData.ownerId, 
+                    name: roomData.ownerName, 
+                    photo: roomData.ownerPhoto 
+                };
+            
+            // Get questions for the game
+            const qDocs = await getQuestions(roomData.subject, roomData.questionType);
+            if (qDocs.length === 0) { 
+                showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
+                leaveRoom();
+                return; 
+            }
+            
+            const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
+            
+            localMatchData = {
+                status: 'active',
+                grade: userData.grade,
+                player1: { 
+                    uid: isPlayer1 ? currentUser.uid : opponent.uid, 
+                    name: isPlayer1 ? userData.name : opponent.name, 
+                    score: 0, 
+                    photo: isPlayer1 ? userData.photo : opponent.photo,
+                    grade: userData.grade
+                },
+                player2: { 
+                    uid: isPlayer1 ? opponent.uid : currentUser.uid, 
+                    name: isPlayer1 ? opponent.name : userData.name, 
+                    score: 0, 
+                    photo: isPlayer1 ? opponent.photo : userData.photo,
+                    grade: userData.grade
+                },
+                questions: shuffledQs, 
+                currentIdx: 0, 
+                answersCount: 0,
+                roomId: currentRoomId,
+                isFriendGame: true
+            };
+            
+            // Show VS animation
+            await showVSAnimation(
+                isPlayer1 ? localMatchData.player1 : localMatchData.player2,
+                isPlayer1 ? localMatchData.player2 : localMatchData.player1
+            );
+            
+            // Show game overlay
+            document.getElementById('game-overlay').classList.remove('hidden');
+            document.getElementById('withdraw-game-btn').classList.remove('hidden');
+            
+            // Render game
+            renderGame(localMatchData);
+        }
+
+        // Modify submitGameAnswer to handle friend games
+        window.submitGameAnswer = async function(ansObj, q, matchData) {
+            if(hasAnsweredCurrentQ || isExitingGame) return;
+            hasAnsweredCurrentQ = true;
+            userAnsweredCorrectly = ansObj && ansObj.isCorrect;
+            
+            const answerButtons = document.querySelectorAll('#answers-container button');
+            answerButtons.forEach(btn => {
+                btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
+                if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) btn.classList.add('answer-correct');
+                else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) btn.classList.add('answer-wrong');
+                else btn.classList.add('answer-neutral');
+            });
+            
+            document.getElementById('answers-container').classList.add('pointer-events-none');
+
+            if(ansObj && ansObj.isCorrect) {
+                localMatchData.player1.score += 1;
+                document.getElementById('game-my-score').innerText = localMatchData.player1.score;
+            }
+            
+            if (matchData.isFriendGame) {
+                // In friend game, wait for opponent or proceed after timeout
+                document.getElementById('waiting-msg').classList.remove('hidden');
+                
+                // Set timeout for opponent response
+                setTimeout(() => {
+                    if (!isExitingGame) {
+                        handleAINextTurn();
+                    }
+                }, 10000); // 10 second timeout for opponent
+            } else {
+                // AI game
+                triggerAIResponse();
+            }
+        };
+
     </script>
 </body>
 </html>
