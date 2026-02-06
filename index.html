@@ -342,189 +342,6 @@
             object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-block; vertical-align: middle;
         }
 
-        .room-code-display {
-            font-family: monospace;
-            font-size: 2rem;
-            font-weight: 900;
-            letter-spacing: 5px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            padding: 10px 20px;
-            border: 3px dashed #667eea;
-            border-radius: 15px;
-            text-align: center;
-            margin: 20px auto;
-            display: inline-block;
-        }
-
-        .ready-btn {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .ready-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-        }
-
-        .ready-btn:active {
-            transform: translateY(0);
-        }
-
-        .ready-btn.not-ready {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-        }
-
-        .room-user-card {
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border: 2px solid #e5e7eb;
-            transition: all 0.3s;
-        }
-
-        .room-user-card.ready {
-            border-color: #10b981;
-            background: #f0fdf4;
-        }
-
-        .room-user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 3px solid #e5e7eb;
-            object-fit: cover;
-        }
-
-        .room-user-card.ready .room-user-avatar {
-            border-color: #10b981;
-        }
-
-        .room-counter {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            backdrop-filter: blur(10px);
-        }
-
-        .beautiful-modal {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 25px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255,255,255,0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .beautiful-modal::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #4f46e5, #9333ea);
-            border-radius: 0 25px 0 100px;
-            opacity: 0.1;
-        }
-
-        .beautiful-modal h3 {
-            color: #1e293b;
-            font-weight: 900;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .beautiful-btn {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            margin-top: 15px;
-        }
-
-        .beautiful-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-        }
-
-        .beautiful-btn:active {
-            transform: translateY(0);
-        }
-
-        .beautiful-btn.secondary {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
-        }
-
-        .withdraw-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-            z-index: 100;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .withdraw-btn:hover {
-            transform: translateX(-50%) translateY(-2px);
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
-        }
-
-        .withdraw-btn:active {
-            transform: translateX(-50%) translateY(0);
-        }
-
         .premium-timer-container {
             background: linear-gradient(135deg, #0f172a, #1e293b);
             color: white;
@@ -943,6 +760,192 @@
             50% { opacity: 0.7; }
         }
 
+        .room-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            z-index: 18000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .room-container {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border: 3px solid #4f46e5;
+        }
+
+        .room-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .room-id {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-family: monospace;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .room-status {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-dot.online {
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        .room-time {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .players-container {
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .player-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border-radius: 16px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .player-card.ready {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .player-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        .player-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .player-status {
+            font-size: 0.9rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .status-waiting {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-ready {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .room-controls {
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .room-btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .ready-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .leave-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .room-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .room-info {
+            padding: 15px 20px;
+            background: #f1f5f9;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .player-count {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin: 0 5px;
+        }
+
         @media (min-width: 768px) {
             .input-box { font-size: 1.1rem; }
             .auth-overlay > div { max-width: 500px; }
@@ -1090,10 +1093,160 @@
                     <div><input type="password" id="signup-pass" placeholder="كلمة المرور (6+ أحرف)" class="input-box" required minlength="6"></div>
                 </div>
                 <div class="mt-4 text-xs text-gray-500">
-                    <p>ⓘ كلمة المرور يجب أن تكون 6 أحرف على الأقل</p>
+                    <p>كلمة المرور يجب أن تكون 6 أحرف على الأقل</p>
                 </div>
                 <button type="submit" class="btn-main mt-6 bg-indigo-600">إنشاء حساب جديد</button>
             </form>
+        </div>
+    </div>
+
+    <!-- نافذة اختيار نوع اللعب -->
+    <div id="play-friend-modal" class="modal-overlay hidden">
+        <div class="modal-content relative">
+            <button onclick="document.getElementById('play-friend-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="font-bold text-lg mb-6 text-indigo-700 text-center">اللعب ضد صديق</h3>
+            
+            <div class="space-y-4">
+                <button onclick="createRoom()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-xl font-bold shadow-lg hover:opacity-90 transition flex items-center justify-center gap-3">
+                    <i class="fas fa-plus-circle text-xl"></i>
+                    <span>إنشاء غرفة جديدة</span>
+                </button>
+                
+                <div class="relative my-4">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-white text-gray-500">أو</span>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-600 mb-2">أدخل كود الغرفة</label>
+                    <input type="text" id="join-room-code" placeholder="أدخل كود الغرفة" class="input-box text-center font-mono text-lg uppercase" maxlength="8">
+                </div>
+                
+                <button onclick="joinRoom()" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-xl font-bold shadow-lg hover:opacity-90 transition flex items-center justify-center gap-3">
+                    <i class="fas fa-search text-xl"></i>
+                    <span>البحث عن غرفة</span>
+                </button>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button onclick="document.getElementById('play-friend-modal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700 font-medium">رجوع</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إنشاء غرفة -->
+    <div id="create-room-modal" class="modal-overlay hidden">
+        <div class="modal-content relative">
+            <button onclick="closeCreateRoomModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="font-bold text-lg mb-6 text-indigo-700 text-center">إنشاء غرفة جديدة</h3>
+            
+            <form onsubmit="event.preventDefault(); proceedToRoom();">
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-600 mb-2">المادة</label>
+                    <select id="room-subject" class="input-box" required>
+                        <option value="">اختر المادة</option>
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-gray-600 mb-2">نوع السؤال</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" onclick="setRoomQType('mcq')" id="room-btn-mcq" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition">اختيارات</button>
+                        <button type="button" onclick="setRoomQType('tf')" id="room-btn-tf" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition">صح وخطأ</button>
+                    </div>
+                    <input type="hidden" id="room-qtype" required>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeCreateRoomModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
+                        رجوع
+                    </button>
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-bold shadow-md hover:opacity-90 transition">
+                        التالي
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- واجهة الغرفة -->
+    <div id="room-screen" class="room-overlay hidden">
+        <div class="room-container">
+            <div class="room-header">
+                <div class="room-status">
+                    <div class="status-dot online"></div>
+                    <span>متصل</span>
+                </div>
+                <h2 class="text-2xl font-black">غرفة المباراة</h2>
+                <div class="room-id" id="room-id-display">جاري التحميل...</div>
+                <div class="room-time" id="room-timer">10:00</div>
+            </div>
+            
+            <div class="players-container">
+                <div class="player-card" id="player1-card">
+                    <img id="player1-avatar" src="" class="player-avatar">
+                    <div class="player-name" id="player1-name">...</div>
+                    <div class="player-status status-waiting" id="player1-status">بانتظار</div>
+                </div>
+                
+                <div class="player-card" id="player2-card">
+                    <img id="player2-avatar" src="" class="player-avatar">
+                    <div class="player-name" id="player2-name">...</div>
+                    <div class="player-status status-waiting" id="player2-status">بانتظار</div>
+                </div>
+            </div>
+            
+            <div class="room-info">
+                <span id="players-count">المستخدمين (<span>1</span>/2)</span>
+                <span class="mx-2">•</span>
+                <span id="ready-count">جاهز (<span>0</span>/2)</span>
+            </div>
+            
+            <div class="room-controls">
+                <button id="ready-btn" onclick="toggleReady()" class="room-btn ready-btn">
+                    <i class="fas fa-check"></i>
+                    <span>جاهز</span>
+                </button>
+                
+                <button id="start-btn" onclick="startRoomGame()" class="room-btn start-btn hidden">
+                    <i class="fas fa-play"></i>
+                    <span>بدء المباراة</span>
+                </button>
+                
+                <button id="leave-btn" onclick="leaveRoom()" class="room-btn leave-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span id="leave-btn-text">مغادرة</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- رسالة انتظار العثور على غرفة -->
+    <div id="finding-room-modal" class="modal-overlay hidden">
+        <div class="modal-content relative text-center">
+            <button onclick="cancelRoomSearch()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="w-24 h-24 rounded-full bg-indigo-50 flex items-center justify-center relative mx-auto mb-6">
+                <div class="absolute inset-0 rounded-full border-4 border-indigo-500 opacity-20 animate-ping"></div>
+                <i class="fas fa-search text-3xl text-indigo-600"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-gray-800 mb-2">جاري البحث عن غرفة...</h3>
+            <p class="text-gray-600 mb-6" id="search-room-msg">يتم الآن البحث عن غرفة متاحة</p>
+            
+            <button onclick="cancelRoomSearch()" class="text-red-500 font-bold text-sm bg-red-50 px-4 py-2 rounded-full">
+                إلغاء البحث
+            </button>
         </div>
     </div>
 
@@ -1140,17 +1293,13 @@
                         <button onclick="setQType('tf')" id="btn-tf" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition">صح وخطأ</button>
                     </div>
 
-                    <button onclick="startMatchmaking('online')" class="btn-main bg-gradient-to-r from-indigo-600 to-purple-600 mb-4 h-12">
-                        <i class="fas fa-user-graduate ml-2"></i> اللعب ضد طالب (حقيقي)
-                    </button>
-
                     <button onclick="startMatchmaking('ai')" class="btn-main bg-gradient-to-r from-emerald-500 to-green-600 mb-3 h-12">
                         <i class="fas fa-robot ml-2"></i> ضد الذكاء الاصطناعي
                         <span id="ai-remaining" class="text-xs bg-white text-green-600 px-2 py-1 rounded-full mr-2">10</span>
                     </button>
-
-                    <button onclick="openFriendChallenge()" class="btn-main bg-gradient-to-r from-pink-500 to-rose-600 h-12">
-                        <i class="fas fa-users ml-2"></i> تحدّي الأصدقاء (غرف)
+                    
+                    <button onclick="openPlayFriendModal()" class="btn-main bg-gradient-to-r from-purple-500 to-pink-600 h-12">
+                        <i class="fas fa-user-friends ml-2"></i> ضد صديقك
                     </button>
                 </div>
 
@@ -1159,7 +1308,7 @@
                         <div class="absolute inset-0 rounded-full border-4 border-indigo-500 opacity-20 animate-ping"></div>
                         <i class="fas fa-search text-3xl text-indigo-600"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-800" id="search-msg">جاري البحث...</h3>
+                    <h3 class="text-xl font-bold text-gray-800" id="search-msg">جاري تحضير البوت...</h3>
                     <button onclick="cancelSearch()" class="mt-8 text-red-500 font-bold text-sm bg-red-50 px-4 py-2 rounded-full">إلغاء</button>
                 </div>
             </div>
@@ -1198,8 +1347,8 @@
                 <p id="ai-thinking-msg" class="text-center text-green-600 text-sm hidden animate-pulse mt-4 font-bold">الذكاء الاصطناعي يفكر...</p>
             </div>
 
-            <button id="withdraw-game-btn" onclick="withdrawFromGame()" class="withdraw-btn hidden">
-                <i class="fas fa-sign-out-alt"></i> انسحاب
+            <button id="withdraw-game-btn" onclick="withdrawFromGame()" class="w-full bg-red-100 text-red-600 py-3 font-bold border-t border-red-200 hover:bg-red-50 transition flex items-center justify-center gap-2">
+                <i class="fas fa-sign-out-alt"></i> انسحاب (-10 نقاط)
             </button>
         </div>
 
@@ -1229,7 +1378,7 @@
                     <i class="fas fa-gem"></i>
                 </div>
                 
-                <button onclick="closeResultScreen()" class="beautiful-btn">
+                <button onclick="closeResultScreen()" class="btn-main mt-6">
                     <i class="fas fa-home"></i>
                     <span>العودة للصفحة الرئيسية</span>
                 </button>
@@ -1251,7 +1400,7 @@
                     <i class="fas fa-trophy text-4xl opacity-50"></i>
                 </div>
                 <div id="leaderboard-list" class="space-y-4 pb-10 flex flex-col"></div>
-                <button id="load-more-leaderboard" onclick="loadMoreLeaderboard()" class="beautiful-btn secondary hidden mt-4 mb-10">
+                <button id="load-more-leaderboard" onclick="loadMoreLeaderboard()" class="btn-main bg-gray-100 text-gray-600 hidden mt-4 mb-10">
                     <i class="fas fa-chevron-down"></i> عرض المزيد
                 </button>
             </div>
@@ -1281,14 +1430,15 @@
                             </div>
 
                             <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2">الوقت المتبقي (ساعات)</label>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">الوقت المتبقي للامتحان (ساعات)</label>
                                 <input type="number" id="totalHours" required min="1" max="999" placeholder="مثال: 10" class="input-box text-center font-bold text-lg">
                             </div>
 
                             <div class="grid grid-cols-3 gap-4 mb-6">
                                 <div>
                                     <label class="block text-gray-700 text-xs font-bold mb-2">وقت النوم؟</label>
-                                    <select id="needSleep" class="input-box text-sm font-bold">
+                                    <select id="needSleep" class="input-box text-sm font-bold" required>
+                                        <option value="">اختر</option>
                                         <option value="yes">احسب وقت النوم</option>
                                         <option value="no">لا تحسبه</option>
                                     </select>
@@ -1355,11 +1505,11 @@
                         </div>
                     </div>
 
-                    <div id="schedule-action-buttons" class="space-y-3">
-                        <button onclick="downloadScheduleAsImage()" class="w-full bg-indigo-100 text-indigo-700 font-bold py-3 rounded-xl hover:bg-indigo-200 flex items-center justify-center gap-2">
+                    <div id="schedule-action-buttons" class="flex gap-3">
+                        <button onclick="downloadScheduleAsImage()" class="flex-1 bg-indigo-100 text-indigo-700 font-bold py-3 rounded-xl hover:bg-indigo-200 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-download"></i> حفظ كصورة
                         </button>
-                        <button onclick="resetSchedule()" class="w-full bg-white text-red-500 border border-red-200 font-bold py-3 rounded-xl hover:bg-red-50 flex items-center justify-center gap-2">
+                        <button onclick="resetSchedule()" class="flex-1 bg-white text-red-500 border border-red-200 font-bold py-3 rounded-xl hover:bg-red-50 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-trash-can"></i> حذف وإنشاء جديد
                         </button>
                     </div>
@@ -1794,7 +1944,7 @@
                             </div>
                         </div>
 
-                        <button onclick="goToUploadStep2()" class="beautiful-btn">
+                        <button onclick="goToUploadStep2()" class="btn-main">
                             <i class="fas fa-arrow-left"></i> التالي
                         </button>
                     </div>
@@ -1830,10 +1980,10 @@
                         </div>
 
                         <div class="flex gap-3">
-                            <button onclick="goToUploadStep1()" class="beautiful-btn secondary flex-1">
+                            <button onclick="goToUploadStep1()" class="btn-main bg-gray-100 text-gray-600 flex-1">
                                 <i class="fas fa-arrow-right"></i> رجوع
                             </button>
-                            <button onclick="submitQuestionMCQ()" class="beautiful-btn flex-1">
+                            <button onclick="submitQuestionMCQ()" class="btn-main flex-1">
                                 <i class="fas fa-paper-plane"></i> إرسال للمراجعة
                             </button>
                         </div>
@@ -1854,76 +2004,14 @@
                         </div>
 
                         <div class="flex gap-3">
-                            <button onclick="goToUploadStep1()" class="beautiful-btn secondary flex-1">
+                            <button onclick="goToUploadStep1()" class="btn-main bg-gray-100 text-gray-600 flex-1">
                                 <i class="fas fa-arrow-right"></i> رجوع
                             </button>
-                            <button onclick="submitQuestionTF()" class="beautiful-btn flex-1">
+                            <button onclick="submitQuestionTF()" class="btn-main flex-1">
                                 <i class="fas fa-paper-plane"></i> إرسال للمراجعة
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="screen-friend-challenge" class="screen pt-20">
-            <div class="absolute top-0 w-full h-20 bg-white shadow-sm z-30 flex items-center px-5 gap-4">
-                <button onclick="backToChallenges()" class="text-gray-500"><i class="fas fa-arrow-right text-xl"></i></button>
-                <h1 class="font-bold text-lg text-gray-800">تحدي الأصدقاء</h1>
-            </div>
-            <div class="scroll-container px-5 py-6">
-                <div id="room-content" class="text-center">
-                    <p class="text-gray-400 mt-10">جاري تحميل الغرفة...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="screen-create-room" class="screen pt-20">
-            <div class="absolute top-0 w-full h-20 bg-white shadow-sm z-30 flex items-center px-5 gap-4">
-                <button onclick="backToFriendChallenge()" class="text-gray-500"><i class="fas fa-arrow-right text-xl"></i></button>
-                <h1 class="font-bold text-lg text-gray-800">إنشاء غرفة</h1>
-            </div>
-            <div class="scroll-container px-5 py-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 class="font-bold text-gray-800 mb-4 text-center">إنشاء غرفة لتحدي صديق</h3>
-                    
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-600 mb-2">المادة</label>
-                        <select id="room-subject" class="input-box"></select>
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-sm font-bold text-gray-600 mb-2">نوع الأسئلة</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="setRoomQType('mcq')" id="room-btn-mcq" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition">اختيارات</button>
-                            <button onclick="setRoomQType('tf')" id="room-btn-tf" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition">صح وخطأ</button>
-                        </div>
-                    </div>
-
-                    <button onclick="createRoom()" class="beautiful-btn">
-                        <i class="fas fa-plus-circle"></i> إنشاء الغرفة
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="screen-join-room" class="screen pt-20">
-            <div class="absolute top-0 w-full h-20 bg-white shadow-sm z-30 flex items-center px-5 gap-4">
-                <button onclick="backToFriendChallenge()" class="text-gray-500"><i class="fas fa-arrow-right text-xl"></i></button>
-                <h1 class="font-bold text-lg text-gray-800">الدخول إلى غرفة</h1>
-            </div>
-            <div class="scroll-container px-5 py-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 class="font-bold text-gray-800 mb-4 text-center">الدخول إلى غرفة صديق</h3>
-                    
-                    <div class="mb-6">
-                        <label class="block text-sm font-bold text-gray-600 mb-2">رقم الغرفة (8 أرقام)</label>
-                        <input type="text" id="room-code-input" placeholder="أدخل رقم الغرفة" class="input-box text-center font-mono text-xl tracking-widest" maxlength="8">
-                    </div>
-
-                    <button onclick="joinRoom()" class="beautiful-btn">
-                        <i class="fas fa-sign-in-alt"></i> الدخول إلى الغرفة
-                    </button>
                 </div>
             </div>
         </div>
@@ -2056,26 +2144,7 @@
             <div id="beautiful-alert-icon" class="beautiful-alert-icon">!</div>
             <h3 id="beautiful-alert-title" class="beautiful-alert-title">تنبيه</h3>
             <p id="beautiful-alert-message" class="beautiful-alert-message">...</p>
-            <button id="beautiful-alert-ok-btn" class="beautiful-alert-btn">حسناً</button>
-        </div>
-
-        <div id="friend-challenge-modal" class="modal-overlay hidden">
-            <div class="beautiful-modal">
-                <button onclick="closeFriendChallengeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-times"></i>
-                </button>
-                <h3 class="font-bold text-lg mb-6 text-center text-indigo-700">تحدي الأصدقاء</h3>
-                
-                <div class="space-y-4">
-                    <button onclick="openCreateRoomScreen()" class="beautiful-btn">
-                        <i class="fas fa-plus-circle"></i> إنشاء غرفة
-                    </button>
-                    
-                    <button onclick="openJoinRoomScreen()" class="beautiful-btn secondary">
-                        <i class="fas fa-sign-in-alt"></i> ابحث عن غرفة
-                    </button>
-                </div>
-            </div>
+            <button id="beautiful-alert-ok-btn" onclick="document.getElementById('beautiful-alert').classList.add('hidden')" class="beautiful-alert-btn">حسناً</button>
         </div>
     </div>
 
@@ -2084,6 +2153,7 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, onSnapshot, query, where, orderBy, limit, deleteDoc, serverTimestamp, increment, getDoc, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+        import { getDatabase, ref as dbRef, set, get, update, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAfLOjiPiSQW9opdiIgQif3pAp8zsezy58",
@@ -2099,6 +2169,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const rtdb = getDatabase(app);
         const storage = getStorage(app);
         
         const ADMIN_EMAIL = "mslmalmyaly223@gmail.com";
@@ -2115,19 +2186,15 @@
         let adminListenerUnsubscribe = null;
         let matchListenerUnsubscribe = null; 
         let countdownInterval = null;
-        let roomListenerUnsubscribe = null;
-        let currentRoomId = null;
-        let isRoomHost = false;
-        let roomReadyState = false;
-        
         let isExitingGame = false;
-        let currentGameMode = 'online'; 
+        let currentGameMode = 'ai'; 
         let localMatchData = null; 
         let aiTimeoutId = null; 
         let currentQuestionCorrectAnswer = null; 
         let userAnsweredCorrectly = false; 
         let leaderboardOffset = 0;
         let allLeaderboardUsers = [];
+        let selectedRoomQType = null;
 
         let premiumInterval = null;
         const BADGES_LIST = ["سجاج", "سجاجة", "دكتور", "دكتورة", "كسلان", "كسولة", "شطور", "شطورة", "نايم", "نايمة", "نعسان", "نعسانة", "ماكو واهس", "مهندس", "مهندسة", "واحد عراق", "صگاركم", "صگارتكم", "فستقة", "المحامي", "المحامية"];
@@ -2153,6 +2220,17 @@
         let uploadTFAnswer = null;
         let dailyAIRemaining = 10;
         let uploadSubject = null;
+        
+        // متغيرات نظام الغرف
+        let currentRoomId = null;
+        let roomData = null;
+        let roomListener = null;
+        let roomTimerInterval = null;
+        let roomTimeLeft = 600; // 10 دقائق بالثواني
+        let isRoomCreator = false;
+        let isReady = false;
+        let roomGameStarted = false;
+        let networkCheckInterval = null;
 
         onAuthStateChanged(auth, async (user) => {
             const intro = document.getElementById('intro-screen');
@@ -2171,17 +2249,17 @@
                         console.log("تم تحميل بيانات المستخدم:", userData.name);
 
                         if (userData.isBanned === true) {
-    banScreen.classList.remove('hidden');
-    await signOut(auth);
-    localStorage.setItem('device_banned', 'true');
-    return;
-}
+                            banScreen.classList.remove('hidden');
+                            await signOut(auth);
+                            localStorage.setItem('device_banned', 'true');
+                            return;
+                        }
 
-if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN_EMAIL) {
-    banScreen.classList.remove('hidden');
-    await signOut(auth);
-    return;
-}
+                        if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN_EMAIL) {
+                            banScreen.classList.remove('hidden');
+                            await signOut(auth);
+                            return;
+                        }
 
                         await updateDoc(doc(db, "users", user.uid), { 
                             lastActive: serverTimestamp(),
@@ -2632,8 +2710,10 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         window.logout = () => {
             if(adminListenerUnsubscribe) adminListenerUnsubscribe(); 
             if(matchListenerUnsubscribe) matchListenerUnsubscribe();
-            if(roomListenerUnsubscribe) roomListenerUnsubscribe();
             if(premiumInterval) clearInterval(premiumInterval);
+            if(roomListener) roomListener();
+            if(roomTimerInterval) clearInterval(roomTimerInterval);
+            if(networkCheckInterval) clearInterval(networkCheckInterval);
             signOut(auth);
         };
 
@@ -3087,6 +3167,12 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         };
 
         window.startMatchmaking = async (mode) => {
+            // التحقق من النقاط السالبة
+            if (userData.points < 0) {
+                showBeautifulAlert('error', 'نقاط سالبة', '❌ لديك نقاط سالبة. يرجى رفع الأسئلة للحصول على 5 نقاط لكل سؤال يتم قبوله.');
+                return;
+            }
+            
             const sub = document.getElementById('challenge-subject').value;
             if(!sub || !selectedQType) {
                 showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
@@ -3112,7 +3198,7 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
             document.getElementById('challenge-active-card').classList.add('hidden');
             document.getElementById('searching-ui').classList.remove('hidden');
             document.getElementById('searching-ui').style.display = 'flex'; 
-            document.getElementById('search-msg').innerText = mode === 'online' ? "جاري البحث عن طالب..." : "جاري تحضير البوت...";
+            document.getElementById('search-msg').innerText = "جاري تحضير البوت...";
 
             const grade = userData.grade;
             let group = `${grade}_${sub}`;
@@ -3121,89 +3207,8 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                 group = `6shared_${sub}`;
             }
 
-            if (mode === 'online') startOnlineMatch(group, sub);
-            else startAIMatch(sub);
+            startAIMatch(sub);
         };
-
-        async function startOnlineMatch(group, sub) {
-            try {
-                const qRef = collection(db, "match_queue");
-                
-                const qWait = query(
-                    qRef, 
-                    where("group", "==", group), 
-                    where("status", "==", "waiting"), 
-                    limit(10)
-                );
-                
-                const snap = await getDocs(qWait);
-                let foundMatchId = null;
-                let foundMatchData = null;
-                
-                snap.forEach((doc) => { 
-                    const matchData = doc.data();
-                    if (matchData.player1.uid !== currentUser.uid && matchData.grade === userData.grade) {
-                        const lastActiveTime = matchData.player1LastActive || 0;
-                        const currentTime = Date.now();
-                        
-                        if (currentTime - lastActiveTime < 30000) {
-                            foundMatchId = doc.id;
-                            foundMatchData = matchData;
-                        }
-                    }
-                });
-
-                if(foundMatchId && foundMatchData) {
-                    currentMatchId = foundMatchId;
-                    await updateDoc(doc(db, "match_queue", foundMatchId), {
-                        player2: { 
-                            uid: currentUser.uid, 
-                            name: userData.name, 
-                            score: 0, 
-                            photo: userData.photo,
-                            grade: userData.grade
-                        },
-                        status: 'active',
-                        answersCount: 0,
-                        player2LastActive: Date.now(),
-                        lastActivity: Date.now()
-                    });
-                    listenToMatch(foundMatchId);
-                } else {
-                    const qDocs = await getQuestions(sub, selectedQType);
-                    if(qDocs.length === 0) { 
-                        showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم لهذه المرحلة'); 
-                        cancelSearch(); 
-                        return; 
-                    }
-                    
-                    const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
-                    const newMatch = await addDoc(qRef, {
-                        group: group, 
-                        status: 'waiting',
-                        grade: userData.grade,
-                        player1: { 
-                            uid: currentUser.uid, 
-                            name: userData.name, 
-                            score: 0, 
-                            photo: userData.photo,
-                            grade: userData.grade
-                        },
-                        questions: shuffledQs, 
-                        currentIdx: 0, 
-                        answersCount: 0,
-                        player1LastActive: Date.now(),
-                        lastActivity: Date.now(),
-                        createdAt: serverTimestamp()
-                    });
-                    currentMatchId = newMatch.id;
-                    listenToMatch(newMatch.id);
-                }
-            } catch(e) { 
-                console.error("خطأ في البحث عن مباراة:", e); 
-                cancelSearch(); 
-            }
-        }
 
         async function startAIMatch(sub) {
             const qDocs = await getQuestions(sub, selectedQType);
@@ -3240,7 +3245,7 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
             
             await showVSAnimation(localMatchData.player1, localMatchData.player2);
             document.getElementById('game-overlay').classList.remove('hidden');
-            document.getElementById('withdraw-game-btn').classList.add('hidden');
+            document.getElementById('withdraw-game-btn').classList.remove('hidden');
             renderGame(localMatchData);
         }
 
@@ -3283,32 +3288,6 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
             return list;
         }
 
-        function listenToMatch(id) {
-            if(matchListenerUnsubscribe) matchListenerUnsubscribe(); 
-            matchListenerUnsubscribe = onSnapshot(doc(db, "match_queue", id), async (snap) => {
-                if(isExitingGame) return;
-                if(!snap.exists()) {
-                    if (currentGameMode === 'online') {
-                        console.log("المباراة حذفت من السيرفر");
-                        return;
-                    }
-                    return;
-                }
-                const d = snap.data();
-                
-                if(d.status === 'active') {
-                    if (document.getElementById('game-overlay').classList.contains('hidden') && !document.getElementById('vs-screen').classList.contains('flex')) {
-                         await showVSAnimation(d.player1, d.player2);
-                         document.getElementById('game-overlay').classList.remove('hidden');
-                         document.getElementById('withdraw-game-btn').classList.remove('hidden');
-                         renderGame(d);
-                    } else {
-                         renderGame(d);
-                    }
-                }
-            });
-        }
-        
         function showVSAnimation(p1, p2) {
             return new Promise(resolve => {
                 document.getElementById('searching-ui').classList.add('hidden');
@@ -3335,25 +3314,11 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         }
 
         function renderGame(data) {
-    // بدء مراقبة الشبكة إذا لم تكن بدأت
-    if (!networkCheckInterval) {
-        addNetworkMonitoringToGame();
-    }
             if (isExitingGame) return;
             const totalQs = data.questions.length;
             if(!data.questions || data.currentIdx >= totalQs) { 
                 endGame(data); 
                 return; 
-            }
-            
-            if (currentGameMode === 'online' && data.answersCount >= 2) {
-                 if(data.player1.uid === currentUser.uid) {
-                     updateDoc(doc(db, "match_queue", currentMatchId), { 
-                         currentIdx: increment(1), 
-                         answersCount: 0 
-                     });
-                 }
-                 return;
             }
             
             const q = data.questions[data.currentIdx];
@@ -3362,22 +3327,12 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                 return; 
             }
             
-            if (currentGameMode === 'online') {
-                const isP1 = data.player1.uid === currentUser.uid;
-                document.getElementById('p1-name').innerText = userData.name;
-                document.getElementById('game-p1-img').src = userData.photo;
-                document.getElementById('p2-name').innerText = isP1 ? data.player2.name : data.player1.name;
-                document.getElementById('game-p2-img').src = isP1 ? data.player2.photo : data.player1.photo;
-                document.getElementById('game-my-score').innerText = isP1 ? data.player1.score : data.player2.score;
-                document.getElementById('game-op-score').innerText = isP1 ? data.player2.score : data.player1.score;
-            } else {
-                document.getElementById('p1-name').innerText = userData.name;
-                document.getElementById('game-p1-img').src = userData.photo;
-                document.getElementById('p2-name').innerText = data.player2.name;
-                document.getElementById('game-p2-img').src = data.player2.photo;
-                document.getElementById('game-my-score').innerText = data.player1.score;
-                document.getElementById('game-op-score').innerText = data.player2.score;
-            }
+            document.getElementById('p1-name').innerText = userData.name;
+            document.getElementById('game-p1-img').src = userData.photo;
+            document.getElementById('p2-name').innerText = data.player2.name;
+            document.getElementById('game-p2-img').src = data.player2.photo;
+            document.getElementById('game-my-score').innerText = data.player1.score;
+            document.getElementById('game-op-score').innerText = data.player2.score;
 
             const qTextEl = document.getElementById('q-text');
             if(qTextEl.innerText !== q.question) {
@@ -3400,7 +3355,7 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                         clearInterval(gameTimer); 
                         if(!hasAnsweredCurrentQ) {
                             submitGameAnswer(null, q, data);
-                        } else if (currentGameMode === 'ai') {
+                        } else {
                             handleAINextTurn();
                         }
                     }
@@ -3447,25 +3402,12 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
             
             document.getElementById('answers-container').classList.add('pointer-events-none');
 
-            if (currentGameMode === 'online') {
-                document.getElementById('waiting-msg').classList.remove('hidden');
-                const isP1 = matchData.player1.uid === currentUser.uid;
-                if (!currentMatchId) return;
-                const scoreIncrement = ansObj && ansObj.isCorrect ? 1 : 0;
-                const updates = { 
-                    answersCount: increment(1),
-                    lastActivity: Date.now()
-                };
-                if(ansObj && ansObj.isCorrect) updates[isP1?'player1.score':'player2.score'] = increment(scoreIncrement);
-                await updateDoc(doc(db, "match_queue", currentMatchId), updates);
-            } else {
-                document.getElementById('waiting-msg').classList.add('hidden'); 
-                if(ansObj && ansObj.isCorrect) {
-                    localMatchData.player1.score += 1;
-                    document.getElementById('game-my-score').innerText = localMatchData.player1.score;
-                }
-                triggerAIResponse();
+            document.getElementById('waiting-msg').classList.add('hidden'); 
+            if(ansObj && ansObj.isCorrect) {
+                localMatchData.player1.score += 1;
+                document.getElementById('game-my-score').innerText = localMatchData.player1.score;
             }
+            triggerAIResponse();
         }
 
         function triggerAIResponse() {
@@ -3500,30 +3442,9 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                     penalty = -userData.points;
                 }
                 
-                if(currentMatchId && currentGameMode === 'online') {
-                    const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
-                    if(matchDoc.exists()) {
-                        const matchData = matchDoc.data();
-                        const isP1 = matchData.player1.uid === currentUser.uid;
-                        const opponentId = isP1 ? matchData.player2.uid : matchData.player1.uid;
-                        
-                        await updateDoc(doc(db, "users", currentUser.uid), {
-                            points: increment(penalty)
-                        });
-                        
-                        if(opponentId !== 'AI_BOT') {
-                            await updateDoc(doc(db, "users", opponentId), {
-                                points: increment(10)
-                            });
-                        }
-                        
-                        await deleteDoc(doc(db, "match_queue", currentMatchId));
-                    }
-                } else if (currentGameMode === 'ai') {
-                    await updateDoc(doc(db, "users", currentUser.uid), {
-                        points: increment(penalty)
-                    });
-                }
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    points: increment(penalty)
+                });
                 
                 userData.points += penalty;
                 setupHeaderUI();
@@ -3566,17 +3487,9 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
             document.getElementById('withdraw-game-btn').classList.add('hidden');
             if (isExitingGame) return;
             
-            let myScore, opScore, opName;
-            if (currentGameMode === 'online') {
-                const isP1 = d.player1.uid === currentUser.uid;
-                myScore = isP1 ? d.player1.score : d.player2.score;
-                opScore = isP1 ? d.player2.score : d.player1.score;
-                opName = isP1 ? d.player2.name : d.player1.name;
-            } else {
-                myScore = localMatchData.player1.score;
-                opScore = localMatchData.player2.score;
-                opName = localMatchData.player2.name;
-            }
+            let myScore = localMatchData.player1.score;
+            let opScore = localMatchData.player2.score;
+            let opName = localMatchData.player2.name;
             
             let pointsGained = 0; 
             let msg = ""; 
@@ -3589,6 +3502,14 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                 msg = "حظ أوفر!"; 
                 icon = "😢"; 
                 pointsGained = 0;
+                
+                // خصم نصف نقاط الخصم عند الخسارة
+                let pointsToDeduct = Math.floor(opScore / 2);
+                if (pointsToDeduct > 0) {
+                    await updateDoc(doc(db, "users", currentUser.uid), { points: increment(-pointsToDeduct) });
+                    userData.points -= pointsToDeduct;
+                    setupHeaderUI();
+                }
             } else { 
                 if(myScore > 0) { 
                     msg = "تعادل إيجابي!"; 
@@ -3609,10 +3530,6 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                 await updateDoc(doc(db, "users", currentUser.uid), { points: increment(pointsGained) });
                 userData.points += pointsGained;
                 setupHeaderUI();
-            }
-            
-            if(currentMatchId && currentGameMode === 'online') {
-                await deleteDoc(doc(db, "match_queue", currentMatchId));
             }
             
             const resultScreen = document.getElementById('result-screen');
@@ -3644,10 +3561,6 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
              if (matchListenerUnsubscribe) { 
                  matchListenerUnsubscribe(); 
                  matchListenerUnsubscribe = null; 
-             }
-             if(roomListenerUnsubscribe) {
-                 roomListenerUnsubscribe();
-                 roomListenerUnsubscribe = null;
              }
              clearInterval(gameTimer); 
              clearTimeout(aiTimeoutId);
@@ -3710,11 +3623,6 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
             switchTab('challenges');
         };
 
-        window.backToFriendChallenge = () => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-friend-challenge').classList.add('active');
-        };
-
         window.editProfileName = () => {
             document.getElementById('edit-name-input').value = userData.name || "";
             document.getElementById('edit-name-modal').classList.remove('hidden');
@@ -3764,7 +3672,7 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                      if (u.lastActive && u.lastActive.toDate && (now - u.lastActive.toDate()) < 15 * 60 * 1000) activeNow++;
                  });
                  if(activeNow === 0) activeNow = 1; 
-                 div.innerHTML = `<div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">المستخدمين الكلي</p><p class="text-2xl font-bold text-gray-800">${total}</p></div><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600"><i class="fas fa-users"></i></div></div><div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">نشطين الآن</p><p class="text-2xl font-bold text-green-500">${activeNow}</p></div><div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600"><i class="fas fa-wifi"></i></div></div><div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">سجلوا اليوم</p><p class="text-2xl font-bold text-purple-500">${newUsers}</p></div><div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600"><i class="fas fa-user-plus"></i></div></div>`;
+                 div.innerHTML = `<div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">المستخدمين الكلي</p><p class="text-2xl font-bold text-gray-800">${total}</p></div><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600"><i class="fas fa-users"></i></div></div><div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">نشطين الآن</p<p class="text-2xl font-bold text-green-500">${activeNow}</p></div><div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600"><i class="fas fa-wifi"></i></div></div><div class="bg-white p-5 rounded-2xl shadow-sm flex justify-between items-center"><div><p class="text-sm text-gray-500">سجلوا اليوم</p><p class="text-2xl font-bold text-purple-500">${newUsers}</p></div><div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600"><i class="fas fa-user-plus"></i></div></div>`;
              } catch (error) {
                  div.innerHTML = '<p class="text-center text-gray-400">خطأ في تحميل الإحصائيات</p>';
              }
@@ -3773,7 +3681,7 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         async function loadAdminAllContent() {
              const div = document.getElementById('admin-all-list');
              if(allAdminQuestions.length === 0) {
-                 div.innerHTML = '<p class="text-center text-gray-400">جاري جلب كل الأسئلة من قاعدة البيانات...</p>';
+                 div.innerHTML = '<p class="text-center text-gray-400">جاري جبل كل الأسئلة من قاعدة البيانات...</p>';
                  try {
                      const q = await getDocs(query(collection(db, "questions"), orderBy("createdAt", "desc"), limit(100)));
                      allAdminQuestions = [];
@@ -3927,7 +3835,7 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
             leaderboardOffset = 0;
             
             try {
-                const q = query(collection(db, "users"), orderBy("points", "desc"), limit(150));
+                const q = query(collection(db, "users"), orderBy("points", "desc"));
                 const snap = await getDocs(q);
                 allLeaderboardUsers = [];
                 snap.forEach(d => { 
@@ -3958,10 +3866,12 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
             const div = document.getElementById('leaderboard-list');
             div.innerHTML = '';
             
-            const usersToShow = allLeaderboardUsers.slice(start, end);
+            const usersToShow = allLeaderboardUsers.slice(start, Math.min(end, 50));
             
             usersToShow.forEach((u, index) => {
                 const globalIndex = start + index;
+                if (globalIndex >= 50) return;
+                
                 let frameClass = "frame-rank-common";
                 let crown = "";
                 let rankBadge = `<div class="rank-badge-top">${globalIndex + 1}</div>`;
@@ -4043,9 +3953,17 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         window.loadMoreLeaderboard = function() {
             leaderboardOffset += 25;
             const nextChunk = allLeaderboardUsers.slice(leaderboardOffset, leaderboardOffset + 25);
+            const usersToShow = nextChunk.filter((_, index) => leaderboardOffset + index < 50);
             
-            nextChunk.forEach((u, index) => {
+            if (usersToShow.length === 0) {
+                document.getElementById('load-more-leaderboard').classList.add('hidden');
+                return;
+            }
+            
+            usersToShow.forEach((u, index) => {
                 const globalIndex = leaderboardOffset + index;
+                if (globalIndex >= 50) return;
+                
                 let frameClass = "frame-rank-common";
                 let rankBadge = `<div class="rank-badge-top">${globalIndex + 1}</div>`;
                 let backgroundClass = 'bg-rank-default';
@@ -4090,7 +4008,7 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                     </div>`;
             });
             
-            if (leaderboardOffset + 25 >= allLeaderboardUsers.length) {
+            if (leaderboardOffset + 25 >= 50 || leaderboardOffset + 25 >= allLeaderboardUsers.length) {
                 document.getElementById('load-more-leaderboard').classList.add('hidden');
             }
         };
@@ -4153,78 +4071,77 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         };
 
         window.searchUserForAdmin = async () => {
-    const uidInput = document.getElementById('admin-user-search').value.trim();
-    const resDiv = document.getElementById('admin-user-result');
-    if(!uidInput) {
-        showBeautifulAlert('warning', 'تنبيه', 'أدخل المعرف (ID)');
-        return;
-    }
-    
-    resDiv.classList.remove('hidden');
-    resDiv.innerHTML = 'جاري البحث...';
-    
-    try {
-        const q = query(collection(db, "users"), where("uniqueId", "==", uidInput));
-        const snap = await getDocs(q);
-        
-        if(snap.empty) {
-            resDiv.innerHTML = '<p class="text-red-500">المستخدم غير موجود</p>';
-            return;
-        }
-        
-        const uData = snap.docs[0].data();
-        const docId = snap.docs[0].id;
-        const isBanned = uData.isBanned === true;
-        const balance = uData.balance || 0;
-        const deserves = balance >= 100;
-        const createdAt = uData.createdAt ? uData.createdAt.toDate().toLocaleDateString('ar-EG') : 'غير معروف';
-        const lastLogin = uData.lastLogin ? new Date(uData.lastLogin).toLocaleDateString('ar-EG') : 'لم يسجل دخول';
+            const uidInput = document.getElementById('admin-user-search').value.trim();
+            const resDiv = document.getElementById('admin-user-result');
+            if(!uidInput) {
+                showBeautifulAlert('warning', 'تنبيه', 'أدخل المعرف (ID)');
+                return;
+            }
+            
+            resDiv.classList.remove('hidden');
+            resDiv.innerHTML = 'جاري البحث...';
+            
+            try {
+                const q = query(collection(db, "users"), where("uniqueId", "==", uidInput));
+                const snap = await getDocs(q);
+                
+                if(snap.empty) {
+                    resDiv.innerHTML = '<p class="text-red-500">المستخدم غير موجود</p>';
+                    return;
+                }
+                
+                const uData = snap.docs[0].data();
+                const docId = snap.docs[0].id;
+                const isBanned = uData.isBanned === true;
+                const balance = uData.balance || 0;
+                const deserves = balance >= 100;
+                const createdAt = uData.createdAt ? uData.createdAt.toDate().toLocaleDateString('ar-EG') : 'غير معروف';
+                const lastLogin = uData.lastLogin ? new Date(uData.lastLogin).toLocaleDateString('ar-EG') : 'لم يسجل دخول';
 
-        resDiv.innerHTML = `
-            <div class="text-center mb-4">
-                <img src="${uData.photo}" class="w-16 h-16 rounded-full mx-auto mb-2">
-                <h3 class="font-bold">${uData.name}</h3>
-                <p class="text-xs text-gray-500">ID: ${uData.uniqueId}</p>
-                <p class="text-xs text-gray-500">${uData.email}</p>
-            </div>
-            <div class="mb-4 text-right">
-                <p class="text-sm"><span class="font-bold">البريد الإلكتروني:</span> ${uData.email || 'غير معروف'}</p>
-                <p class="text-sm"><span class="font-bold">كلمة المرور:</span> <span class="text-gray-400">(مشفرة في النظام)</span></p>
-                <p class="text-sm"><span class="font-bold">تاريخ التسجيل:</span> ${createdAt}</p>
-                <p class="text-sm"><span class="font-bold">آخر دخول:</span> ${lastLogin}</p>
-                <p class="text-sm"><span class="font-bold">المرحلة الدراسية:</span> ${uData.grade ? getGradeName(uData.grade) : 'غير محدد'}</p>
-                <p class="text-sm"><span class="font-bold">السيرة الذاتية:</span> ${uData.bio || 'لا يوجد'}</p>
-                <p class="text-sm"><span class="font-bold">حالة الحظر:</span> ${isBanned ? '🛑 محظور' : '✅ نشط'}</p>
-                <p class="text-sm"><span class="font-bold">حساب مميز:</span> ${uData.isPremium ? '✅ نعم' : '❌ لا'}</p>
-            </div>
-            <div class="grid grid-cols-2 gap-2 mb-4 text-xs font-bold text-center">
-                <div class="bg-gray-50 p-2 rounded">النقاط: ${uData.points || 0}</div>
-                <div class="bg-gray-50 p-2 rounded">الدولارات: $${balance}</div>
-            </div>
-            <div class="mb-4 text-center">
-                <p class="text-sm font-bold ${deserves ? 'text-green-600' : 'text-red-500'}">
-                    ${deserves ? '✅ يستحق السحب' : '❌ لا يستحق السحب'}
-                </p>
-                ${deserves ? `<button onclick="resetUserBalance('${docId}')" class="mt-2 bg-yellow-500 text-white px-4 py-2 rounded text-xs font-bold">تصفير الدولارات</button>` : ''}
-            </div>
-            <button onclick="toggleBan('${docId}', ${!isBanned})" class="w-full py-3 rounded-xl font-bold text-white ${isBanned ? 'bg-green-500' : 'bg-red-500'}">
-                ${isBanned ? 'إلغاء الحظر (فك القيد)' : 'حظر المستخدم نهائياً'}
-            </button>
-        `;
-    } catch (error) {
-        resDiv.innerHTML = '<p class="text-red-500">خطأ في البحث</p>';
-    }
-};
+                resDiv.innerHTML = `
+                    <div class="text-center mb-4">
+                        <img src="${uData.photo}" class="w-16 h-16 rounded-full mx-auto mb-2">
+                        <h3 class="font-bold">${uData.name}</h3>
+                        <p class="text-xs text-gray-500">ID: ${uData.uniqueId}</p>
+                        <p class="text-xs text-gray-500">${uData.email}</p>
+                    </div>
+                    <div class="mb-4 text-right">
+                        <p class="text-sm"><span class="font-bold">البريد الإلكتروني:</span> ${uData.email || 'غير معروف'}</p>
+                        <p class="text-sm"><span class="font-bold">كلمة المرور:</span> <span class="text-gray-400">(مشفرة في النظام)</span></p>
+                        <p class="text-sm"><span class="font-bold">تاريخ التسجيل:</span> ${createdAt}</p>
+                        <p class="text-sm"><span class="font-bold">آخر دخول:</span> ${lastLogin}</p>
+                        <p class="text-sm"><span class="font-bold">المرحلة الدراسية:</span> ${uData.grade ? getGradeName(uData.grade) : 'غير محدد'}</p>
+                        <p class="text-sm"><span class="font-bold">السيرة الذاتية:</span> ${uData.bio || 'لا يوجد'}</p>
+                        <p class="text-sm"><span class="font-bold">حالة الحظر:</span> ${isBanned ? '🛑 محظور' : '✅ نشط'}</p>
+                        <p class="text-sm"><span class="font-bold">حساب مميز:</span> ${uData.isPremium ? '✅ نعم' : '❌ لا'}</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mb-4 text-xs font-bold text-center">
+                        <div class="bg-gray-50 p-2 rounded">النقاط: ${uData.points || 0}</div>
+                        <div class="bg-gray-50 p-2 rounded">الدولارات: $${balance}</div>
+                    </div>
+                    <div class="mb-4 text-center">
+                        <p class="text-sm font-bold ${deserves ? 'text-green-600' : 'text-red-500'}">
+                            ${deserves ? '✅ يستحق السحب' : '❌ لا يستحق السحب'}
+                        </p>
+                        ${deserves ? `<button onclick="resetUserBalance('${docId}')" class="mt-2 bg-yellow-500 text-white px-4 py-2 rounded text-xs font-bold">تصفير الدولارات</button>` : ''}
+                    </div>
+                    <button onclick="toggleBan('${docId}', ${!isBanned})" class="w-full py-3 rounded-xl font-bold text-white ${isBanned ? 'bg-green-500' : 'bg-red-500'}">
+                        ${isBanned ? 'إلغاء الحظر (فك القيد)' : 'حظر المستخدم نهائياً'}
+                    </button>
+                `;
+            } catch (error) {
+                resDiv.innerHTML = '<p class="text-red-500">خطأ في البحث</p>';
+            }
+        };
 
         window.toggleBan = async (docId, shouldBan) => {
-    if(confirm(shouldBan ? "هل أنت متأكد من حظر هذا المستخدم نهائياً؟ لن يتمكن من الدخول مجدداً." : "هل تريد إلغاء الحظر؟")) {
-        await updateDoc(doc(db, "users", docId), { isBanned: shouldBan });
-        // تم حذف localStorage.setItem('device_banned', 'true');
-        showBeautifulAlert('success', 'تم', shouldBan ? "تم حظر المستخدم" : "تم إلغاء الحظر");
-        searchUserForAdmin();
-        loadBannedUsers();
-    }
-};
+            if(confirm(shouldBan ? "هل أنت متأكد من حظر هذا المستخدم نهائياً؟ لن يتمكن من الدخول مجدداً." : "هل تريد إلغاء الحظر؟")) {
+                await updateDoc(doc(db, "users", docId), { isBanned: shouldBan });
+                showBeautifulAlert('success', 'تم', shouldBan ? "تم حظر المستخدم" : "تم إلغاء الحظر");
+                searchUserForAdmin();
+                loadBannedUsers();
+            }
+        };
 
         window.resetUserBalance = async (docId) => {
              if(confirm("هل تريد تصفير دولارات هذا المستخدم؟ (يعني أنك دفعت له)")) {
@@ -4463,10 +4380,6 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         window.cancelSearch = function() {
             document.getElementById('searching-ui').classList.add('hidden');
             document.getElementById('challenge-active-card').classList.remove('hidden');
-            if(currentMatchId) {
-                deleteDoc(doc(db, "match_queue", currentMatchId));
-                currentMatchId = null;
-            }
         };
 
         window.closeMaintenancePopup = function() {
@@ -4508,7 +4421,14 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
             
             scheduleData.subject = document.getElementById('subjectName').value;
             scheduleData.totalHours = parseFloat(document.getElementById('totalHours').value);
-            scheduleData.needSleep = document.getElementById('needSleep').value === 'yes';
+            
+            const needSleepValue = document.getElementById('needSleep').value;
+            if (needSleepValue === "") {
+                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار خيار وقت النوم');
+                return;
+            }
+            scheduleData.needSleep = needSleepValue === 'yes';
+            
             scheduleData.breakDuration = parseInt(document.getElementById('breakDuration').value);
             scheduleData.studyTimePref = document.getElementById('studyTimePref').value;
             
@@ -4530,112 +4450,106 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         };
 
         function calculateAndRenderSchedule() {
-    let totalMins = scheduleData.totalHours * 60;
-    let sleepMins = 0;
+            let totalMins = scheduleData.totalHours * 60;
+            let sleepMins = 0;
 
-    if (scheduleData.needSleep && scheduleData.totalHours > 16) {
-        const days = scheduleData.totalHours / 24;
-        sleepMins = Math.floor(days * 8 * 60);
-        totalMins -= sleepMins;
-    }
+            if (scheduleData.needSleep && scheduleData.totalHours > 16) {
+                const days = scheduleData.totalHours / 24;
+                sleepMins = Math.floor(days * 8 * 60);
+                totalMins -= sleepMins;
+            }
 
-    const studyRatio = 60 / (60 + scheduleData.breakDuration);
-    const netStudyMins = Math.round(totalMins * studyRatio); // تقريب هنا
-    const totalBreakMins = totalMins - netStudyMins;
+            const studyRatio = 60 / (60 + scheduleData.breakDuration);
+            const netStudyMins = Math.round(totalMins * studyRatio);
+            const totalBreakMins = totalMins - netStudyMins;
 
-    const totalPoints = scheduleData.chapters.reduce((acc, c) => acc + c.difficulty, 0);
+            const totalPoints = scheduleData.chapters.reduce((acc, c) => acc + c.difficulty, 0);
 
-    document.getElementById('schedule-input-page').classList.add('hidden');
-    document.getElementById('schedule-result-page').classList.remove('hidden');
-    document.getElementById('displaySubject').innerText = scheduleData.subject;
-    
-    let timeText = "مدّة: " + scheduleData.totalHours + " س | وقت: ";
-    if (scheduleData.studyTimePref === 'morning') timeText += "صباح";
-    else if (scheduleData.studyTimePref === 'evening') timeText += "مساء";
-    else timeText += "أي وقت";
-    document.getElementById('displayScheduleTime').innerText = timeText;
-
-    const tbody = document.getElementById('scheduleBody');
-    tbody.innerHTML = '';
-
-    let currentTime = 0;
-    if (scheduleData.studyTimePref === 'evening') currentTime = 16 * 60;
-    else if (scheduleData.studyTimePref === 'any') currentTime = 8 * 60;
-
-    scheduleData.chapters.forEach((ch, idx) => {
-        const share = ch.difficulty / totalPoints;
-        const chapterMins = Math.round(netStudyMins * share); // تقريب هنا
-        
-        const startHour = Math.floor(currentTime / 60);
-        const startMin = currentTime % 60;
-        currentTime += chapterMins;
-        const endHour = Math.floor(currentTime / 60);
-        const endMin = currentTime % 60;
-        
-        const breakMins = scheduleData.breakDuration;
-        
-        const tr1 = document.createElement('tr');
-        tr1.innerHTML = `
-            <td>${ch.name}</td>
-            <td>${formatTime2(startHour, startMin)}<br>${formatTime2(endHour, endMin)}</td>
-        `;
-        tbody.appendChild(tr1);
-        
-        if (idx < scheduleData.chapters.length - 1) {
-            const breakStartHour = Math.floor(currentTime / 60);
-            const breakStartMin = currentTime % 60;
-            currentTime += breakMins;
-            const breakEndHour = Math.floor(currentTime / 60);
-            const breakEndMin = currentTime % 60;
+            document.getElementById('schedule-input-page').classList.add('hidden');
+            document.getElementById('schedule-result-page').classList.remove('hidden');
+            document.getElementById('displaySubject').innerText = scheduleData.subject;
             
-            const tr2 = document.createElement('tr');
-            tr2.innerHTML = `
-                <td>استراحة</td>
-                <td>${formatTime2(breakStartHour, breakStartMin)}<br>${formatTime2(breakEndHour, breakEndMin)}</td>
-            `;
-            tbody.appendChild(tr2);
+            let timeText = "مدّة: " + scheduleData.totalHours + " س | وقت: ";
+            if (scheduleData.studyTimePref === 'morning') timeText += "صباح";
+            else if (scheduleData.studyTimePref === 'evening') timeText += "مساء";
+            else timeText += "أي وقت";
+            document.getElementById('displayScheduleTime').innerText = timeText;
+
+            const tbody = document.getElementById('scheduleBody');
+            tbody.innerHTML = '';
+
+            let currentTime = 0;
+            if (scheduleData.studyTimePref === 'evening') currentTime = 16 * 60;
+            else if (scheduleData.studyTimePref === 'any') currentTime = 8 * 60;
+
+            scheduleData.chapters.forEach((ch, idx) => {
+                const share = ch.difficulty / totalPoints;
+                const chapterMins = Math.round(netStudyMins * share);
+                
+                const startHour = Math.floor(currentTime / 60);
+                const startMin = currentTime % 60;
+                currentTime += chapterMins;
+                const endHour = Math.floor(currentTime / 60);
+                const endMin = currentTime % 60;
+                
+                const breakMins = scheduleData.breakDuration;
+                
+                const tr1 = document.createElement('tr');
+                tr1.innerHTML = `
+                    <td>${ch.name}</td>
+                    <td>${formatTime2(startHour, startMin)}<br>${formatTime2(endHour, endMin)}</td>
+                `;
+                tbody.appendChild(tr1);
+                
+                if (idx < scheduleData.chapters.length - 1) {
+                    const breakStartHour = Math.floor(currentTime / 60);
+                    const breakStartMin = currentTime % 60;
+                    currentTime += breakMins;
+                    const breakEndHour = Math.floor(currentTime / 60);
+                    const breakEndMin = currentTime % 60;
+                    
+                    const tr2 = document.createElement('tr');
+                    tr2.innerHTML = `
+                        <td>استراحة</td>
+                        <td>${formatTime2(breakStartHour, breakStartMin)}<br>${formatTime2(breakEndHour, breakEndMin)}</td>
+                    `;
+                    tbody.appendChild(tr2);
+                }
+            });
+
+            if (scheduleData.needSleep && scheduleData.totalHours > 16) {
+                const sleepStart = 22 * 60;
+                const sleepEnd = 6 * 60;
+                const trSleep = document.createElement('tr');
+                trSleep.innerHTML = `
+                    <td>نوم</td>
+                    <td>${formatTime2(22, 0)}<br>${formatTime2(6, 0)}</td>
+                `;
+                tbody.appendChild(trSleep);
+            }
+
+            document.getElementById('statStudy').innerText = formatTime(netStudyMins);
+            document.getElementById('statBreak').innerText = formatTime(totalBreakMins);
+            document.getElementById('statSleep').innerText = formatTime(sleepMins);
         }
-    });
-
-    if (scheduleData.needSleep && scheduleData.totalHours > 16) {
-        const sleepStart = 22 * 60;
-        const sleepEnd = 6 * 60;
-        const trSleep = document.createElement('tr');
-        trSleep.innerHTML = `
-            <td>نوم</td>
-            <td>${formatTime2(22, 0)}<br>${formatTime2(6, 0)}</td>
-        `;
-        tbody.appendChild(trSleep);
-    }
-
-    document.getElementById('statStudy').innerText = formatTime(netStudyMins);
-    document.getElementById('statBreak').innerText = formatTime(totalBreakMins);
-    document.getElementById('statSleep').innerText = formatTime(sleepMins);
-}
 
         function formatTime2(hour, min) {
-    // تقريب الدقائق إلى أقرب رقم صحيح
-    min = Math.round(min);
-    
-    // إذا كانت الدقائق 60 أو أكثر، نضيف ساعة ونطرح 60
-    if (min >= 60) {
-        hour += Math.floor(min / 60);
-        min = min % 60;
-    }
-    
-    // ضبط الساعة لتكون بين 0-23
-    hour = hour % 24;
-    
-    // تحويل إلى تنسيق 12 ساعة
-    let displayHour = hour % 12;
-    if (displayHour === 0) displayHour = 12; // الساعة 0 تكون 12 صباحاً
-    
-    // تحديد ص/م
-    const ampm = hour < 12 ? 'ص' : 'م';
-    
-    // إرجاع التنسيق المطلوب مع دقائق مكونة من رقمين
-    return `${displayHour}:${min < 10 ? '0' + min : min} ${ampm}`;
-}
+            min = Math.round(min);
+            
+            if (min >= 60) {
+                hour += Math.floor(min / 60);
+                min = min % 60;
+            }
+            
+            hour = hour % 24;
+            
+            let displayHour = hour % 12;
+            if (displayHour === 0) displayHour = 12;
+            
+            const ampm = hour < 12 ? 'ص' : 'م';
+            
+            return `${displayHour}:${min < 10 ? '0' + min : min} ${ampm}`;
+        }
 
         function formatTime(m) {
             if(m < 60) return Math.round(m) + ' د';
@@ -4687,382 +4601,6 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                 localStorage.removeItem('studySchedule');
                 location.reload();
             }
-        };
-
-        window.openFriendChallenge = function() {
-            document.getElementById('friend-challenge-modal').classList.remove('hidden');
-        };
-
-        window.closeFriendChallengeModal = function() {
-            document.getElementById('friend-challenge-modal').classList.add('hidden');
-        };
-
-        window.openCreateRoomScreen = function() {
-            closeFriendChallengeModal();
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-create-room').classList.add('active');
-            
-            const grade = userData.grade;
-            if(grade) {
-                populateSubjects(grade, 'room-subject');
-            }
-        };
-
-        window.openJoinRoomScreen = function() {
-            closeFriendChallengeModal();
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-join-room').classList.add('active');
-        };
-
-        let roomQType = 'mcq';
-        window.setRoomQType = (t) => {
-            roomQType = t;
-            document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 font-bold transition flex-1 ${t==='mcq'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
-            document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 font-bold transition flex-1 ${t==='tf'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
-        };
-
-        window.createRoom = async function() {
-            const subject = document.getElementById('room-subject').value;
-            if(!subject || !roomQType) {
-                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
-                return;
-            }
-
-            const roomCode = generateRoomCode();
-            currentRoomId = roomCode;
-            isRoomHost = true;
-            roomReadyState = false;
-
-            await setDoc(doc(db, "rooms", roomCode), {
-                code: roomCode,
-                host: {
-                    uid: currentUser.uid,
-                    name: userData.name,
-                    photo: userData.photo,
-                    grade: userData.grade,
-                    ready: false
-                },
-                guest: null,
-                subject: subject,
-                questionType: roomQType,
-                status: 'waiting',
-                createdAt: serverTimestamp(),
-                lastUpdated: serverTimestamp()
-            });
-
-            openRoomScreen(roomCode);
-        };
-
-        function generateRoomCode() {
-            const chars = '0123456789';
-            let code = '';
-            for (let i = 0; i < 8; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
-        }
-
-        window.joinRoom = async function() {
-            const roomCode = document.getElementById('room-code-input').value.trim();
-            if(!roomCode || roomCode.length !== 8) {
-                showBeautifulAlert('warning', 'تنبيه', 'يرجى إدخال رقم غرفة صحيح (8 أرقام)');
-                return;
-            }
-
-            try {
-                const roomDoc = await getDoc(doc(db, "rooms", roomCode));
-                if(!roomDoc.exists()) {
-                    showBeautifulAlert('error', 'خطأ', 'رقم الغرفة غير صحيح');
-                    return;
-                }
-
-                const roomData = roomDoc.data();
-                if(roomData.status !== 'waiting') {
-                    showBeautifulAlert('warning', 'تنبيه', 'الغرفة غير متاحة للدخول');
-                    return;
-                }
-
-                if(roomData.host.grade !== userData.grade) {
-                    showBeautifulAlert('warning', 'تنبيه', `هذه الغرفة مخصصة لطلاب ${getGradeName(roomData.host.grade)} فقط`);
-                    return;
-                }
-
-                currentRoomId = roomCode;
-                isRoomHost = false;
-                roomReadyState = false;
-
-                await updateDoc(doc(db, "rooms", roomCode), {
-                    guest: {
-                        uid: currentUser.uid,
-                        name: userData.name,
-                        photo: userData.photo,
-                        grade: userData.grade,
-                        ready: false
-                    },
-                    lastUpdated: serverTimestamp()
-                });
-
-                openRoomScreen(roomCode);
-
-            } catch (error) {
-                console.error("Error joining room:", error);
-                showBeautifulAlert('error', 'خطأ', 'حدث خطأ أثناء الدخول إلى الغرفة');
-            }
-        };
-
-        function openRoomScreen(roomCode) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-friend-challenge').classList.add('active');
-            
-            listenToRoom(roomCode);
-        }
-
-        function listenToRoom(roomCode) {
-            if(roomListenerUnsubscribe) roomListenerUnsubscribe();
-            
-            roomListenerUnsubscribe = onSnapshot(doc(db, "rooms", roomCode), async (snap) => {
-                if(!snap.exists()) {
-                    showBeautifulAlert('warning', 'تم الإغلاق', 'تم إغلاق الغرفة');
-                    backToChallenges();
-                    return;
-                }
-
-                const roomData = snap.data();
-                renderRoom(roomData);
-
-                if(roomData.status === 'starting' && roomData.matchId) {
-                    startRoomMatch(roomData.matchId);
-                }
-            });
-        }
-
-        function renderRoom(roomData) {
-            const content = document.getElementById('room-content');
-            const host = roomData.host;
-            const guest = roomData.guest;
-            const totalPlayers = guest ? 2 : 1;
-            const readyCount = (host.ready ? 1 : 0) + (guest?.ready ? 1 : 0);
-
-            content.innerHTML = `
-                <div class="room-counter">${totalPlayers}/${readyCount}</div>
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">غرفة التحدي</h2>
-                    <div class="room-code-display">${roomData.code}</div>
-                    <button onclick="copyRoomCode('${roomData.code}')" class="text-indigo-600 text-sm font-bold flex items-center justify-center gap-2 mx-auto">
-                        <i class="fas fa-copy"></i> نسخ رقم الغرفة
-                    </button>
-                </div>
-
-                <div class="mb-6">
-                    <div class="room-user-card ${host.ready ? 'ready' : ''}">
-                        <img src="${host.photo}" class="room-user-avatar">
-                        <div class="flex-1">
-                            <p class="font-bold text-gray-800">${host.name} (مضيف)</p>
-                            <p class="text-xs text-gray-500">${getGradeName(host.grade)}</p>
-                        </div>
-                        <div class="text-right">
-                            ${host.ready ? '<span class="text-green-600 font-bold">مستعد ✓</span>' : '<span class="text-gray-400">في انتظار...</span>'}
-                        </div>
-                    </div>
-
-                    ${guest ? `
-                    <div class="room-user-card ${guest.ready ? 'ready' : ''}">
-                        <img src="${guest.photo}" class="room-user-avatar">
-                        <div class="flex-1">
-                            <p class="font-bold text-gray-800">${guest.name}</p>
-                            <p class="text-xs text-gray-500">${getGradeName(guest.grade)}</p>
-                        </div>
-                        <div class="text-right">
-                            ${guest.ready ? '<span class="text-green-600 font-bold">مستعد ✓</span>' : '<span class="text-gray-400">في انتظار...</span>'}
-                        </div>
-                    </div>
-                    ` : `
-                    <div class="room-user-card">
-                        <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-                            <i class="fas fa-user-plus text-gray-400"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-gray-400">في انتظار لاعب آخر...</p>
-                        </div>
-                    </div>
-                    `}
-                </div>
-
-                <div class="fixed bottom-20 left-0 right-0 p-4 bg-white border-t">
-                    <div class="flex gap-3">
-                        ${isRoomHost ? `
-                        <button onclick="deleteRoom()" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold">
-                            <i class="fas fa-trash"></i> حذف الغرفة
-                        </button>
-                        ` : `
-                        <button onclick="leaveRoom()" class="flex-1 bg-gray-500 text-white py-3 rounded-xl font-bold">
-                            <i class="fas fa-sign-out-alt"></i> مغادرة
-                        </button>
-                        `}
-                        
-                        <button onclick="toggleReady()" class="flex-1 ${roomReadyState ? 'bg-gray-500' : 'bg-green-500'} text-white py-3 rounded-xl font-bold">
-                            ${roomReadyState ? 'إلغاء الاستعداد' : 'مستعد'}
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        window.copyRoomCode = function(code) {
-            navigator.clipboard.writeText(code)
-                .then(() => {
-                    showBeautifulAlert('success', 'تم النسخ', 'تم نسخ رقم الغرفة إلى الحافظة');
-                })
-                .catch(err => {
-                    const tempInput = document.createElement('input');
-                    tempInput.value = code;
-                    document.body.appendChild(tempInput);
-                    tempInput.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(tempInput);
-                    showBeautifulAlert('success', 'تم النسخ', 'تم نسخ رقم الغرفة إلى الحافظة');
-                });
-        };
-
-        window.toggleReady = async function() {
-            try {
-                roomReadyState = !roomReadyState;
-                const field = isRoomHost ? 'host.ready' : 'guest.ready';
-                
-                await updateDoc(doc(db, "rooms", currentRoomId), {
-                    [field]: roomReadyState,
-                    lastUpdated: serverTimestamp()
-                });
-
-                const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
-                const roomData = roomDoc.data();
-                
-                const hostReady = roomData.host.ready;
-                const guestReady = roomData.guest?.ready || false;
-                
-                if(hostReady && guestReady && roomData.guest) {
-                    await startRoomGame(roomData);
-                }
-
-            } catch (error) {
-                console.error("Error toggling ready:", error);
-            }
-        };
-
-        async function startRoomGame(roomData) {
-            try {
-                const qDocs = await getQuestions(roomData.subject, roomData.questionType);
-                if(qDocs.length === 0) {
-                    showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية');
-                    return;
-                }
-
-                const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
-                const matchRef = collection(db, "match_queue");
-                const newMatch = await addDoc(matchRef, {
-                    group: `room_${currentRoomId}`,
-                    status: 'active',
-                    grade: roomData.host.grade,
-                    player1: {
-                        uid: roomData.host.uid,
-                        name: roomData.host.name,
-                        score: 0,
-                        photo: roomData.host.photo,
-                        grade: roomData.host.grade
-                    },
-                    player2: {
-                        uid: roomData.guest.uid,
-                        name: roomData.guest.name,
-                        score: 0,
-                        photo: roomData.guest.photo,
-                        grade: roomData.guest.grade
-                    },
-                    questions: shuffledQs,
-                    currentIdx: 0,
-                    answersCount: 0,
-                    player1LastActive: Date.now(),
-                    player2LastActive: Date.now(),
-                    lastActivity: Date.now(),
-                    createdAt: serverTimestamp()
-                });
-
-                await updateDoc(doc(db, "rooms", currentRoomId), {
-                    status: 'starting',
-                    matchId: newMatch.id,
-                    lastUpdated: serverTimestamp()
-                });
-
-            } catch (error) {
-                console.error("Error starting room game:", error);
-                showBeautifulAlert('error', 'خطأ', 'حدث خطأ أثناء بدء اللعبة');
-            }
-        }
-
-        async function startRoomMatch(matchId) {
-            if(roomListenerUnsubscribe) {
-                roomListenerUnsubscribe();
-                roomListenerUnsubscribe = null;
-            }
-
-            await deleteDoc(doc(db, "rooms", currentRoomId));
-            currentRoomId = null;
-            
-            currentMatchId = matchId;
-            currentGameMode = 'online';
-            listenToMatch(matchId);
-        }
-
-        window.deleteRoom = async function() {
-            if(confirm('هل أنت متأكد من حذف الغرفة؟')) {
-                if(currentRoomId) {
-                    await deleteDoc(doc(db, "rooms", currentRoomId));
-                }
-                backToChallenges();
-            }
-        };
-
-        window.leaveRoom = async function() {
-            if(confirm('هل أنت متأكد من مغادرة الغرفة؟')) {
-                try {
-                    const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
-                    if(roomDoc.exists()) {
-                        const roomData = roomDoc.data();
-                        if(roomData.guest && roomData.guest.uid === currentUser.uid) {
-                            await updateDoc(doc(db, "rooms", currentRoomId), {
-                                guest: null,
-                                lastUpdated: serverTimestamp()
-                            });
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error leaving room:", error);
-                }
-                
-                backToChallenges();
-            }
-        };
-
-        window.switchTab = (tab) => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('tab-'+tab).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(n => { 
-                n.classList.remove('active'); 
-                n.classList.remove('text-indigo-600'); 
-                n.classList.add('text-gray-400'); 
-            });
-            
-            const navs = document.querySelectorAll('.nav-item');
-            if(tab==='challenges') navs[0].classList.add('active', 'text-indigo-600');
-            if(tab==='leaderboard') { 
-                navs[1].classList.add('active', 'text-indigo-600'); 
-                loadLeaderboard(); 
-            }
-            if(tab==='schedule') { 
-                navs[2].classList.add('active', 'text-indigo-600'); 
-                initSchedule(); 
-            }
-            if(tab==='profile') navs[3].classList.add('active', 'text-indigo-600');
         };
 
         function initUploadQuestions() {
@@ -5274,179 +4812,171 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
         };
 
         async function loadReviewQuestions() {
-    const listDiv = document.getElementById('review-questions-list');
-    
-    // تحقق إذا المستخدم أدمن
-    if (!userData || userData.email !== ADMIN_EMAIL) {
-        listDiv.innerHTML = `
-            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
-                <i class="fas fa-shield-alt text-yellow-500 text-3xl mb-3"></i>
-                <p class="text-yellow-700 font-bold">⛔ صلاحية محدودة</p>
-                <p class="text-gray-600 text-sm mt-2">هذا القسم مخصص للإدارة فقط</p>
-            </div>
-        `;
-        return;
-    }
-    
-    listDiv.innerHTML = '<p class="text-center text-gray-400 animate-pulse">📥 جاري تحميل الأسئلة للمراجعة...</p>';
-    
-    try {
-        // استعلام لجلب الأسئلة المعلقة
-        const q = query(collection(db, "pending_questions"), where("status", "==", "pending"));
-        const snapshot = await getDocs(q);
-        
-        if (snapshot.empty) {
-            listDiv.innerHTML = `
-                <div class="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
-                    <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
-                    <p class="text-green-700 font-bold">🎉 كل الأسئلة تمت مراجعتها</p>
-                    <p class="text-gray-600 text-sm mt-2">لا توجد أسئلة جديدة</p>
-                </div>
-            `;
-            return;
-        }
-        
-        console.log(`✅ تم العثور على ${snapshot.size} سؤال للمراجعة`);
-        
-        // تحويل البيانات إلى مصفوفة للترتيب
-        let questions = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            questions.push({
-                id: doc.id,
-                ...data,
-                // تاريخ الإنشاء (إذا ما موجود، استخدم تاريخ الآن)
-                createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
-                timestamp: data.createdAt ? data.createdAt.toDate().getTime() : Date.now()
-            });
-        });
-        
-        // **الترتيب: من الأحدث إلى الأقدم**
-        questions.sort((a, b) => b.timestamp - a.timestamp);
-        
-        console.log("📊 الأسئلة بعد الترتيب:", questions);
-        
-        // عرض الأسئلة مرتبة
-        let html = `
-            <div class="mb-4 p-3 bg-indigo-50 rounded-xl border border-indigo-100">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="font-bold text-indigo-700 text-sm">عدد الأسئلة: ${questions.length}</p>
-                        <p class="text-xs text-indigo-500">(من الأحدث للأقدم)</p>
-                    </div>
-                    <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">
-                        🔄 مرتبة تلقائياً
-                    </span>
-                </div>
-            </div>
-        `;
-        
-        questions.forEach((item, index) => {
-            const data = item;
+            const listDiv = document.getElementById('review-questions-list');
             
-            // تاريخ النشر بصيغة جميلة
-            const dateStr = data.createdAt.toLocaleDateString('ar-EG', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            
-            let answersHtml = '';
-            if (data.type === 'mcq') {
-                answersHtml = `
-                    <div class="upload-question-answers mt-3">
-                        <p class="text-xs text-gray-500 mb-2 font-bold">الخيارات:</p>
-                        ${(data.answers || []).map((ans, idx) => `
-                            <div class="upload-question-answer ${idx === data.correct ? 'upload-question-correct' : ''}">
-                                <span class="font-bold">${idx + 1}.</span> ${ans || '...'}
-                                ${idx === data.correct ? '<span class="text-green-500 text-xs mr-2">✓ صح</span>' : ''}
-                            </div>
-                        `).join('')}
+            if (!userData || userData.email !== ADMIN_EMAIL) {
+                listDiv.innerHTML = `
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+                        <i class="fas fa-shield-alt text-yellow-500 text-3xl mb-3"></i>
+                        <p class="text-yellow-700 font-bold">⛔ صلاحية محدودة</p>
+                        <p class="text-gray-600 text-sm mt-2">هذا القسم مخصص للإدارة فقط</p>
                     </div>
                 `;
-            } else {
-                answersHtml = `
-                    <div class="upload-question-answers mt-3">
-                        <p class="text-xs text-gray-500 mb-2 font-bold">الإجابة الصحيحة:</p>
-                        <div class="upload-question-answer ${data.correct ? 'upload-question-correct' : ''}">
-                            ${data.correct ? '✅ صح' : '❌ خطأ'}
-                        </div>
-                    </div>
-                `;
+                return;
             }
             
-            html += `
-                <div class="upload-question-item mb-4 border-l-4 ${index === 0 ? 'border-l-blue-500' : 'border-l-gray-300'}">
-                    <div class="upload-question-header">
-                        <div class="flex justify-between items-start">
-                            <div class="flex gap-2 flex-wrap">
-                                <span class="upload-question-grade">${data.grade ? getGradeName(data.grade) : 'غير محدد'}</span>
-                                <span class="upload-question-subject" style="background:#10b981">${data.subject || 'غير محدد'}</span>
-                                <span class="upload-question-type">${data.type === 'mcq' ? 'اختيارات' : 'صح/خطأ'}</span>
-                                ${index === 0 ? '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">🆕 الأحدث</span>' : ''}
-                            </div>
-                            <div class="text-xs text-gray-500" title="${data.createdAt.toISOString()}">
-                                📅 ${dateStr}
-                            </div>
+            listDiv.innerHTML = '<p class="text-center text-gray-400 animate-pulse">📥 جاري تحميل الأسئلة للمراجعة...</p>';
+            
+            try {
+                const q = query(collection(db, "pending_questions"), where("status", "==", "pending"));
+                const snapshot = await getDocs(q);
+                
+                if (snapshot.empty) {
+                    listDiv.innerHTML = `
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+                            <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
+                            <p class="text-green-700 font-bold">🎉 كل الأسئلة تمت مراجعتها</p>
+                            <p class="text-gray-600 text-sm mt-2">لا توجد أسئلة جديدة</p>
                         </div>
-                    </div>
-                    
-                    <p class="upload-question-text mt-3">${data.question || 'لا يوجد نص للسؤال'}</p>
-                    
-                    ${answersHtml}
-                    
-                    <div class="mt-4 pt-3 border-t border-gray-100">
+                    `;
+                    return;
+                }
+                
+                console.log(`✅ تم العثور على ${snapshot.size} سؤال للمراجعة`);
+                
+                let questions = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    questions.push({
+                        id: doc.id,
+                        ...data,
+                        createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+                        timestamp: data.createdAt ? data.createdAt.toDate().getTime() : Date.now()
+                    });
+                });
+                
+                questions.sort((a, b) => b.timestamp - a.timestamp);
+                
+                console.log("📊 الأسئلة بعد الترتيب:", questions);
+                
+                let html = `
+                    <div class="mb-4 p-3 bg-indigo-50 rounded-xl border border-indigo-100">
                         <div class="flex justify-between items-center">
-                            <p class="upload-sender text-sm">
-                                <span class="text-gray-500">📤 مرسل:</span>
-                                <span class="font-bold text-purple-600 mr-2">${data.senderName || data.senderId || 'مجهول'}</span>
-                            </p>
-                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                                #${index + 1}
+                            <div>
+                                <p class="font-bold text-indigo-700 text-sm">عدد الأسئلة: ${questions.length}</p>
+                                <p class="text-xs text-indigo-500">(من الأحدث للأقدم)</p>
+                            </div>
+                            <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">
+                                🔄 مرتبة تلقائياً
                             </span>
                         </div>
                     </div>
+                `;
+                
+                questions.forEach((item, index) => {
+                    const data = item;
                     
-                    <div class="upload-question-buttons mt-4">
-                        <button onclick="acceptQuestion('${item.id}')" class="upload-accept-btn hover:scale-105 transition">
-                            <i class="fas fa-check"></i> قبول السؤال (+5 نقاط للمرسل)
+                    const dateStr = data.createdAt.toLocaleDateString('ar-EG', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    let answersHtml = '';
+                    if (data.type === 'mcq') {
+                        answersHtml = `
+                            <div class="upload-question-answers mt-3">
+                                <p class="text-xs text-gray-500 mb-2 font-bold">الخيارات:</p>
+                                ${(data.answers || []).map((ans, idx) => `
+                                    <div class="upload-question-answer ${idx === data.correct ? 'upload-question-correct' : ''}">
+                                        <span class="font-bold">${idx + 1}.</span> ${ans || '...'}
+                                        ${idx === data.correct ? '<span class="text-green-500 text-xs mr-2">✓ صح</span>' : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    } else {
+                        answersHtml = `
+                            <div class="upload-question-answers mt-3">
+                                <p class="text-xs text-gray-500 mb-2 font-bold">الإجابة الصحيحة:</p>
+                                <div class="upload-question-answer ${data.correct ? 'upload-question-correct' : ''}">
+                                    ${data.correct ? '✅ صح' : '❌ خطأ'}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    html += `
+                        <div class="upload-question-item mb-4 border-l-4 ${index === 0 ? 'border-l-blue-500' : 'border-l-gray-300'}">
+                            <div class="upload-question-header">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex gap-2 flex-wrap">
+                                        <span class="upload-question-grade">${data.grade ? getGradeName(data.grade) : 'غير محدد'}</span>
+                                        <span class="upload-question-subject" style="background:#10b981">${data.subject || 'غير محدد'}</span>
+                                        <span class="upload-question-type">${data.type === 'mcq' ? 'اختيارات' : 'صح/خطأ'}</span>
+                                        ${index === 0 ? '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">🆕 الأحدث</span>' : ''}
+                                    </div>
+                                    <div class="text-xs text-gray-500" title="${data.createdAt.toISOString()}">
+                                        📅 ${dateStr}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p class="upload-question-text mt-3">${data.question || 'لا يوجد نص للسؤال'}</p>
+                            
+                            ${answersHtml}
+                            
+                            <div class="mt-4 pt-3 border-t border-gray-100">
+                                <div class="flex justify-between items-center">
+                                    <p class="upload-sender text-sm">
+                                        <span class="text-gray-500">📤 مرسل:</span>
+                                        <span class="font-bold text-purple-600 mr-2">${data.senderName || data.senderId || 'مجهول'}</span>
+                                    </p>
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                                        #${index + 1}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="upload-question-buttons mt-4">
+                                <button onclick="acceptQuestion('${item.id}')" class="upload-accept-btn hover:scale-105 transition">
+                                    <i class="fas fa-check"></i> قبول السؤال (+5 نقاط للمرسل)
+                                </button>
+                                <button onclick="rejectQuestion('${item.id}')" class="upload-reject-btn hover:scale-105 transition">
+                                    <i class="fas fa-times"></i> رفض السؤال
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                    <div class="mt-6 text-center">
+                        <button onclick="loadReviewQuestions()" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-200 transition flex items-center gap-2 mx-auto">
+                            <i class="fas fa-sync-alt"></i> تحديث القائمة
                         </button>
-                        <button onclick="rejectQuestion('${item.id}')" class="upload-reject-btn hover:scale-105 transition">
-                            <i class="fas fa-times"></i> رفض السؤال
+                        <p class="text-xs text-gray-400 mt-2">آخر تحديث: ${new Date().toLocaleTimeString('ar-EG')}</p>
+                    </div>
+                `;
+                
+                listDiv.innerHTML = html;
+                
+            } catch (error) {
+                console.error("❌ خطأ في تحميل الأسئلة:", error);
+                listDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
+                        <p class="text-red-700 font-bold">فشل في تحميل الأسئلة</p>
+                        <p class="text-red-600 text-sm mt-2">${error.message || 'خطأ غير معروف'}</p>
+                        <button onclick="loadReviewQuestions()" class="mt-4 bg-red-100 text-red-700 px-6 py-2 rounded-lg font-bold hover:bg-red-200 transition">
+                            <i class="fas fa-redo"></i> إعادة المحاولة
                         </button>
                     </div>
-                </div>
-            `;
-        });
-        
-        // زر تحديث في الأسفل
-        html += `
-            <div class="mt-6 text-center">
-                <button onclick="loadReviewQuestions()" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-200 transition flex items-center gap-2 mx-auto">
-                    <i class="fas fa-sync-alt"></i> تحديث القائمة
-                </button>
-                <p class="text-xs text-gray-400 mt-2">آخر تحديث: ${new Date().toLocaleTimeString('ar-EG')}</p>
-            </div>
-        `;
-        
-        listDiv.innerHTML = html;
-        
-    } catch (error) {
-        console.error("❌ خطأ في تحميل الأسئلة:", error);
-        listDiv.innerHTML = `
-            <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-                <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
-                <p class="text-red-700 font-bold">فشل في تحميل الأسئلة</p>
-                <p class="text-red-600 text-sm mt-2">${error.message || 'خطأ غير معروف'}</p>
-                <button onclick="loadReviewQuestions()" class="mt-4 bg-red-100 text-red-700 px-6 py-2 rounded-lg font-bold hover:bg-red-200 transition">
-                    <i class="fas fa-redo"></i> إعادة المحاولة
-                </button>
-            </div>
-        `;
-    }
-}
+                `;
+            }
+        }
 
         window.acceptQuestion = async function(questionId) {
             try {
@@ -5502,1004 +5032,489 @@ if (localStorage.getItem('device_banned') === 'true' && userData.email !== ADMIN
                 showBeautifulAlert('error', 'خطأ', 'حدث خطأ في رفض السؤال');
             }
         };
-        
-        // نظام مراقبة الإنترنت وإنهاء المباراة فوراً
-let networkCheckInterval = null;
-let lastPingTime = null;
-let networkCheckCounter = 0;
-const MAX_MISSED_PINGS = 3; // إذا فات 3 مرات متتالية، يعتبر انقطع
 
-function startNetworkMonitoring() {
-    if (networkCheckInterval) clearInterval(networkCheckInterval);
-    lastPingTime = Date.now();
-    networkCheckCounter = 0;
-    
-    networkCheckInterval = setInterval(async () => {
-        try {
-            // فحص الاتصال عن طريق ping صغير
-            const response = await fetch('https://www.google.com/favicon.ico', {
-                method: 'HEAD',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                timeout: 2000
-            });
-            
-            lastPingTime = Date.now();
-            networkCheckCounter = 0;
-        } catch (error) {
-            networkCheckCounter++;
-            console.log(`فشل في الاتصال (${networkCheckCounter}/${MAX_MISSED_PINGS})`);
-            
-            if (networkCheckCounter >= MAX_MISSED_PINGS) {
-                // انقطع الإنترنت نهائياً
-                console.log("انقطع الإنترنت - إنهاء المباراة فوراً");
-                handleNetworkDisconnection();
-            }
-        }
-    }, 2000); // كل 2 ثانية
-}
-
-function handleNetworkDisconnection() {
-    if (isExitingGame) return;
-    
-    // إيقاف كل المؤقتات
-    if (networkCheckInterval) clearInterval(networkCheckInterval);
-    clearInterval(gameTimer);
-    
-    // إذا كان في مباراة حالية
-    if (currentMatchId && currentGameMode === 'online') {
-        // أخذ البيانات الحالية للمباراة
-        getDoc(doc(db, "match_queue", currentMatchId)).then(matchDoc => {
-            if (matchDoc.exists()) {
-                const matchData = matchDoc.data();
-                const isP1 = matchData.player1.uid === currentUser.uid;
-                const opponentId = isP1 ? matchData.player2.uid : matchData.player1.uid;
-                
-                // خصم 10 نقاط من المنقطع وإعطائها للخصم
-                const penalty = -10;
-                
-                // تحديث النقاط في قاعدة البيانات
-                updateDoc(doc(db, "users", currentUser.uid), {
-                    points: increment(penalty)
-                });
-                
-                if (opponentId !== 'AI_BOT') {
-                    updateDoc(doc(db, "users", opponentId), {
-                        points: increment(10)
-                    });
-                }
-                
-                // حذف المباراة من السيرفر
-                deleteDoc(doc(db, "match_queue", currentMatchId));
-                
-                // إظهار نتيجة الانسحاب
-                showNetworkDisconnectionResult(isP1 ? matchData.player2.name : matchData.player1.name);
-            }
-        }).catch(() => {
-            // إذا فشل الاتصال بالسيرفر، نعرض النتيجة محلياً
-            showNetworkDisconnectionResult("الخصم");
-        });
-    } else if (currentGameMode === 'ai') {
-        // في حالة الذكاء الاصطناعي
-        updateDoc(doc(db, "users", currentUser.uid), {
-            points: increment(-10)
-        });
-        
-        showNetworkDisconnectionResult("الذكاء الاصطناعي");
-    }
-    
-    // إعادة تعيين المتغيرات
-    isExitingGame = true;
-    currentMatchId = null;
-    localMatchData = null;
-}
-
-function showNetworkDisconnectionResult(opponentName) {
-    // إخفاء واجهة اللعب
-    document.getElementById('game-overlay').classList.add('hidden');
-    document.getElementById('searching-ui').classList.add('hidden');
-    
-    // إظهار شاشة الخسارة بسبب الانقطاع
-    const resultScreen = document.getElementById('result-screen');
-    const iconContainer = document.getElementById('result-icon-container');
-    const title = document.getElementById('result-title');
-    const msg = document.getElementById('result-msg');
-    const myScore = document.getElementById('final-my-score');
-    const opScore = document.getElementById('final-op-score');
-    const opName = document.getElementById('final-op-name');
-    const pointsGained = document.getElementById('result-points-gained-text');
-    
-    iconContainer.innerText = "📡";
-    title.innerText = "انقطع الاتصال";
-    msg.innerText = "فقدت الاتصال بالإنترنت";
-    myScore.innerText = "0";
-    opScore.innerText = "10";
-    opName.innerText = opponentName;
-    pointsGained.innerText = "-10";
-    pointsGained.style.color = "#ef4444";
-    
-    resultScreen.classList.remove('hidden');
-}
-
-// إضافة هذه الدوال عند بدء المباراة
-function addNetworkMonitoringToGame() {
-    // بدء مراقبة الشبكة عند بدء المباراة
-    startNetworkMonitoring();
-    
-    // إضافة مراقبة لتغيير حالة الشبكة
-    window.addEventListener('online', () => {
-        console.log("تم استعادة الاتصال بالإنترنت");
-        networkCheckCounter = 0;
-    });
-    
-    window.addEventListener('offline', () => {
-        console.log("فقدت الاتصال بالإنترنت");
-        handleNetworkDisconnection();
-    });
-}
-
-// نظام صارم للمؤقت والانتقال الفوري بين الأسئلة
-let strictTimer = null;
-let questionStartTime = null;
-const QUESTION_TIME_LIMIT = 15000; // 15 ثانية
-
-function startStrictTimer() {
-    if (strictTimer) clearInterval(strictTimer);
-    
-    let timeLeft = QUESTION_TIME_LIMIT / 1000; // تحويل إلى ثواني
-    updateTimerDisplay(timeLeft);
-    questionStartTime = Date.now();
-    
-    strictTimer = setInterval(() => {
-        timeLeft--;
-        updateTimerDisplay(timeLeft);
-        
-        if (timeLeft <= 0) {
-            clearInterval(strictTimer);
-            forceNextQuestion();
-        }
-    }, 1000);
-}
-
-function updateTimerDisplay(seconds) {
-    const timerElement = document.getElementById('game-timer');
-    if (timerElement) {
-        timerElement.innerText = seconds;
-        
-        // تغيير اللون عند اقتراب انتهاء الوقت
-        if (seconds <= 5) {
-            timerElement.style.backgroundColor = '#ef4444';
-            timerElement.style.color = 'white';
-            timerElement.style.animation = 'pulse 0.5s infinite';
-        } else if (seconds <= 10) {
-            timerElement.style.backgroundColor = '#f59e0b';
-            timerElement.style.color = 'white';
-        } else {
-            timerElement.style.backgroundColor = '#1f2937';
-            timerElement.style.color = 'white';
-            timerElement.style.animation = '';
-        }
-    }
-}
-
-async function forceNextQuestion() {
-    if (hasAnsweredCurrentQ || isExitingGame) return;
-    
-    console.log("انتهى الوقت - الانتقال الفوري للسؤال التالي");
-    
-    // إظهار الإجابة الصحيحة حتى لو لم يجيب اللاعب
-    const answerButtons = document.querySelectorAll('#answers-container button');
-    answerButtons.forEach(btn => {
-        btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
-        if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) {
-            btn.classList.add('answer-correct');
-        } else {
-            btn.classList.add('answer-neutral');
-        }
-    });
-    
-    document.getElementById('answers-container').classList.add('pointer-events-none', 'opacity-50');
-    
-    // إرسال الإجابة كـ "خطأ" أو "لم يجب"
-    if (currentGameMode === 'online') {
-        if (currentMatchId) {
-            const isP1 = localMatchData?.player1?.uid === currentUser.uid;
-            
-            await robustConnection.executeWithRetry(async () => {
-                await updateDoc(doc(db, "match_queue", currentMatchId), {
-                    answersCount: increment(1),
-                    lastActivity: Date.now()
-                });
-            }, `forceNext-${Date.now()}`);
-        }
-    }
-    
-    // الانتقال للسؤال التالي بعد تأخير قصير
-    setTimeout(() => {
-        moveToNextQuestion();
-    }, 1000);
-}
-
-async function moveToNextQuestion() {
-    if (isExitingGame) return;
-    
-    if (currentGameMode === 'online' && currentMatchId) {
-        // للمباريات الجماعية
-        const matchDoc = await getDoc(doc(db, "match_queue", currentMatchId));
-        if (matchDoc.exists()) {
-            const matchData = matchDoc.data();
-            
-            if (matchData.currentIdx + 1 >= matchData.questions.length) {
-                // آخر سؤال - إنهاء المباراة
-                endGame(matchData);
-            } else {
-                // الانتقال للسؤال التالي
-                await updateDoc(doc(db, "match_queue", currentMatchId), {
-                    currentIdx: increment(1),
-                    answersCount: 0
-                });
-            }
-        }
-    } else if (currentGameMode === 'ai' && localMatchData) {
-        // للذكاء الاصطناعي
-        if (localMatchData.currentIdx + 1 >= localMatchData.questions.length) {
-            endGame(localMatchData);
-        } else {
-            localMatchData.currentIdx += 1;
-            localMatchData.answersCount = 0;
-            
-            // بدء السؤال الجديد
-            setTimeout(() => {
-                renderGameWithTimer(localMatchData);
-            }, 500);
-        }
-    }
-}
-
-// تعديل دالة renderGame لاستخدام النظام الصارم
-function renderGameWithTimer(data) {
-    if (isExitingGame) return;
-    
-    // إيقاف أي مؤقت سابق
-    if (strictTimer) clearInterval(strictTimer);
-    
-    // إعادة تعيين حالة الإجابة
-    hasAnsweredCurrentQ = false;
-    userAnsweredCorrectly = false;
-    
-    const totalQs = data.questions.length;
-    if(!data.questions || data.currentIdx >= totalQs) { 
-        endGame(data); 
-        return; 
-    }
-    
-    if (currentGameMode === 'online' && data.answersCount >= 2) {
-        // إذا أجاب كلا اللاعبين
-        setTimeout(() => {
-            moveToNextQuestion();
-        }, 1000);
-        return;
-    }
-    
-    const q = data.questions[data.currentIdx];
-    if (!q) { 
-        endGame(data); 
-        return; 
-    }
-    
-    // تحديث واجهة اللاعبين
-    if (currentGameMode === 'online') {
-        const isP1 = data.player1.uid === currentUser.uid;
-        document.getElementById('p1-name').innerText = userData.name;
-        document.getElementById('game-p1-img').src = userData.photo;
-        document.getElementById('p2-name').innerText = isP1 ? data.player2.name : data.player1.name;
-        document.getElementById('game-p2-img').src = isP1 ? data.player2.photo : data.player1.photo;
-        document.getElementById('game-my-score').innerText = isP1 ? data.player1.score : data.player2.score;
-        document.getElementById('game-op-score').innerText = isP1 ? data.player2.score : data.player1.score;
-    } else {
-        document.getElementById('p1-name').innerText = userData.name;
-        document.getElementById('game-p1-img').src = userData.photo;
-        document.getElementById('p2-name').innerText = data.player2.name;
-        document.getElementById('game-p2-img').src = data.player2.photo;
-        document.getElementById('game-my-score').innerText = data.player1.score;
-        document.getElementById('game-op-score').innerText = data.player2.score;
-    }
-    
-    // تحديث تقدم الأسئلة
-    document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
-    
-    // عرض السؤال
-    document.getElementById('q-text').innerText = q.question;
-    
-    // عرض الخيارات
-    const div = document.getElementById('answers-container');
-    div.innerHTML = '';
-    div.classList.remove('pointer-events-none', 'opacity-50');
-    
-    let ansList = [];
-    if(q.type === 'mcq') ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
-    else ansList = [
-        { txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, 
-        { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }
-    ];
-    
-    const correctAns = ansList.find(ans => ans.isCorrect);
-    if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
-    
-    ansList.sort(() => 0.5 - Math.random());
-    
-    ansList.forEach(ansObj => {
-        const btn = document.createElement('button');
-        btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
-        btn.innerText = ansObj.txt;
-        btn.dataset.value = ansObj.value;
-        btn.onclick = () => { 
-            if(hasAnsweredCurrentQ) return; 
-            handleStrictAnswer(ansObj, q, data); 
+        // نظام الغرف الجديد
+        window.openPlayFriendModal = function() {
+            document.getElementById('play-friend-modal').classList.remove('hidden');
         };
-        div.appendChild(btn);
-    });
-    
-    // بدء المؤقت الصارم
-    startStrictTimer();
-    
-    // إخفاء رسائل الانتظار
-    document.getElementById('waiting-msg').classList.add('hidden');
-    document.getElementById('ai-thinking-msg').classList.add('hidden');
-}
 
-async function handleStrictAnswer(ansObj, q, matchData) {
-    if(hasAnsweredCurrentQ || isExitingGame) return;
-    
-    hasAnsweredCurrentQ = true;
-    userAnsweredCorrectly = ansObj && ansObj.isCorrect;
-    
-    // إيقاف المؤقت
-    if (strictTimer) clearInterval(strictTimer);
-    
-    // إظهار الإجابة الصحيحة والخاطئة
-    const answerButtons = document.querySelectorAll('#answers-container button');
-    answerButtons.forEach(btn => {
-        btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
-        if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) {
-            btn.classList.add('answer-correct');
-        } else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) {
-            btn.classList.add('answer-wrong');
-        } else {
-            btn.classList.add('answer-neutral');
-        }
-    });
-    
-    document.getElementById('answers-container').classList.add('pointer-events-none');
-    
-    if (currentGameMode === 'online') {
-        document.getElementById('waiting-msg').classList.remove('hidden');
-        
-        const isP1 = matchData.player1.uid === currentUser.uid;
-        if (!currentMatchId) return;
-        
-        const scoreIncrement = ansObj && ansObj.isCorrect ? 1 : 0;
-        
-        await robustConnection.executeWithRetry(async () => {
-            const updates = { 
-                answersCount: increment(1),
-                lastActivity: Date.now()
+        window.createRoom = async function() {
+            document.getElementById('play-friend-modal').classList.add('hidden');
+            document.getElementById('create-room-modal').classList.remove('hidden');
+            
+            const subjectSelect = document.getElementById('room-subject');
+            subjectSelect.innerHTML = '<option value="">اختر المادة</option>';
+            
+            if (userData.grade && subjects[userData.grade]) {
+                subjects[userData.grade].forEach(sub => {
+                    subjectSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+                });
+            }
+            
+            selectedRoomQType = null;
+            document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition`;
+            document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition`;
+        };
+
+        window.setRoomQType = function(t) {
+            selectedRoomQType = t;
+            document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 font-bold transition flex-1 ${t==='mcq'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
+            document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 font-bold transition flex-1 ${t==='tf'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
+            document.getElementById('room-qtype').value = t;
+        };
+
+        window.closeCreateRoomModal = function() {
+            document.getElementById('create-room-modal').classList.add('hidden');
+            document.getElementById('play-friend-modal').classList.remove('hidden');
+        };
+
+        window.proceedToRoom = async function() {
+            const subject = document.getElementById('room-subject').value;
+            const qtype = document.getElementById('room-qtype').value;
+            
+            if (!subject || !qtype) {
+                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
+                return;
+            }
+            
+            document.getElementById('create-room-modal').classList.add('hidden');
+            
+            const roomId = generateRoomId();
+            currentRoomId = roomId;
+            isRoomCreator = true;
+            
+            const roomData = {
+                id: roomId,
+                creator: currentUser.uid,
+                subject: subject,
+                qtype: qtype,
+                grade: userData.grade,
+                players: {
+                    [currentUser.uid]: {
+                        uid: currentUser.uid,
+                        name: userData.name,
+                        photo: userData.photo,
+                        ready: false,
+                        joinedAt: Date.now()
+                    }
+                },
+                readyCount: 0,
+                playerCount: 1,
+                status: 'waiting',
+                createdAt: Date.now(),
+                expiresAt: Date.now() + 10 * 60 * 1000
             };
             
-            if(ansObj && ansObj.isCorrect) {
-                updates[isP1 ? 'player1.score' : 'player2.score'] = increment(scoreIncrement);
-            }
-            
-            await updateDoc(doc(db, "match_queue", currentMatchId), updates);
-        }, `answer-${Date.now()}`);
-        
-    } else {
-        if(ansObj && ansObj.isCorrect) {
-            localMatchData.player1.score += 1;
-            document.getElementById('game-my-score').innerText = localMatchData.player1.score;
-        }
-        
-        // الذكاء الاصطناعي يجيب بعد تأخير قصير
-        setTimeout(() => {
-            const isCorrect = Math.random() < 0.6;
-            if(isCorrect) {
-                localMatchData.player2.score += 1;
-                document.getElementById('game-op-score').innerText = localMatchData.player2.score;
-            }
-            
-            // الانتقال للسؤال التالي بعد 1.5 ثانية
-            setTimeout(() => {
-                moveToNextQuestion();
-            }, 1500);
-        }, 1000);
-    }
-}
-
-// إضافة CSS للنبض
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-        100% { transform: scale(1); }
-    }
-`;
-document.head.appendChild(style);
-
-
-// نظام اتصال محسّن للإنترنت الضعيف
-let connectionMonitor = null;
-let retryCount = 0;
-const MAX_RETRIES = 5;
-const BASE_RETRY_DELAY = 1000;
-
-class RobustConnection {
-    constructor() {
-        this.connectionState = 'connected';
-        this.pendingOperations = [];
-        this.operationTimeouts = {};
-        this.connectionCheckInterval = null;
-    }
-    
-    startMonitoring() {
-        if (this.connectionCheckInterval) clearInterval(this.connectionCheckInterval);
-        
-        this.connectionCheckInterval = setInterval(() => {
-            this.checkConnectionQuality();
-        }, 3000); // فحص كل 3 ثواني
-    }
-    
-    async checkConnectionQuality() {
-        const testUrls = [
-            'https://firestore.googleapis.com',
-            'https://www.google.com',
-            'https://cloud.firestore.com'
-        ];
-        
-        let successfulChecks = 0;
-        
-        for (const url of testUrls) {
             try {
-                const startTime = Date.now();
-                await fetch(url + '/favicon.ico', {
-                    method: 'HEAD',
-                    mode: 'no-cors',
-                    cache: 'no-cache',
-                    signal: AbortSignal.timeout(3000)
-                });
-                const latency = Date.now() - startTime;
-                
-                if (latency < 5000) { // إذا كان التأخير أقل من 5 ثواني
-                    successfulChecks++;
-                }
+                await set(dbRef(rtdb, `rooms/${roomId}`), roomData);
+                await joinRoomById(roomId);
             } catch (error) {
-                console.log(`فشل الاتصال بـ ${url}`);
-            }
-        }
-        
-        if (successfulChecks >= 2) {
-            this.connectionState = 'good';
-        } else if (successfulChecks >= 1) {
-            this.connectionState = 'weak';
-            this.enableOfflineMode();
-        } else {
-            this.connectionState = 'disconnected';
-            this.handleDisconnection();
-        }
-        
-        console.log(`حالة الاتصال: ${this.connectionState}`);
-    }
-    
-    enableOfflineMode() {
-        // تفعيل وضع العمل بدون اتصال
-        console.log("تفعيل وضع العمل مع إنترنت ضعيف");
-        
-        // تخفيض جودة المزامنة
-        if (matchListenerUnsubscribe) {
-            matchListenerUnsubscribe();
-            // إعادة الاشتراك بفاصل أطول
-            listenToMatchWithRetry(currentMatchId);
-        }
-    }
-    
-    async handleDisconnection() {
-        console.log("الاتصال منقطع - محاولة إعادة الاتصال");
-        
-        if (retryCount < MAX_RETRIES) {
-            retryCount++;
-            const delay = BASE_RETRY_DELAY * Math.pow(2, retryCount - 1);
-            
-            console.log(`محاولة إعادة اتصال ${retryCount}/${MAX_RETRIES} بعد ${delay}ms`);
-            
-            setTimeout(() => {
-                this.attemptReconnection();
-            }, delay);
-        } else {
-            console.log("فشلت جميع محاولات إعادة الاتصال");
-            handleNetworkDisconnection();
-        }
-    }
-    
-    async attemptReconnection() {
-        try {
-            // اختبار اتصال بسيط
-            await fetch('https://www.google.com/favicon.ico', {
-                method: 'HEAD',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                signal: AbortSignal.timeout(5000)
-            });
-            
-            console.log("تمت إعادة الاتصال بنجاح");
-            retryCount = 0;
-            this.connectionState = 'connected';
-            
-            // إعادة تحميل المباراة
-            if (currentMatchId) {
-                listenToMatchWithRetry(currentMatchId);
-            }
-            
-        } catch (error) {
-            console.log("فشلت إعادة الاتصال");
-            this.handleDisconnection();
-        }
-    }
-    
-    async executeWithRetry(operation, operationId, maxRetries = 3) {
-        if (this.operationTimeouts[operationId]) {
-            clearTimeout(this.operationTimeouts[operationId]);
-        }
-        
-        let attempts = 0;
-        
-        const execute = async () => {
-            attempts++;
-            
-            try {
-                const result = await operation();
-                console.log(`نجحت العملية ${operationId} بعد ${attempts} محاولة`);
-                delete this.operationTimeouts[operationId];
-                return result;
-            } catch (error) {
-                if (attempts < maxRetries) {
-                    const delay = 1000 * attempts;
-                    console.log(`فشلت العملية ${operationId}، إعادة المحاولة بعد ${delay}ms`);
-                    
-                    this.operationTimeouts[operationId] = setTimeout(() => {
-                        execute();
-                    }, delay);
-                } else {
-                    console.log(`فشلت العملية ${operationId} بعد ${maxRetries} محاولات`);
-                    delete this.operationTimeouts[operationId];
-                    throw error;
-                }
+                console.error("Error creating room:", error);
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إنشاء الغرفة');
             }
         };
-        
-        return execute();
-    }
-}
 
-// إنشاء نسخة من النظام
-const robustConnection = new RobustConnection();
+        function generateRoomId() {
+            const chars = '0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
 
-// تعديل دالة listenToMatch لدعم إعادة المحاولة
-function listenToMatchWithRetry(id) {
-    if (matchListenerUnsubscribe) matchListenerUnsubscribe();
-    
-    let retryAttempts = 0;
-    const MAX_LISTENER_RETRIES = 3;
-    
-    const setupListener = () => {
-        try {
-            matchListenerUnsubscribe = onSnapshot(doc(db, "match_queue", id), async (snap) => {
-                if (isExitingGame) return;
+        window.joinRoom = function() {
+            const roomCode = document.getElementById('join-room-code').value.trim();
+            if (!roomCode) {
+                showBeautifulAlert('warning', 'تنبيه', 'يرجى إدخال كود الغرفة');
+                return;
+            }
+            
+            document.getElementById('play-friend-modal').classList.add('hidden');
+            document.getElementById('finding-room-modal').classList.remove('hidden');
+            document.getElementById('search-room-msg').innerText = `جاري الانضمام إلى الغرفة ${roomCode}...`;
+            
+            setTimeout(() => {
+                joinRoomById(roomCode);
+            }, 1000);
+        };
+
+        async function joinRoomById(roomId) {
+            try {
+                const roomRef = dbRef(rtdb, `rooms/${roomId}`);
+                const snapshot = await get(roomRef);
                 
-                if (!snap.exists()) {
-                    if (currentGameMode === 'online') {
-                        console.log("المباراة حذفت من السيرفر");
-                        return;
-                    }
+                if (!snapshot.exists()) {
+                    showBeautifulAlert('error', 'خطأ', 'الغرفة غير موجودة أو انتهت صلاحيتها');
+                    document.getElementById('finding-room-modal').classList.add('hidden');
+                    document.getElementById('play-friend-modal').classList.remove('hidden');
                     return;
                 }
                 
-                const d = snap.data();
+                const roomData = snapshot.val();
                 
-                if (d.status === 'active') {
-                    if (document.getElementById('game-overlay').classList.contains('hidden') && 
-                        !document.getElementById('vs-screen').classList.contains('flex')) {
-                        await showVSAnimation(d.player1, d.player2);
-                        document.getElementById('game-overlay').classList.remove('hidden');
-                        document.getElementById('withdraw-game-btn').classList.remove('hidden');
-                        renderGameWithTimer(d);
-                    } else {
-                        renderGameWithTimer(d);
-                    }
+                if (roomData.playerCount >= 2) {
+                    showBeautifulAlert('error', 'خطأ', 'الغرفة ممتلئة');
+                    document.getElementById('finding-room-modal').classList.add('hidden');
+                    document.getElementById('play-friend-modal').classList.remove('hidden');
+                    return;
                 }
                 
-                retryAttempts = 0; // إعادة تعيين عند نجاح الاستماع
-            }, (error) => {
-                console.error("خطأ في الاستماع للمباراة:", error);
-                
-                retryAttempts++;
-                if (retryAttempts < MAX_LISTENER_RETRIES) {
-                    const delay = 2000 * retryAttempts;
-                    console.log(`إعادة محاولة الاستماع بعد ${delay}ms`);
-                    
-                    setTimeout(() => {
-                        setupListener();
-                    }, delay);
-                } else {
-                    console.error("فشل الاستماع للمباراة بعد عدة محاولات");
-                    handleNetworkDisconnection();
+                if (roomData.status !== 'waiting') {
+                    showBeautifulAlert('error', 'خطأ', 'المباراة بدأت بالفعل');
+                    document.getElementById('finding-room-modal').classList.add('hidden');
+                    document.getElementById('play-friend-modal').classList.remove('hidden');
+                    return;
                 }
-            });
-        } catch (error) {
-            console.error("خطأ في إعداد المستمع:", error);
-        }
-    };
-    
-    setupListener();
-}
-
-
-// بدء المراقبة عند بدء التطبيق
-function initializeConnectionSystem() {
-    // بدء مراقبة جودة الاتصال
-    robustConnection.startMonitoring();
-    
-    // إضافة مراقبة لتغير حالة الشبكة
-    window.addEventListener('online', () => {
-        console.log("الاتصال عاد");
-        robustConnection.connectionState = 'connected';
-        retryCount = 0;
-    });
-    
-    window.addEventListener('offline', () => {
-        console.log("الاتصال انقطع");
-        robustConnection.connectionState = 'disconnected';
-        robustConnection.handleDisconnection();
-    });
-}
-
-// استدعاء التهيئة عند بدء التطبيق
-setTimeout(() => {
-    initializeConnectionSystem();
-}, 3000);
-
-// نظام تزامن محسّن للمباريات
-class MatchSyncSystem {
-    constructor() {
-        this.lastSyncTime = null;
-        this.syncInterval = null;
-        this.pendingSyncs = new Map();
-        this.conflictResolver = new ConflictResolver();
-    }
-    
-    startSync(matchId) {
-        if (this.syncInterval) clearInterval(this.syncInterval);
-        
-        // مزامنة أولية
-        this.performSync(matchId);
-        
-        // مزامنة دورية كل 2 ثانية
-        this.syncInterval = setInterval(() => {
-            this.performSync(matchId);
-        }, 2000);
-    }
-    
-    async performSync(matchId) {
-        try {
-            const now = Date.now();
-            
-            // الحصول على أحدث بيانات المباراة
-            const matchDoc = await getDoc(doc(db, "match_queue", matchId));
-            
-            if (!matchDoc.exists()) {
-                console.log("المباراة غير موجودة - إيقاف المزامنة");
-                this.stopSync();
-                return;
-            }
-            
-            const matchData = matchDoc.data();
-            this.lastSyncTime = now;
-            
-            // التحقق من تناسق البيانات
-            await this.verifyConsistency(matchId, matchData);
-            
-            // تحديث النشاط الأخير
-            await this.updateLastActivity(matchId);
-            
-            // معالجة أي عمليات معلقة
-            await this.processPendingOperations(matchId);
-            
-            console.log("✅ تمت المزامنة بنجاح");
-            
-        } catch (error) {
-            console.error("❌ فشل في المزامنة:", error);
-            this.handleSyncError(error, matchId);
-        }
-    }
-    
-    async verifyConsistency(matchId, matchData) {
-        // التحقق من أن البيانات متسقة
-        const expectedState = this.calculateExpectedState(matchData);
-        
-        // إذا كان هناك تناقض، محاولة حله
-        if (this.hasStateConflict(matchData, expectedState)) {
-            console.warn("⚠️ اكتشاف تناقض في الحالة، محاولة الحل...");
-            await this.conflictResolver.resolve(matchId, matchData, expectedState);
-        }
-    }
-    
-    calculateExpectedState(matchData) {
-        // حساب الحالة المتوقعة بناءً على الوقت والنشاط
-        const now = Date.now();
-        const lastActivity = matchData.lastActivity || 0;
-        const timeSinceLastActivity = now - lastActivity;
-        
-        // إذا مر أكثر من 30 ثانية بدون نشاط، قد يكون اللاعب منقطعاً
-        if (timeSinceLastActivity > 30000) {
-            return { status: 'needs_check' };
-        }
-        
-        return { status: 'normal' };
-    }
-    
-    hasStateConflict(matchData, expectedState) {
-        // التحقق من وجود تناقضات
-        if (matchData.status === 'active' && expectedState.status === 'needs_check') {
-            return true;
-        }
-        
-        // التحقق من أن الوقت الحالي يتناسب مع الأسئلة
-        const currentTime = Date.now();
-        const questionStartTime = matchData.questionStartTime || 0;
-        const timeInQuestion = currentTime - questionStartTime;
-        
-        if (timeInQuestion > 20000) { // أكثر من 20 ثانية في نفس السؤال
-            return true;
-        }
-        
-        return false;
-    }
-    
-    async updateLastActivity(matchId) {
-        const isP1 = localMatchData?.player1?.uid === currentUser.uid;
-        const field = isP1 ? 'player1LastActive' : 'player2LastActive';
-        
-        try {
-            await updateDoc(doc(db, "match_queue", matchId), {
-                [field]: Date.now(),
-                lastActivity: Date.now()
-            });
-        } catch (error) {
-            console.error("فشل في تحديث النشاط:", error);
-        }
-    }
-    
-    async processPendingOperations(matchId) {
-        for (const [operationId, operation] of this.pendingSyncs) {
-            try {
-                await operation();
-                this.pendingSyncs.delete(operationId);
+                
+                currentRoomId = roomId;
+                isRoomCreator = false;
+                
+                await update(roomRef, {
+                    [`players/${currentUser.uid}`]: {
+                        uid: currentUser.uid,
+                        name: userData.name,
+                        photo: userData.photo,
+                        ready: false,
+                        joinedAt: Date.now()
+                    },
+                    playerCount: roomData.playerCount + 1
+                });
+                
+                document.getElementById('finding-room-modal').classList.add('hidden');
+                setupRoomListener(roomId);
+                
             } catch (error) {
-                console.error(`فشلت العملية ${operationId}:`, error);
-                
-                // إذا فشلت 3 مرات، حذفها
-                const retryCount = operation.retryCount || 0;
-                if (retryCount >= 2) {
-                    this.pendingSyncs.delete(operationId);
-                } else {
-                    operation.retryCount = retryCount + 1;
+                console.error("Error joining room:", error);
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في الانضمام إلى الغرفة');
+                document.getElementById('finding-room-modal').classList.add('hidden');
+                document.getElementById('play-friend-modal').classList.remove('hidden');
+            }
+        }
+
+        function setupRoomListener(roomId) {
+            if (roomListener) roomListener();
+            
+            const roomRef = dbRef(rtdb, `rooms/${roomId}`);
+            roomListener = onValue(roomRef, (snapshot) => {
+                if (!snapshot.exists()) {
+                    showBeautifulAlert('error', 'انتهت الغرفة', 'تم إغلاق الغرفة من قبل المالك');
+                    leaveRoom();
+                    return;
                 }
-            }
-        }
-    }
-    
-    async queueOperation(operationId, operation) {
-        this.pendingSyncs.set(operationId, {
-            execute: operation,
-            timestamp: Date.now(),
-            retryCount: 0
-        });
-    }
-    
-    handleSyncError(error, matchId) {
-        console.error("خطأ في المزامنة:", error);
-        
-        // محاولة إعادة الاتصال
-        setTimeout(() => {
-            if (currentMatchId === matchId) {
-                this.performSync(matchId);
-            }
-        }, 3000);
-    }
-    
-    stopSync() {
-        if (this.syncInterval) {
-            clearInterval(this.syncInterval);
-            this.syncInterval = null;
-        }
-    }
-    
-    cleanup() {
-        this.stopSync();
-        this.pendingSyncs.clear();
-    }
-}
-
-class ConflictResolver {
-    async resolve(matchId, currentState, expectedState) {
-        try {
-            // إذا كانت المباراة تحتاج فحص
-            if (expectedState.status === 'needs_check') {
-                await this.handleStaleMatch(matchId, currentState);
-            }
-            
-            // إذا كان الوقت في السؤال طويل جداً
-            await this.handleLongQuestionTime(matchId, currentState);
-            
-        } catch (error) {
-            console.error("❌ فشل في حل التناقض:", error);
-        }
-    }
-    
-    async handleStaleMatch(matchId, matchData) {
-        const now = Date.now();
-        const lastActivity = matchData.lastActivity || 0;
-        
-        // إذا مر أكثر من 45 ثانية بدون نشاط
-        if (now - lastActivity > 45000) {
-            console.log("المباراة متوقفة - محاولة استئناف...");
-            
-            // التحقق من حالة اللاعبين
-            const p1LastActive = matchData.player1LastActive || 0;
-            const p2LastActive = matchData.player2LastActive || 0;
-            
-            const p1Inactive = now - p1LastActive > 45000;
-            const p2Inactive = now - p2LastActive > 45000;
-            
-            if (p1Inactive && !p2Inactive) {
-                // اللاعب 1 منقطع
-                await this.handleDisconnectedPlayer(matchId, matchData.player1.uid);
-            } else if (p2Inactive && !p1Inactive) {
-                // اللاعب 2 منقطع
-                await this.handleDisconnectedPlayer(matchId, matchData.player2.uid);
-            } else if (p1Inactive && p2Inactive) {
-                // كلا اللاعبين منقطعان
-                await deleteDoc(doc(db, "match_queue", matchId));
-            }
-        }
-    }
-    
-    async handleDisconnectedPlayer(matchId, playerId) {
-        // إعطاء النقاط للاعب المتصل وخصمها للمنقطع
-        const penalty = -10;
-        
-        await updateDoc(doc(db, "users", playerId), {
-            points: increment(penalty)
-        });
-        
-        // حذف المباراة
-        await deleteDoc(doc(db, "match_queue", matchId));
-        
-        console.log(`تم معالجة انقطاع اللاعب ${playerId}`);
-    }
-    
-    async handleLongQuestionTime(matchId, matchData) {
-        const questionStartTime = matchData.questionStartTime || 0;
-        const now = Date.now();
-        
-        if (now - questionStartTime > 20000 && matchData.answersCount < 2) {
-            console.log("السؤال طويل جداً - الانتقال للسؤال التالي");
-            
-            // الانتقال للسؤال التالي
-            await updateDoc(doc(db, "match_queue", matchId), {
-                currentIdx: increment(1),
-                answersCount: 0,
-                questionStartTime: now
+                
+                roomData = snapshot.val();
+                updateRoomUI(roomData);
+                
+                if (roomData.status === 'playing') {
+                    startRoomGamePlay();
+                }
             });
+            
+            startRoomTimer();
+            setupNetworkCheck();
         }
-    }
-}
 
-// إنشاء نسخة من نظام المزامنة
-const matchSyncSystem = new MatchSyncSystem();
-
-// تعديل دالة بدء المباراة لاستخدام النظام الجديد
-function startEnhancedMatch(matchId) {
-    // بدء نظام المزامنة
-    matchSyncSystem.startSync(matchId);
-    
-    // بدء مراقبة الشبكة
-    if (!networkCheckInterval) {
-        startNetworkMonitoring();
-    }
-    
-    // إضافة تنظيف عند انتهاء المباراة
-    const originalEndGame = window.endGame;
-    window.endGame = async function(d) {
-        // تنظيف أنظمة المزامنة
-        matchSyncSystem.cleanup();
-        if (networkCheckInterval) {
-            clearInterval(networkCheckInterval);
-            networkCheckInterval = null;
+        function updateRoomUI(roomData) {
+            document.getElementById('room-screen').classList.remove('hidden');
+            document.getElementById('room-id-display').textContent = roomData.id;
+            
+            const players = Object.values(roomData.players || {});
+            const player1 = players[0] || null;
+            const player2 = players[1] || null;
+            
+            if (player1) {
+                document.getElementById('player1-avatar').src = player1.photo;
+                document.getElementById('player1-name').textContent = player1.name;
+                document.getElementById('player1-status').textContent = player1.ready ? 'جاهز' : 'بانتظار';
+                document.getElementById('player1-status').className = `player-status ${player1.ready ? 'status-ready' : 'status-waiting'}`;
+                document.getElementById('player1-card').className = `player-card ${player1.ready ? 'ready' : ''}`;
+            }
+            
+            if (player2) {
+                document.getElementById('player2-avatar').src = player2.photo;
+                document.getElementById('player2-name').textContent = player2.name;
+                document.getElementById('player2-status').textContent = player2.ready ? 'جاهز' : 'بانتظار';
+                document.getElementById('player2-status').className = `player-status ${player2.ready ? 'status-ready' : 'status-waiting'}`;
+                document.getElementById('player2-card').className = `player-card ${player2.ready ? 'ready' : ''}`;
+            } else {
+                document.getElementById('player2-avatar').src = 'https://ui-avatars.com/api/?name=مستعد&background=random&size=128';
+                document.getElementById('player2-name').textContent = 'بانتظار لاعب...';
+                document.getElementById('player2-status').textContent = 'بانتظار';
+                document.getElementById('player2-status').className = 'player-status status-waiting';
+                document.getElementById('player2-card').className = 'player-card';
+            }
+            
+            document.getElementById('players-count').innerHTML = `المستخدمين (<span>${roomData.playerCount || 1}</span>/2)`;
+            document.getElementById('ready-count').innerHTML = `جاهز (<span>${roomData.readyCount || 0}</span>/2)`;
+            
+            const readyBtn = document.getElementById('ready-btn');
+            const startBtn = document.getElementById('start-btn');
+            const leaveBtn = document.getElementById('leave-btn');
+            
+            if (isRoomCreator) {
+                document.getElementById('leave-btn-text').textContent = 'حذف الغرفة';
+            } else {
+                document.getElementById('leave-btn-text').textContent = 'مغادرة';
+            }
+            
+            const currentPlayer = roomData.players?.[currentUser.uid];
+            if (currentPlayer) {
+                isReady = currentPlayer.ready || false;
+                readyBtn.innerHTML = isReady ? 
+                    '<i class="fas fa-times"></i><span>إلغاء الجاهزية</span>' : 
+                    '<i class="fas fa-check"></i><span>جاهز</span>';
+            }
+            
+            if (isRoomCreator && roomData.readyCount === 2) {
+                startBtn.classList.remove('hidden');
+                readyBtn.classList.add('hidden');
+            } else {
+                startBtn.classList.add('hidden');
+                readyBtn.classList.remove('hidden');
+            }
         }
-        
-        // استدعاء الدالة الأصلية
-        return originalEndGame.call(this, d);
-    };
-}
 
-// استبدال listenToMatch بدالة محسنة
-function listenToEnhancedMatch(id) {
-    if (matchListenerUnsubscribe) matchListenerUnsubscribe();
-    
-    matchListenerUnsubscribe = onSnapshot(doc(db, "match_queue", id), async (snap) => {
-        if (isExitingGame) return;
-        
-        if (!snap.exists()) {
-            if (currentGameMode === 'online') {
-                console.log("المباراة حذفت من السيرفر");
-                matchSyncSystem.cleanup();
+        window.toggleReady = async function() {
+            if (!currentRoomId || !roomData) return;
+            
+            const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
+            const currentPlayer = roomData.players?.[currentUser.uid];
+            
+            if (!currentPlayer) return;
+            
+            const newReadyState = !currentPlayer.ready;
+            
+            try {
+                await update(roomRef, {
+                    [`players/${currentUser.uid}/ready`]: newReadyState,
+                    readyCount: newReadyState ? (roomData.readyCount || 0) + 1 : (roomData.readyCount || 1) - 1
+                });
+                
+                isReady = newReadyState;
+                
+            } catch (error) {
+                console.error("Error updating ready status:", error);
+            }
+        };
+
+        window.startRoomGame = async function() {
+            if (!currentRoomId || !roomData || !isRoomCreator) return;
+            
+            if (roomData.readyCount !== 2) {
+                showBeautifulAlert('warning', 'تنبيه', 'يجب أن يكون كلا اللاعبين جاهزين');
                 return;
             }
-            return;
+            
+            try {
+                const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
+                await update(roomRef, {
+                    status: 'playing',
+                    startedAt: Date.now()
+                });
+                
+            } catch (error) {
+                console.error("Error starting game:", error);
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في بدء المباراة');
+            }
+        };
+
+        async function startRoomGamePlay() {
+            if (roomGameStarted) return;
+            roomGameStarted = true;
+            
+            const players = Object.values(roomData.players || {});
+            const player1 = players[0];
+            const player2 = players[1];
+            
+            if (!player1 || !player2) return;
+            
+            const isPlayer1 = player1.uid === currentUser.uid;
+            const me = isPlayer1 ? player1 : player2;
+            const opponent = isPlayer1 ? player2 : player1;
+            
+            await showVSAnimation(me, opponent);
+            
+            document.getElementById('room-screen').classList.add('hidden');
+            document.getElementById('game-overlay').classList.remove('hidden');
+            document.getElementById('withdraw-game-btn').classList.remove('hidden');
+            
+            try {
+                const qDocs = await getQuestions(roomData.subject, roomData.qtype);
+                if (qDocs.length === 0) {
+                    showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
+                    leaveRoom();
+                    return;
+                }
+                
+                const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
+                
+                localMatchData = {
+                    status: 'active',
+                    grade: userData.grade,
+                    player1: {
+                        uid: player1.uid,
+                        name: player1.name,
+                        score: 0,
+                        photo: player1.photo,
+                        grade: userData.grade
+                    },
+                    player2: {
+                        uid: player2.uid,
+                        name: player2.name,
+                        score: 0,
+                        photo: player2.photo,
+                        grade: userData.grade
+                    },
+                    questions: shuffledQs,
+                    currentIdx: 0,
+                    answersCount: 0,
+                    roomId: currentRoomId
+                };
+                
+                renderGame(localMatchData);
+                
+            } catch (error) {
+                console.error("Error starting room game:", error);
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في بدء المباراة');
+                leaveRoom();
+            }
         }
-        
-        const d = snap.data();
-        
-        // بدء نظام المزامنة إذا لم يبدأ
-        if (!matchSyncSystem.syncInterval && d.status === 'active') {
-            startEnhancedMatch(id);
-        }
-        
-        if (d.status === 'active') {
-            if (document.getElementById('game-overlay').classList.contains('hidden') && 
-                !document.getElementById('vs-screen').classList.contains('flex')) {
-                await showVSAnimation(d.player1, d.player2);
-                document.getElementById('game-overlay').classList.remove('hidden');
-                document.getElementById('withdraw-game-btn').classList.remove('hidden');
-                renderGameWithTimer(d);
+
+        window.leaveRoom = async function() {
+            if (!currentRoomId) return;
+            
+            if (isRoomCreator) {
+                if (!confirm('هل أنت متأكد من حذف الغرفة؟ سيتم طرد جميع اللاعبين.')) return;
+                
+                try {
+                    await remove(dbRef(rtdb, `rooms/${currentRoomId}`));
+                } catch (error) {
+                    console.error("Error deleting room:", error);
+                }
             } else {
-                renderGameWithTimer(d);
+                if (!confirm('هل أنت متأكد من مغادرة الغرفة؟')) return;
+                
+                try {
+                    const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
+                    const snapshot = await get(roomRef);
+                    
+                    if (snapshot.exists()) {
+                        const roomData = snapshot.val();
+                        const currentPlayer = roomData.players?.[currentUser.uid];
+                        
+                        const updates = {};
+                        updates[`players/${currentUser.uid}`] = null;
+                        updates.playerCount = (roomData.playerCount || 1) - 1;
+                        
+                        if (currentPlayer?.ready) {
+                            updates.readyCount = (roomData.readyCount || 1) - 1;
+                        }
+                        
+                        await update(roomRef, updates);
+                    }
+                } catch (error) {
+                    console.error("Error leaving room:", error);
+                }
             }
+            
+            cleanupRoom();
+            document.getElementById('room-screen').classList.add('hidden');
+            document.getElementById('challenge-active-card').classList.remove('hidden');
+            switchTab('challenges');
+        };
+
+        window.cancelRoomSearch = function() {
+            document.getElementById('finding-room-modal').classList.add('hidden');
+            document.getElementById('play-friend-modal').classList.remove('hidden');
+        };
+
+        function startRoomTimer() {
+            if (roomTimerInterval) clearInterval(roomTimerInterval);
+            
+            roomTimerInterval = setInterval(() => {
+                if (roomTimeLeft <= 0) {
+                    clearInterval(roomTimerInterval);
+                    if (isRoomCreator) {
+                        remove(dbRef(rtdb, `rooms/${currentRoomId}`));
+                    }
+                    showBeautifulAlert('info', 'انتهت الغرفة', 'انتهت مدة الغرفة (10 دقائق)');
+                    leaveRoom();
+                    return;
+                }
+                
+                roomTimeLeft--;
+                const minutes = Math.floor(roomTimeLeft / 60);
+                const seconds = roomTimeLeft % 60;
+                document.getElementById('room-timer').textContent = 
+                    `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                
+            }, 1000);
         }
-    }, (error) => {
-        console.error("خطأ في الاستماع للمباراة:", error);
-        
-        // محاولة إعادة الاتصال
-        setTimeout(() => {
-            if (currentMatchId === id) {
-                listenToEnhancedMatch(id);
+
+        function setupNetworkCheck() {
+            if (networkCheckInterval) clearInterval(networkCheckInterval);
+            
+            networkCheckInterval = setInterval(async () => {
+                if (!currentRoomId || !roomData) return;
+                
+                try {
+                    const roomRef = dbRef(rtdb, `rooms/${currentRoomId}`);
+                    const snapshot = await get(roomRef);
+                    
+                    if (!snapshot.exists()) {
+                        clearInterval(networkCheckInterval);
+                        return;
+                    }
+                    
+                    const currentRoomData = snapshot.val();
+                    const players = Object.values(currentRoomData.players || {});
+                    
+                    players.forEach(async (player) => {
+                        if (player.uid === currentUser.uid) return;
+                        
+                        const lastSeen = Date.now() - player.joinedAt;
+                        if (lastSeen > 10000) {
+                            showBeautifulAlert('warning', 'انقطع الاتصال', `انقطع اتصال ${player.name}. جاري استبداله بالذكاء الاصطناعي...`);
+                            
+                            const updates = {};
+                            updates[`players/${player.uid}/isAI`] = true;
+                            updates[`players/${player.uid}/name`] = 'ذكاء اصطناعي (35%)';
+                            updates[`players/${player.uid}/photo`] = 'https://cdn-icons-png.flaticon.com/512/4712/4712027.png';
+                            
+                            await update(roomRef, updates);
+                        }
+                    });
+                    
+                } catch (error) {
+                    console.error("Network check error:", error);
+                }
+            }, 2000);
+        }
+
+        function cleanupRoom() {
+            if (roomListener) {
+                roomListener();
+                roomListener = null;
             }
-        }, 3000);
-    });
-}
-
-// استبدال الدوال القديمة بالجديدة
-function initializeEnhancedGameSystem() {
-    // استبدال دالة الاستماع
-    const originalListenToMatch = window.listenToMatch;
-    window.listenToMatch = listenToEnhancedMatch;
-    
-    // استبدال دالة renderGame
-    window.renderGame = renderGameWithTimer;
-    
-    // استبدال دالة submitGameAnswer
-    window.submitGameAnswer = handleStrictAnswer;
-    
-    console.log("✅ تم تحميل نظام المباريات المحسن");
-}
-
-// تهيئة النظام عند تحميل الصفحة
-setTimeout(() => {
-    initializeEnhancedGameSystem();
-    initializeConnectionSystem();
-}, 2000);
-
-
+            
+            if (roomTimerInterval) {
+                clearInterval(roomTimerInterval);
+                roomTimerInterval = null;
+            }
+            
+            if (networkCheckInterval) {
+                clearInterval(networkCheckInterval);
+                networkCheckInterval = null;
+            }
+            
+            currentRoomId = null;
+            roomData = null;
+            isRoomCreator = false;
+            isReady = false;
+            roomGameStarted = false;
+            roomTimeLeft = 600;
+        }
     </script>
 </body>
 </html>
