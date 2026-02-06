@@ -2154,10 +2154,10 @@
     </div>
 
 <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, onSnapshot, query, where, orderBy, limit, deleteDoc, serverTimestamp, increment, getDoc, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, onSnapshot, query, where, orderBy, limit, deleteDoc, serverTimestamp, increment, getDoc, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAfLOjiPiSQW9opdiIgQif3pAp8zsezy58",
@@ -5445,6 +5445,7 @@ window.confirmCreateRoom = async function() {
         
         // Check if both players are ready and game should start IMMEDIATELY
         // Check if both players are ready and game should start IMMEDIATELY
+// Check if both players are ready and game should start IMMEDIATELY
 if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiting') {
     // Start the game immediately without delay
     console.log("Both players ready! Starting game immediately...");
@@ -5469,6 +5470,11 @@ if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiti
             roomTimerInterval = null;
         }
         
+        // تأكد أن db موجود و doc يعمل
+        if (!db) {
+            throw new Error("قاعدة البيانات غير متاحة");
+        }
+        
         // Update status and start game immediately
         await updateDoc(doc(db, "rooms", roomId), {
             status: 'playing',
@@ -5484,6 +5490,12 @@ if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiti
         
     } catch (error) {
         console.error("Error starting game:", error);
+        console.error("Error details:", {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            code: error.code
+        });
         
         // إظهار رسالة خطأ مفصلة
         let errorMessage = '';
@@ -5494,6 +5506,14 @@ if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiti
             errorMessage = '❌ خطأ: لم يتم تحديد نوع الأسئلة. يرجى إنشاء غرفة جديدة.';
         } else if (error.message.includes('المرحلة الدراسية غير محددة')) {
             errorMessage = '❌ خطأ: المرحلة الدراسية غير محددة. يرجى تحديد مرحلتك أولاً.';
+        } else if (error.message.includes('قاعدة البيانات غير متاحة')) {
+            errorMessage = '❌ خطأ: قاعدة البيانات غير متصلة. تحقق من اتصال الإنترنت.';
+        } else if (error.name === 'TypeError' && error.message.includes('doc is not a function')) {
+            errorMessage = '❌ خطأ تقني: مشكلة في مكتبة قاعدة البيانات. جاري إعادة تحميل التطبيق...';
+            // إعادة تحميل الصفحة تلقائياً
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
         } else if (error.code) {
             errorMessage = `❌ خطأ تقني: ${getDetailedFirebaseError(error)}`;
         } else {
