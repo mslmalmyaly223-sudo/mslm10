@@ -2154,10 +2154,10 @@
     </div>
 
 <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, onSnapshot, query, where, orderBy, limit, deleteDoc, serverTimestamp, increment, getDoc, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, onSnapshot, query, where, orderBy, limit, deleteDoc, serverTimestamp, increment, getDoc, writeBatch, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAfLOjiPiSQW9opdiIgQif3pAp8zsezy58",
@@ -5448,7 +5448,7 @@ window.confirmCreateRoom = async function() {
 // Check if both players are ready and game should start IMMEDIATELY
 if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiting') {
     // Start the game immediately without delay
-    console.log("Both players ready! Starting game immediately...");
+    console.log("كلا اللاعبين جاهزان! بدء المباراة فوراً...");
     
     try {
         // التحقق من صحة البيانات قبل البدء
@@ -5470,32 +5470,12 @@ if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiti
             roomTimerInterval = null;
         }
         
-        // تأكد أن db موجود و doc يعمل
-        if (!db) {
-            throw new Error("قاعدة البيانات غير متاحة");
-        }
-        
-        // Update status and start game immediately
-        await updateDoc(doc(db, "rooms", roomId), {
-            status: 'playing',
-            gameStartedAt: serverTimestamp(),
-            currentQuestionIndex: 0,
-            player1Score: 0,
-            player2Score: 0,
-            lastUpdated: serverTimestamp()
-        });
-        
-        // Start the game directly
-        startFriendGame(roomData);
+        // فقط ابدأ اللعبة مباشرة
+        // دع startFriendGame تقوم بتحديث حالة الغرفة
+        await startFriendGame(roomData);
         
     } catch (error) {
-        console.error("Error starting game:", error);
-        console.error("Error details:", {
-            name: error.name,
-            message: error.message,
-            stack: error.stack,
-            code: error.code
-        });
+        console.error("خطأ في بدء المباراة:", error);
         
         // إظهار رسالة خطأ مفصلة
         let errorMessage = '';
@@ -5506,14 +5486,6 @@ if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiti
             errorMessage = '❌ خطأ: لم يتم تحديد نوع الأسئلة. يرجى إنشاء غرفة جديدة.';
         } else if (error.message.includes('المرحلة الدراسية غير محددة')) {
             errorMessage = '❌ خطأ: المرحلة الدراسية غير محددة. يرجى تحديد مرحلتك أولاً.';
-        } else if (error.message.includes('قاعدة البيانات غير متاحة')) {
-            errorMessage = '❌ خطأ: قاعدة البيانات غير متصلة. تحقق من اتصال الإنترنت.';
-        } else if (error.name === 'TypeError' && error.message.includes('doc is not a function')) {
-            errorMessage = '❌ خطأ تقني: مشكلة في مكتبة قاعدة البيانات. جاري إعادة تحميل التطبيق...';
-            // إعادة تحميل الصفحة تلقائياً
-            setTimeout(() => {
-                window.location.reload();
-            }, 3000);
         } else if (error.code) {
             errorMessage = `❌ خطأ تقني: ${getDetailedFirebaseError(error)}`;
         } else {
@@ -5525,11 +5497,11 @@ if (roomData.player1Ready && roomData.player2Ready && roomData.status === 'waiti
         // إعادة تعيين حالة الجاهزية في حالة الخطأ
         try {
             const field = isRoomOwner ? 'player1Ready' : 'player2Ready';
-            await updateDoc(doc(db, "rooms", roomId), {
+            await updateDoc(doc(db, "rooms", currentRoomId), {
                 [field]: false
             });
         } catch (resetError) {
-            console.error("Error resetting ready status:", resetError);
+            console.error("خطأ في إعادة تعيين حالة الجاهزية:", resetError);
         }
     }
 }
@@ -5840,110 +5812,165 @@ function updateRoomTimerDisplay(timeLeft) {
         }
 
         async function startFriendGame(roomData) {
-            // Hide room lobby
-            document.getElementById('room-lobby-screen').classList.add('hidden');
-            
-            // Determine if this is AI replacement
-            const isAIReplacement = roomData.ownerId === 'AI_BOT' || roomData.player2Id === 'AI_BOT';
-            
-            // Determine player positions
-            let player1, player2;
-            
-            if (isRoomOwner) {
-                player1 = {
-                    uid: currentUser.uid,
-                    name: userData.name,
-                    score: 0,
-                    photo: userData.photo,
-                    grade: userData.grade
-                };
-                
-                if (roomData.player2Id === 'AI_BOT') {
-                    player2 = {
-                        uid: 'AI_BOT',
-                        name: 'الذكاء الاصطناعي (بديل)',
-                        score: 0,
-                        photo: 'https://cdn-icons-png.flaticon.com/512/4712/4712027.png',
-                        grade: userData.grade
-                    };
-                } else {
-                    player2 = {
-                        uid: roomData.player2Id,
-                        name: roomData.player2Name,
-                        score: 0,
-                        photo: roomData.player2Photo,
-                        grade: roomData.player2Grade
-                    };
-                }
-            } else {
-                player1 = {
-                    uid: roomData.ownerId === 'AI_BOT' ? 'AI_BOT' : roomData.ownerId,
-                    name: roomData.ownerId === 'AI_BOT' ? 'الذكاء الاصطناعي (بديل)' : roomData.ownerName,
-                    score: 0,
-                    photo: roomData.ownerId === 'AI_BOT' ? 'https://cdn-icons-png.flaticon.com/512/4712/4712027.png' : roomData.ownerPhoto,
-                    grade: roomData.ownerGrade
-                };
-                
-                player2 = {
-                    uid: currentUser.uid,
-                    name: userData.name,
-                    score: 0,
-                    photo: userData.photo,
-                    grade: userData.grade
-                };
-            }
-            
-            // Get questions for the game
-            const qDocs = await getQuestions(roomData.subject, roomData.questionType);
-            if (qDocs.length === 0) { 
-                showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
-                leaveRoom();
-                return; 
-            }
-            
-            const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
-            
-            localMatchData = {
-                status: 'active',
-                grade: userData.grade,
-                player1: player1,
-                player2: player2,
-                questions: shuffledQs, 
-                currentIdx: 0, 
-                answersCount: 0,
-                roomId: currentRoomId,
-                isFriendGame: true,
-                isAIReplacement: isAIReplacement
+    try {
+        // التحقق من وجود المتغيرات الضرورية
+        if (!db) {
+            throw new Error("قاعدة البيانات غير متاحة");
+        }
+        
+        if (!currentRoomId) {
+            throw new Error("رقم الغرفة غير معرف");
+        }
+        
+        if (!roomData) {
+            throw new Error("بيانات الغرفة فارغة");
+        }
+        
+        console.log("بدء مباراة مع صديق، رقم الغرفة:", currentRoomId);
+        
+        // Hide room lobby
+        document.getElementById('room-lobby-screen').classList.add('hidden');
+        
+        // Determine if this is AI replacement
+        const isAIReplacement = roomData.ownerId === 'AI_BOT' || roomData.player2Id === 'AI_BOT';
+        
+        // Determine player positions
+        let player1, player2;
+        
+        if (isRoomOwner) {
+            player1 = {
+                uid: currentUser.uid,
+                name: userData.name,
+                score: 0,
+                photo: userData.photo,
+                grade: userData.grade
             };
             
-            // Update room status to playing
-            try {
-                await updateDoc(doc(db, "rooms", currentRoomId), {
-                    status: 'playing',
-                    gameStartedAt: serverTimestamp(),
-                    currentQuestionIndex: 0,
-                    player1Score: 0,
-                    player2Score: 0
-                });
-            } catch (error) {
-                console.error("Error updating room status:", error);
+            if (roomData.player2Id === 'AI_BOT') {
+                player2 = {
+                    uid: 'AI_BOT',
+                    name: 'الذكاء الاصطناعي (بديل)',
+                    score: 0,
+                    photo: 'https://cdn-icons-png.flaticon.com/512/4712/4712027.png',
+                    grade: userData.grade
+                };
+            } else {
+                player2 = {
+                    uid: roomData.player2Id,
+                    name: roomData.player2Name,
+                    score: 0,
+                    photo: roomData.player2Photo,
+                    grade: roomData.player2Grade
+                };
             }
+        } else {
+            player1 = {
+                uid: roomData.ownerId === 'AI_BOT' ? 'AI_BOT' : roomData.ownerId,
+                name: roomData.ownerId === 'AI_BOT' ? 'الذكاء الاصطناعي (بديل)' : roomData.ownerName,
+                score: 0,
+                photo: roomData.ownerId === 'AI_BOT' ? 'https://cdn-icons-png.flaticon.com/512/4712/4712027.png' : roomData.ownerPhoto,
+                grade: roomData.ownerGrade
+            };
             
-            // Show VS animation only if not AI replacement
-            if (!isAIReplacement) {
-                await showVSAnimation(player1, player2);
-            }
-            
-            // Show game overlay
-            document.getElementById('game-overlay').classList.remove('hidden');
-            document.getElementById('withdraw-game-btn').classList.remove('hidden');
-            
-            // Start game listener for synchronization
-            startGameListener(currentRoomId);
-            
-            // Render first question
-            renderGame(localMatchData);
+            player2 = {
+                uid: currentUser.uid,
+                name: userData.name,
+                score: 0,
+                photo: userData.photo,
+                grade: userData.grade
+            };
         }
+        
+        // Get questions for the game
+        const qDocs = await getQuestions(roomData.subject, roomData.questionType);
+        if (qDocs.length === 0) { 
+            showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
+            leaveRoom();
+            return; 
+        }
+        
+        const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
+        
+        localMatchData = {
+            status: 'active',
+            grade: userData.grade,
+            player1: player1,
+            player2: player2,
+            questions: shuffledQs, 
+            currentIdx: 0, 
+            answersCount: 0,
+            roomId: currentRoomId,
+            isFriendGame: true,
+            isAIReplacement: isAIReplacement
+        };
+        
+        // Update room status to playing
+        console.log("جاري تحديث حالة الغرفة...");
+        await updateDoc(doc(db, "rooms", currentRoomId), {
+            status: 'playing',
+            gameStartedAt: serverTimestamp(),
+            currentQuestionIndex: 0,
+            player1Score: 0,
+            player2Score: 0,
+            lastUpdated: serverTimestamp()
+        });
+        
+        console.log("تم تحديث حالة الغرفة بنجاح");
+        
+        // Show VS animation only if not AI replacement
+        if (!isAIReplacement) {
+            await showVSAnimation(player1, player2);
+        }
+        
+        // Show game overlay
+        document.getElementById('game-overlay').classList.remove('hidden');
+        document.getElementById('withdraw-game-btn').classList.remove('hidden');
+        
+        // Start game listener for synchronization
+        startGameListener(currentRoomId);
+        
+        // Render first question
+        renderGame(localMatchData);
+        
+    } catch (error) {
+        console.error("خطأ في startFriendGame:", error);
+        console.error("تفاصيل الخطأ:", {
+            message: error.message,
+            stack: error.stack,
+            db: !!db,
+            currentRoomId: currentRoomId,
+            roomData: roomData
+        });
+        
+        let errorMessage = "حدث خطأ غير متوقع";
+        
+        if (error.message.includes("doc is not a function")) {
+            errorMessage = "❌ خطأ في اتصال قاعدة البيانات. يرجى المحاولة مرة أخرى.";
+        } else if (error.code) {
+            errorMessage = `❌ ${getDetailedFirebaseError(error)}`;
+        } else {
+            errorMessage = `❌ ${error.message}`;
+        }
+        
+        showBeautifulAlert('error', 'فشل بدء المباراة', errorMessage);
+        
+        // العودة إلى اللوبي في حالة الخطأ
+        document.getElementById('room-lobby-screen').classList.remove('hidden');
+        document.getElementById('room-lobby-screen').classList.add('active');
+        
+        // إعادة تعيين حالة الجاهزية
+        if (currentRoomId) {
+            try {
+                const field = isRoomOwner ? 'player1Ready' : 'player2Ready';
+                await updateDoc(doc(db, "rooms", currentRoomId), {
+                    [field]: false
+                });
+            } catch (resetError) {
+                console.error("خطأ في إعادة تعيين حالة الجاهزية:", resetError);
+            }
+        }
+    }
+}
         
         function startGameListener(roomId) {
             // Listen for game updates
