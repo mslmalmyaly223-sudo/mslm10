@@ -903,25 +903,32 @@
         }
 
         .withdraw-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 100;
-            cursor: pointer;
-            border: none;
-        }
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 200;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    transition: all 0.3s;
+    font-size: 1rem;
+    min-width: 120px;
+}
 
-        .withdraw-btn:hover {
-            transform: scale(1.05);
-        }
+.withdraw-btn:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
 
         @media (min-width: 768px) {
             .input-box { font-size: 1.1rem; }
@@ -1173,9 +1180,10 @@
                 <p id="ai-thinking-msg" class="text-center text-green-600 text-sm hidden animate-pulse mt-4 font-bold">الذكاء الاصطناعي يفكر...</p>
             </div>
 
-            <button id="withdraw-game-btn" onclick="withdrawFromGame()" class="withdraw-btn">
-                <i class="fas fa-sign-out-alt"></i> انسحاب
-            </button>
+            <!-- أضيف هذا الزر بعد beautiful-alert مباشرة -->
+<button id="withdraw-game-btn" onclick="withdrawFromGame()" class="withdraw-btn hidden">
+    <i class="fas fa-sign-out-alt"></i> انسحاب
+</button>
         </div>
 
         <div id="result-screen" class="fixed inset-0 bg-white z-[200] hidden">
@@ -3706,28 +3714,37 @@
         }
 
         function listenToRoomUpdates() {
-            if(friendMatchListener) friendMatchListener();
-            
-            friendMatchListener = onSnapshot(doc(db, "rooms", currentRoomId), async (doc) => {
-                if(!doc.exists()) {
-                    showBeautifulAlert('info', 'تم الإغلاق', 'تم إغلاق الغرفة من قبل المالك');
-                    leaveRoom();
-                    return;
-                }
-                
-                const roomData = doc.data();
-                updateRoomUI(roomData);
-                
-                if(roomData.status === 'active' && !roomGameData) {
-                    startFriendGame(roomData);
-                }
-                
-                if(roomData.status === 'closed') {
-                    showBeautifulAlert('info', 'انتهت المباراة', 'تم إنهاء المباراة');
-                    leaveRoom();
-                }
-            });
+    if(friendMatchListener) friendMatchListener();
+    
+    friendMatchListener = onSnapshot(doc(db, "rooms", currentRoomId), async (doc) => {
+        if(!doc.exists()) {
+            showBeautifulAlert('info', 'تم الإغلاق', 'تم إغلاق الغرفة من قبل المالك');
+            leaveRoom();
+            return;
         }
+        
+        const roomData = doc.data();
+        updateRoomUI(roomData);
+        
+        // تحقق من الحالات المختلفة
+        if(roomData.status === 'starting') {
+            console.log("🚀 بدء المباراة...");
+            // يمكن إضافة مؤقت بسيط هنا للانتقال السلس
+        }
+        
+        if(roomData.status === 'active' && !roomGameData) {
+            // انتظر قليلاً لضمان وصول البيانات للطرفين
+            setTimeout(() => {
+                startFriendGame(roomData);
+            }, 1000);
+        }
+        
+        if(roomData.status === 'closed') {
+            showBeautifulAlert('info', 'انتهت المباراة', 'تم إنهاء المباراة');
+            leaveRoom();
+        }
+    });
+}
 
         function updateRoomUI(roomData = null) {
             if(!roomData) {
@@ -3810,61 +3827,115 @@
         };
 
         async function checkIfBothReady(roomData) {
-            if(roomData.creatorReady && roomData.player2Ready && roomData.player2Id) {
-                await updateDoc(doc(db, "rooms", currentRoomId), {
-                    status: 'active'
-                });
-                
-                setTimeout(() => {
-                    startFriendGame(roomData);
-                }, 2000);
-            }
+    // تحقق إذا كان الاثنان جاهزين
+    if(roomData.creatorReady && roomData.player2Ready && roomData.player2Id) {
+        console.log("✅ كلا اللاعبين جاهزان، بدء المباراة...");
+        
+        // أولاً: تحديث حالة الغرفة إلى 'starting' لمنع عمليات متعددة
+        await updateDoc(doc(db, "rooms", currentRoomId), {
+            status: 'starting'
+        });
+        
+        // ثانياً: جلب الأسئلة
+        const qDocs = await getQuestions(roomData.subject, roomData.type);
+        
+        if(qDocs.length === 0) { 
+            showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
+            
+            // إعادة تعيين حالة الجاهزية
+            await updateDoc(doc(db, "rooms", currentRoomId), {
+                creatorReady: false,
+                player2Ready: false,
+                status: 'waiting'
+            });
+            return; 
         }
+        
+        // ثالثاً: تحديث الغرفة بالمباراة النشطة
+        const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
+        
+        await updateDoc(doc(db, "rooms", currentRoomId), {
+            status: 'active',
+            gameQuestions: shuffledQs,
+            gameStartTime: serverTimestamp(),
+            player1Score: 0,
+            player2Score: 0,
+            currentQuestionIndex: 0
+        });
+        
+        console.log("🎮 بدء المباراة مع", shuffledQs.length, "سؤال");
+        
+    } else {
+        console.log("⏳ في انتظار اللاعب الآخر...");
+    }
+}
 
         async function startFriendGame(roomData) {
-            const qDocs = await getQuestions(roomData.subject, roomData.type);
-            if(qDocs.length === 0) { 
-                showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
-                return; 
-            }
+    console.log("🎮 بدء المباراة ضد صديق...");
+    
+    // تأكد أن لدينا بيانات الأسئلة
+    let shuffledQs = [];
+    
+    if(roomData.gameQuestions && roomData.gameQuestions.length > 0) {
+        shuffledQs = roomData.gameQuestions;
+    } else {
+        // إذا لم تكن الأسئلة مخزنة، جلبها
+        const qDocs = await getQuestions(roomData.subject, roomData.type);
+        if(qDocs.length === 0) { 
+            showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
             
-            const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
-            
-            const isPlayer1 = currentUser.uid === roomData.creatorId;
-            const myPlayer = isPlayer1 ? 'player1' : 'player2';
-            const opPlayer = isPlayer1 ? 'player2' : 'player1';
-            
-            roomGameData = {
-                status: 'active',
-                grade: userData.grade,
-                player1: { 
-                    uid: roomData.creatorId, 
-                    name: roomData.creatorName, 
-                    score: 0, 
-                    photo: roomData.creatorPhoto
-                },
-                player2: { 
-                    uid: roomData.player2Id, 
-                    name: roomData.player2Name, 
-                    score: 0, 
-                    photo: roomData.player2Photo
-                },
-                questions: shuffledQs, 
-                currentIdx: 0, 
-                answersCount: 0
-            };
-            
-            await showVSAnimation(
-                { photo: roomData.creatorPhoto, name: roomData.creatorName },
-                { photo: roomData.player2Photo, name: roomData.player2Name }
-            );
-            
-            document.getElementById('room-screen').classList.add('hidden');
-            document.getElementById('game-overlay').classList.remove('hidden');
-            document.getElementById('withdraw-game-btn').classList.remove('hidden');
-            
-            renderFriendGame(roomGameData, myPlayer);
+            // إعادة تعيين حالة الغرفة
+            await updateDoc(doc(db, "rooms", currentRoomId), {
+                creatorReady: false,
+                player2Ready: false,
+                status: 'waiting'
+            });
+            return; 
         }
+        shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
+    }
+    
+    const isPlayer1 = currentUser.uid === roomData.creatorId;
+    const myPlayer = isPlayer1 ? 'player1' : 'player2';
+    const opPlayer = isPlayer1 ? 'player2' : 'player1';
+    
+    // إنشاء بيانات المباراة المحلية
+    roomGameData = {
+        status: 'active',
+        grade: userData.grade,
+        player1: { 
+            uid: roomData.creatorId, 
+            name: roomData.creatorName, 
+            score: roomData.player1Score || 0, 
+            photo: roomData.creatorPhoto
+        },
+        player2: { 
+            uid: roomData.player2Id, 
+            name: roomData.player2Name, 
+            score: roomData.player2Score || 0, 
+            photo: roomData.player2Photo
+        },
+        questions: shuffledQs, 
+        currentIdx: roomData.currentQuestionIndex || 0, 
+        answersCount: 0
+    };
+    
+    console.log("🤝 بيانات المباراة جاهزة، عرض شاشة VS...");
+    
+    // عرض شاشة VS
+    await showVSAnimation(
+        { photo: roomData.creatorPhoto, name: roomData.creatorName },
+        { photo: roomData.player2Photo, name: roomData.player2Name }
+    );
+    
+    // الانتقال إلى شاشة اللعبة
+    document.getElementById('room-screen').classList.add('hidden');
+    document.getElementById('game-overlay').classList.remove('hidden');
+    document.getElementById('withdraw-game-btn').classList.remove('hidden');
+    
+    // بدء عرض الأسئلة
+    renderFriendGame(roomGameData, myPlayer);
+}
 
         function renderFriendGame(data, myPlayer) {
             const totalQs = data.questions.length;
