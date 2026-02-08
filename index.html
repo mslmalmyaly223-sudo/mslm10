@@ -21,7 +21,7 @@
         import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, deleteDoc, onSnapshot, query, where, serverTimestamp, arrayUnion, setDoc, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
-        // إعدادات الفايربيس الخاصة بك
+        // إعدادات الفايربيس
         const firebaseConfig = {
             apiKey: "AIzaSyCTagUwMRX9_2RgU4l4q-1jRs3JlgR8mt8",
             authDomain: "what-s-his-name.firebaseapp.com",
@@ -36,8 +36,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const analytics = getAnalytics(app);
-
+        
         // Global Variables
         window.db = db;
         window.auth = auth;
@@ -47,6 +46,7 @@
         window.gameTimer = null;
         window.questionTimer = null;
         window.isAdmin = false;
+        window.isHost = false; // Will be determined dynamically
 
         // --- AUTH FUNCTIONS ---
         window.handleAuth = async (type) => {
@@ -81,7 +81,6 @@
                 if(error.code === 'auth/weak-password') msg = "الرمز ضعيف، خليه أقوى";
                 if(error.code === 'auth/network-request-failed') msg = "تأكد من النت، ماكو اتصال بالسيرفر";
                 errorMsg.innerText = msg;
-            } finally {
                 document.getElementById('btnSubmitAuth').innerText = type === 'signup' ? 'انشاء حساب' : 'دخول';
             }
         };
@@ -100,7 +99,6 @@
                 document.getElementById('appSection').classList.remove('hidden');
                 document.getElementById('userNameDisplay').innerText = user.displayName;
                 
-                // Check Admin
                 if(user.email === "mslmalmyaly223@gmail.com") {
                     window.isAdmin = true;
                     document.getElementById('adminTab').classList.remove('hidden');
@@ -116,7 +114,6 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
             
-            // Highlight active tab
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-blue-500', 'bg-blue-900/20'));
             const activeBtn = document.querySelector(`[onclick="switchTab('${tabId}')"]`);
             if(activeBtn) activeBtn.classList.add('text-blue-500', 'bg-blue-900/20');
@@ -141,7 +138,7 @@
                     subject,
                     text,
                     answer,
-                    approved: false, // Needs admin approval
+                    approved: false,
                     author: window.currentUser.displayName,
                     authorId: window.currentUser.uid,
                     createdAt: serverTimestamp()
@@ -151,7 +148,7 @@
             } catch (e) {
                 console.error("Upload Error:", e);
                 if(e.code === 'permission-denied') {
-                    alert("فشل! ما عندك صلاحية. تأكد من قواعد البيانات (Rules) في الفايربيس واجعلها true");
+                    alert("فشل! ما عندك صلاحية. تأكد من قواعد البيانات (Rules) في الفايربيس.");
                 } else {
                     alert("فشل الارسال: " + e.message);
                 }
@@ -201,14 +198,13 @@
                 });
             } catch (e) {
                 console.error("Admin Load Error:", e);
-                qContainer.innerHTML = `<div class="text-center text-red-400 mt-10">حدث خطأ: ${e.message}<br>تأكد من الصلاحيات (Rules)</div>`;
+                qContainer.innerHTML = `<div class="text-center text-red-400 mt-10">حدث خطأ: ${e.message}</div>`;
             }
         }
 
         window.approveQuestion = async (id) => {
             try {
                 await updateDoc(doc(db, "questions", id), { approved: true });
-                document.getElementById('pendingQuestions').innerHTML = '<div class="text-center text-gray-400">جاري التحديث...</div>'; // Feedback
                 loadPendingQuestions();
             } catch(e) { alert("خطأ: " + e.message); }
         };
@@ -222,25 +218,20 @@
 
         // --- ROOM LOGIC ---
 
-        // 1. Create Room Modal
         window.showCreateModal = () => document.getElementById('createRoomModal').classList.remove('hidden');
         window.closeCreateModal = () => document.getElementById('createRoomModal').classList.add('hidden');
-
-        // 2. Search Room Modal
         window.showSearchModal = () => document.getElementById('searchRoomModal').classList.remove('hidden');
         window.closeSearchModal = () => document.getElementById('searchRoomModal').classList.add('hidden');
 
-        // 3. Create Room Action
         window.createRoom = async () => {
             const subject = document.getElementById('roomSubject').value;
-            const roomId = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit ID
+            const roomId = Math.floor(100000 + Math.random() * 900000).toString();
             
             const btn = document.getElementById('btnCreateRoom');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الانشاء...';
             btn.disabled = true;
 
             try {
-                // Set self-destruct time (10 mins)
                 const expireTime = new Date();
                 expireTime.setMinutes(expireTime.getMinutes() + 10);
 
@@ -250,33 +241,28 @@
                     guest: null,
                     guestName: null,
                     subject: subject,
-                    status: "waiting", // waiting, playing, finished
+                    status: "waiting",
                     hostReady: false,
                     guestReady: false,
                     createdAt: serverTimestamp(),
                     expiresAt: expireTime.getTime(),
-                    questions: [] // populated when game starts
+                    questions: []
                 });
                 
                 window.currentRoomId = roomId;
-                window.isHost = true;
+                // isHost will be set correctly in enterRoomUI
                 closeCreateModal();
                 enterRoomUI(roomId);
 
             } catch (e) {
                 console.error(e);
-                if(e.code === 'permission-denied') {
-                    alert("فشل! ما عندك صلاحية انشاء غرفة. فعل الـ Rules في الفايربيس.");
-                } else {
-                    alert("خطأ غير متوقع: " + e.message);
-                }
+                alert("خطأ: " + e.message);
             } finally {
                 btn.innerHTML = 'التالي (انشاء) <i class="fas fa-arrow-left mr-2"></i>';
                 btn.disabled = false;
             }
         };
 
-        // 4. Join Room Action
         window.joinRoom = async () => {
             const roomId = document.getElementById('roomIdInput').value;
             if(!roomId) return;
@@ -289,19 +275,18 @@
                 const roomSnap = await getDoc(roomRef);
 
                 if (!roomSnap.exists()) {
-                    alert("الغرفة غير موجودة! تأكد من الرقم.");
+                    alert("الغرفة غير موجودة!");
                     btn.innerHTML = 'بحث ودخول <i class="fas fa-search mr-2"></i>';
                     return;
                 }
 
                 const data = roomSnap.data();
                 if (data.guest && data.guest !== window.currentUser.uid) {
-                    alert("الغرفة ممتلئة (2/2)!");
+                    alert("الغرفة ممتلئة!");
                     btn.innerHTML = 'بحث ودخول <i class="fas fa-search mr-2"></i>';
                     return;
                 }
 
-                // Join
                 if (!data.guest) {
                     await updateDoc(roomRef, {
                         guest: window.currentUser.uid,
@@ -310,59 +295,55 @@
                 }
 
                 window.currentRoomId = roomId;
-                window.isHost = false;
                 closeSearchModal();
                 enterRoomUI(roomId);
 
             } catch (e) {
                 console.error(e);
-                alert("خطأ بالدخول: " + e.message);
+                alert("خطأ: " + e.message);
             } finally {
                 btn.innerHTML = 'بحث ودخول <i class="fas fa-search mr-2"></i>';
             }
         };
 
-        // 5. Room UI & Realtime Listener
+        // --- REALTIME ROOM UI ---
         function enterRoomUI(roomId) {
             document.getElementById('challengesHome').classList.add('hidden');
             document.getElementById('roomLobby').classList.remove('hidden');
             document.getElementById('displayRoomId').innerText = roomId;
 
-            // Listen to room updates
+            if(window.unsubRoom) window.unsubRoom(); // Clear old listener
+
             window.unsubRoom = onSnapshot(doc(db, "rooms", roomId), async (docSnap) => {
                 if (!docSnap.exists()) {
-                    alert("تم إغلاق الغرفة من قبل المالك");
+                    alert("تم إغلاق الغرفة");
                     leaveRoomLogic(true); 
                     return;
                 }
 
                 const data = docSnap.data();
+                
+                // CRITICAL: Determine role on every update
+                window.isHost = (window.currentUser.uid === data.host);
 
-                // Check Expiration
                 if(Date.now() > data.expiresAt) {
-                    alert("انتهى وقت الغرفة (10 دقائق)");
+                    alert("انتهى وقت الغرفة");
                     if(window.isHost) await deleteDoc(doc(db, "rooms", roomId));
                     return;
                 }
 
-                // Update UI Header (2/2 Ready)
-                let readyCount = 0;
-                if(data.hostReady) readyCount++;
-                if(data.guestReady) readyCount++;
+                let readyCount = (data.hostReady ? 1 : 0) + (data.guestReady ? 1 : 0);
                 let userCount = 1 + (data.guest ? 1 : 0);
                 
-                // Status Badge logic
                 const statusBadge = document.getElementById('roomStatusBadge');
                 statusBadge.innerText = `${readyCount}/${userCount} جاهزة`;
                 statusBadge.className = readyCount === userCount && userCount > 1 
-                    ? "bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg shadow-green-900/50 transition-all" 
+                    ? "bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg transition-all" 
                     : "bg-slate-700 text-gray-300 px-3 py-1 rounded-full text-sm font-bold transition-all";
 
-                // Update Host Card
                 document.getElementById('hostName').innerText = data.hostName;
                 updateReadyStatus('hostStatus', data.hostReady);
 
-                // Update Guest Card
                 if (data.guest) {
                     document.getElementById('guestCard').classList.remove('opacity-50');
                     document.getElementById('guestName').innerText = data.guestName;
@@ -370,38 +351,38 @@
                 } else {
                     document.getElementById('guestCard').classList.add('opacity-50');
                     document.getElementById('guestName').innerText = "في الانتظار...";
-                    document.getElementById('guestStatus').innerHTML = '<span class="text-xs text-yellow-500 animate-pulse">ينتظر دخول لاعب...</span>';
+                    document.getElementById('guestStatus').innerHTML = '<span class="text-xs text-yellow-500 animate-pulse">ينتظر لاعب...</span>';
                 }
 
-                // Ready Button Logic
+                // Update Ready Button based on CORRECT role
                 const readyBtn = document.getElementById('readyBtn');
-                const isReady = window.isHost ? data.hostReady : data.guestReady;
+                const myReadyState = window.isHost ? data.hostReady : data.guestReady;
                 
-                if (data.status === 'waiting') {
-                    if (isReady) {
-                        readyBtn.innerText = "الغاء الجاهزية ❌";
-                        readyBtn.className = "w-full py-4 bg-red-600 rounded-xl text-white font-bold text-xl shadow-lg hover:bg-red-700 transition";
-                    } else {
-                        readyBtn.innerText = "جـــــاهـــــز ✅";
-                        readyBtn.className = "w-full py-4 bg-blue-500 hover:bg-blue-600 rounded-xl text-white font-bold text-xl shadow-lg shadow-blue-500/50 animate-pulse transition";
+                // Only update button text if NOT loading (disabled)
+                if (!readyBtn.disabled) {
+                    if (data.status === 'waiting') {
+                        if (myReadyState) {
+                            readyBtn.innerText = "الغاء الجاهزية ❌";
+                            readyBtn.className = "w-full py-4 bg-red-600 rounded-xl text-white font-bold text-xl shadow-lg hover:bg-red-700 transition";
+                        } else {
+                            readyBtn.innerText = "جـــــاهـــــز ✅";
+                            readyBtn.className = "w-full py-4 bg-blue-500 hover:bg-blue-600 rounded-xl text-white font-bold text-xl shadow-lg shadow-blue-500/50 animate-pulse transition";
+                        }
                     }
                 }
 
-                // Admin/Leave Controls
                 const leaveBtn = document.getElementById('leaveBtn');
                 if (window.isHost) {
                     leaveBtn.innerText = "حذف الغرفة 🗑️";
                     leaveBtn.onclick = async () => {
-                        if(confirm("تحذف الغرفة وتنهي اللعبة؟")) await deleteDoc(doc(db, "rooms", roomId));
+                        if(confirm("تحذف الغرفة؟")) await deleteDoc(doc(db, "rooms", roomId));
                     }
                 } else {
                     leaveBtn.innerText = "مغادرة 🏃";
                     leaveBtn.onclick = () => leaveRoomUser();
                 }
 
-                // START GAME TRIGGER
                 if (data.status === 'waiting' && data.hostReady && data.guestReady && data.questions && data.questions.length > 0) {
-                     // Both ready and questions loaded -> Switch to Playing
                      await updateDoc(doc(db, "rooms", roomId), { status: 'playing' });
                 }
 
@@ -411,42 +392,69 @@
                     if(!window.gameActive) startGame(data.questions);
                 }
 
-                // If we are host and both ready but no questions yet, fetch them
                 if (window.isHost && data.hostReady && data.guestReady && (!data.questions || data.questions.length === 0)) {
                     fetchAndSetQuestions(roomId, data.subject);
                 }
             }, (error) => {
                 console.error("Room Listener Error:", error);
-                // Don't alert here to avoid spamming alerts if connection drops momentarily
             });
         }
 
         function updateReadyStatus(elementId, isReady) {
             const el = document.getElementById(elementId);
-            if (isReady) {
-                el.innerHTML = `<span class="text-green-500 font-bold text-lg flex items-center gap-2"><i class="fas fa-check-circle"></i> جاهزة</span>`;
-            } else {
-                el.innerHTML = `<span class="text-gray-500 font-bold text-lg">غير جاهز</span>`;
-            }
+            el.innerHTML = isReady 
+                ? `<span class="text-green-500 font-bold text-lg flex items-center gap-2"><i class="fas fa-check-circle"></i> جاهزة</span>`
+                : `<span class="text-gray-500 font-bold text-lg">غير جاهز</span>`;
         }
 
+        // --- FIXED TOGGLE READY FUNCTION ---
         async function toggleReady() {
             if(!window.currentRoomId) return;
-            const field = window.isHost ? 'hostReady' : 'guestReady';
+            
+            const btn = document.getElementById('readyBtn');
+            // Save text to restore in case of error, though listener usually updates it
+            const originalText = btn.innerText; 
+            
+            // 1. Loading State
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> انتظر...';
+            btn.disabled = true;
+
             const roomRef = doc(db, "rooms", window.currentRoomId);
             
             try {
+                // 2. Fetch fresh data to be absolutely sure of role
                 const snap = await getDoc(roomRef);
-                const currentVal = snap.data()[field];
+                if (!snap.exists()) {
+                    alert("الغرفة اختفت!");
+                    btn.disabled = false;
+                    return;
+                }
+                const data = snap.data();
+                
+                // 3. Determine Field dynamically
+                const amIHost = (window.currentUser.uid === data.host);
+                const field = amIHost ? 'hostReady' : 'guestReady';
+                
+                const currentVal = data[field];
+                
+                // 4. Update
                 await updateDoc(roomRef, { [field]: !currentVal });
+                
+                // Success! Listener will update the UI. 
+                // We keep it disabled for a split second to prevent double clicks until listener fires.
+                setTimeout(() => { btn.disabled = false; }, 500);
+
             } catch(e) {
-                console.error(e);
+                console.error("Toggle Error:", e);
+                alert("حدث خطأ: " + e.message);
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
         }
 
         async function leaveRoomUser() {
             if(!window.currentRoomId) return;
-            if(!confirm("تريد تغادر الغرفة؟")) return;
+            if(!confirm("تريد تغادر؟")) return;
 
             try {
                 await updateDoc(doc(db, "rooms", window.currentRoomId), {
@@ -474,7 +482,6 @@
 
         async function fetchAndSetQuestions(roomId, subject) {
             try {
-                // Get random approved questions for the subject
                 const qRef = collection(db, "questions");
                 const qQuery = query(qRef, where("subject", "==", subject), where("approved", "==", true), limit(30));
                 const snap = await getDocs(qQuery);
@@ -483,13 +490,11 @@
                 snap.forEach(d => allQ.push({id: d.id, ...d.data()}));
                 
                 if(allQ.length < 1) {
-                    alert("للأسف ماكو اسئلة كافية بمادة " + subject + "!\nلازم ترفع اسئلة من قسم رفع الاسئلة ويوافق عليها المالك.");
-                    // Reset ready status
+                    alert("ماكو اسئلة كافية بهاي المادة!");
                     await updateDoc(doc(db, "rooms", roomId), { hostReady: false, guestReady: false }); 
                     return;
                 }
 
-                // Shuffle and pick 10
                 allQ = allQ.sort(() => 0.5 - Math.random()).slice(0, 10);
 
                 await updateDoc(doc(db, "rooms", roomId), {
@@ -497,8 +502,8 @@
                     status: 'waiting' 
                 });
             } catch (e) {
-                console.error("Fetch Q Error:", e);
-                alert("خطأ بجلب الاسئلة: " + e.message);
+                console.error(e);
+                alert("خطأ بجلب الاسئلة");
             }
         }
 
@@ -525,13 +530,11 @@
             document.getElementById('qCount').innerText = `السؤال ${currentQIndex + 1} / 10`;
             document.getElementById('gameQuestionText').innerText = q.text;
             
-            // Reset UI
-            document.getElementById('btnTrue').classList.remove('bg-green-600', 'bg-red-600', 'opacity-50');
-            document.getElementById('btnFalse').classList.remove('bg-green-600', 'bg-red-600', 'opacity-50');
+            document.getElementById('btnTrue').classList.remove('bg-green-600', 'bg-red-600', 'opacity-50', '!bg-green-600', '!bg-red-600');
+            document.getElementById('btnFalse').classList.remove('bg-green-600', 'bg-red-600', 'opacity-50', '!bg-green-600', '!bg-red-600');
             document.getElementById('btnTrue').disabled = false;
             document.getElementById('btnFalse').disabled = false;
 
-            // Timer
             let timeLeft = 15;
             document.getElementById('timerBar').style.width = '100%';
             document.getElementById('timerText').innerText = timeLeft + "ث";
@@ -546,7 +549,7 @@
                 
                 if (timeLeft <= 0) {
                     clearInterval(window.questionTimer);
-                    handleAnswer(null); // Timeout
+                    handleAnswer(null); 
                 }
             }, 1000);
         }
@@ -554,9 +557,8 @@
         window.handleAnswer = (userAnswer) => {
             clearInterval(window.questionTimer);
             const q = gameQuestions[currentQIndex];
-            const correct = q.answer; // boolean
+            const correct = q.answer; 
             
-            // UI Feedback
             const btnTrue = document.getElementById('btnTrue');
             const btnFalse = document.getElementById('btnFalse');
             
@@ -565,16 +567,13 @@
 
             if (userAnswer === correct) {
                 localScore++;
-                // Flash Green
                 if(userAnswer === true) btnTrue.classList.add('!bg-green-600');
                 if(userAnswer === false) btnFalse.classList.add('!bg-green-600');
             } else if (userAnswer !== null) {
-                // Flash Red
                 if(userAnswer === true) btnTrue.classList.add('!bg-red-600');
                 if(userAnswer === false) btnFalse.classList.add('!bg-red-600');
             }
 
-            // Show correct answer briefly
             if(correct) btnTrue.classList.add('bg-green-600', 'bg-opacity-50');
             else btnFalse.classList.add('bg-green-600', 'bg-opacity-50');
 
@@ -598,16 +597,12 @@
                     <button onclick="resetToLobby()" class="w-full max-w-xs bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg transition transform active:scale-95">العودة للغرفة</button>
                 </div>
             `;
-            
-            // Optional: Save score to DB user history here
         }
 
         window.resetToLobby = async () => {
-            // Reset logic
             document.getElementById('gameArea').classList.add('hidden');
             document.getElementById('roomLobby').classList.remove('hidden');
             
-            // Restore Game HTML Structure
             document.getElementById('gameArea').innerHTML = `
                 <div class="w-full bg-slate-800 rounded-2xl p-6 shadow-2xl border border-slate-700 relative overflow-hidden">
                     <div class="h-2 bg-slate-700 w-full absolute top-0 left-0">
@@ -631,13 +626,16 @@
                 </div>
             `;
 
-            // Reset Status in DB
             if (window.currentRoomId) {
-                const field = window.isHost ? 'hostReady' : 'guestReady';
-                await updateDoc(doc(db, "rooms", window.currentRoomId), {
-                    [field]: false,
-                    status: 'waiting' 
-                });
+                // Determine field again to be safe
+                const roomRef = doc(db, "rooms", window.currentRoomId);
+                const snap = await getDoc(roomRef);
+                if(snap.exists()) {
+                     const data = snap.data();
+                     const amIHost = (window.currentUser.uid === data.host);
+                     const field = amIHost ? 'hostReady' : 'guestReady';
+                     await updateDoc(roomRef, { [field]: false, status: 'waiting' });
+                }
             }
         };
 
@@ -654,16 +652,9 @@
             overscroll-behavior: none;
         }
         
-        /* Hide Scrollbar */
         ::-webkit-scrollbar {
             width: 0px;
             background: transparent;
-        }
-
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .modal-enter {
@@ -675,7 +666,6 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        /* Avatar Circle Gradient */
         .avatar-ring {
             background: linear-gradient(45deg, #3b82f6, #8b5cf6);
         }
@@ -691,10 +681,8 @@
         </div>
 
         <div class="w-full max-w-sm space-y-4 bg-slate-800 p-6 rounded-3xl shadow-2xl border border-slate-700 relative overflow-hidden">
-            <!-- Glow Effect -->
             <div class="absolute top-0 right-0 w-20 h-20 bg-blue-500 blur-3xl opacity-20 pointer-events-none"></div>
 
-            <!-- Toggle Login/Signup -->
             <div class="flex bg-slate-700 rounded-xl p-1 mb-6">
                 <button onclick="document.getElementById('signupFields').classList.add('hidden'); document.getElementById('btnSubmitAuth').onclick = () => handleAuth('login'); document.getElementById('btnSubmitAuth').innerText = 'دخول'; this.classList.add('bg-slate-600', 'shadow'); this.nextElementSibling.classList.remove('bg-slate-600', 'shadow');" class="flex-1 py-3 rounded-lg text-sm font-bold bg-slate-600 shadow transition-all duration-300">تسجيل دخول</button>
                 <button onclick="document.getElementById('signupFields').classList.remove('hidden'); document.getElementById('btnSubmitAuth').onclick = () => handleAuth('signup'); document.getElementById('btnSubmitAuth').innerText = 'انشاء حساب'; this.classList.add('bg-slate-600', 'shadow'); this.previousElementSibling.classList.remove('bg-slate-600', 'shadow');" class="flex-1 py-3 rounded-lg text-sm font-bold transition-all duration-300">حساب جديد</button>
@@ -714,7 +702,6 @@
 
     <!-- APP SECTION -->
     <div id="appSection" class="hidden h-full flex flex-col">
-        <!-- Header -->
         <header class="p-4 flex justify-between items-center bg-slate-800 shadow-lg z-10 border-b border-slate-700">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center font-bold text-xl shadow-lg border-2 border-slate-700">
@@ -728,12 +715,9 @@
             <button onclick="logout()" class="text-red-400 hover:bg-red-500/10 p-3 rounded-full transition"><i class="fas fa-sign-out-alt text-xl"></i></button>
         </header>
 
-        <!-- Main Content -->
         <main class="flex-1 overflow-y-auto p-4 pb-28 relative scroll-smooth">
             
-            <!-- Tab: Challenges (Home) -->
             <div id="challengesTab" class="tab-content h-full">
-                <!-- Main Home UI -->
                 <div id="challengesHome" class="space-y-6 mt-6">
                     <div class="bg-gradient-to-br from-indigo-900 to-slate-800 p-6 rounded-3xl border border-indigo-500/30 text-center relative overflow-hidden">
                          <div class="absolute top-0 left-0 w-32 h-32 bg-blue-500 blur-[60px] opacity-20"></div>
@@ -742,7 +726,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-5">
-                        <!-- Create Room Btn -->
                         <button onclick="showCreateModal()" class="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-800 p-8 rounded-3xl shadow-xl transform transition hover:scale-[1.02] active:scale-95 text-right border border-blue-500/30">
                             <div class="absolute left-0 top-0 h-full w-24 bg-white opacity-10 -skew-x-12 transform -translate-x-10 group-hover:translate-x-full transition duration-700"></div>
                             <div class="relative z-10">
@@ -752,7 +735,6 @@
                             <i class="fas fa-plus-circle absolute left-6 top-1/2 transform -translate-y-1/2 text-5xl text-blue-400/30 group-hover:text-blue-400/50 transition"></i>
                         </button>
 
-                        <!-- Search Room Btn -->
                         <button onclick="showSearchModal()" class="group relative overflow-hidden bg-slate-800 border border-slate-600 p-8 rounded-3xl shadow-xl transform transition hover:scale-[1.02] active:scale-95 text-right">
                             <div class="relative z-10">
                                 <h3 class="text-2xl font-bold mb-2 text-white">بحث عن غرفة</h3>
@@ -763,9 +745,7 @@
                     </div>
                 </div>
 
-                <!-- Room Lobby UI -->
                 <div id="roomLobby" class="hidden flex flex-col h-full justify-between pb-4">
-                    <!-- Top Info Card -->
                     <div class="bg-slate-800 rounded-3xl p-6 shadow-2xl border border-slate-700 relative mt-2">
                         <div class="flex justify-between items-start mb-8 border-b border-slate-700 pb-4">
                             <div id="roomStatusBadge" class="bg-slate-700 px-4 py-2 rounded-full text-sm font-bold">
@@ -780,9 +760,7 @@
                             </div>
                         </div>
 
-                        <!-- Players List -->
                         <div class="space-y-6">
-                            <!-- Host -->
                             <div class="flex items-center justify-between bg-slate-900/50 p-3 rounded-2xl border border-slate-700/50">
                                 <div class="flex items-center gap-3">
                                     <div class="w-14 h-14 rounded-full avatar-ring p-0.5 shadow-lg">
@@ -796,7 +774,6 @@
                                 <div id="hostStatus"></div>
                             </div>
 
-                            <!-- Guest -->
                             <div id="guestCard" class="flex items-center justify-between bg-slate-900/50 p-3 rounded-2xl border border-slate-700/50 opacity-50 transition-all duration-300">
                                 <div class="flex items-center gap-3">
                                     <div class="w-14 h-14 rounded-full border-2 border-slate-600 p-0.5 shadow-lg">
@@ -816,7 +793,6 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Controls -->
                     <div class="flex gap-3 mt-4">
                         <button id="leaveBtn" class="flex-1 py-4 bg-slate-800 text-red-400 hover:text-red-300 hover:bg-slate-700 rounded-2xl font-bold border border-slate-600 shadow-lg transition">مغادرة</button>
                         <button id="readyBtn" onclick="toggleReady()" class="flex-[2] py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl text-white font-bold text-xl shadow-lg shadow-blue-900/50 transition transform active:scale-95">
@@ -825,26 +801,21 @@
                     </div>
                 </div>
 
-                <!-- Game Area -->
                 <div id="gameArea" class="hidden h-full flex items-center justify-center p-2">
                     <div class="w-full bg-slate-800 rounded-3xl p-6 shadow-2xl border border-slate-700 relative overflow-hidden">
-                        <!-- Timer Bar -->
                         <div class="h-2 bg-slate-700 w-full absolute top-0 left-0">
                             <div id="timerBar" class="h-full bg-yellow-400 transition-all duration-1000 ease-linear shadow-[0_0_10px_#facc15]" style="width: 100%;"></div>
                         </div>
 
-                        <!-- Question Info -->
                         <div class="flex justify-between text-gray-300 text-sm mt-6 mb-8 font-bold">
                             <span id="qCount" class="bg-slate-900 px-3 py-1 rounded-lg">السؤال 1 / 10</span>
                             <span id="timerText" class="bg-slate-900 px-3 py-1 rounded-lg text-yellow-400">15ث</span>
                         </div>
 
-                        <!-- Question Text -->
                         <h2 id="gameQuestionText" class="text-2xl text-white font-bold text-center mb-10 leading-relaxed h-32 flex items-center justify-center select-none">
                             جاري تحميل السؤال...
                         </h2>
 
-                        <!-- Answers -->
                         <div class="space-y-4">
                             <button id="btnTrue" onclick="handleAnswer(true)" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-5 rounded-2xl text-2xl font-bold transition-all border-2 border-transparent hover:border-green-500 shadow-lg flex items-center justify-center gap-3">
                                 صح <i class="fas fa-check-circle text-green-400"></i>
@@ -857,7 +828,6 @@
                 </div>
             </div>
 
-            <!-- Tab: Upload Questions -->
             <div id="uploadTab" class="hidden tab-content p-2 pt-6">
                 <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-2xl space-y-5">
                      <div class="text-center mb-4">
@@ -908,7 +878,6 @@
                 </div>
             </div>
 
-            <!-- Tab: Admin Panel (Hidden by default) -->
             <div id="adminPanel" class="hidden tab-content p-2 pt-6">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-bold text-red-400 bg-red-900/20 px-4 py-2 rounded-full border border-red-900/50"><i class="fas fa-shield-alt mr-2"></i>لوحة التحكم</h2>
@@ -922,7 +891,6 @@
 
         </main>
 
-        <!-- Bottom Navigation -->
         <nav class="fixed bottom-0 w-full bg-slate-800/90 backdrop-blur-md border-t border-slate-700 p-3 flex justify-around z-40 pb-6 shadow-[0_-5px_20px_rgba(0,0,0,0.5)]">
             <button onclick="switchTab('challengesTab')" class="nav-btn flex-1 flex flex-col items-center p-2 rounded-2xl text-blue-500 bg-blue-900/20 transition-all duration-300">
                 <i class="fas fa-gamepad text-2xl mb-1"></i>
@@ -941,7 +909,6 @@
 
     <!-- MODALS -->
 
-    <!-- Create Room Modal -->
     <div id="createRoomModal" class="hidden fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity">
         <div class="bg-slate-800 w-full max-w-md p-8 rounded-t-[2.5rem] sm:rounded-[2.5rem] border-t sm:border border-slate-700 modal-enter shadow-2xl relative">
             <div class="absolute top-4 left-1/2 transform -translate-x-1/2 w-12 h-1.5 bg-slate-600 rounded-full sm:hidden"></div>
@@ -969,7 +936,6 @@
         </div>
     </div>
 
-    <!-- Search Room Modal -->
     <div id="searchRoomModal" class="hidden fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity">
         <div class="bg-slate-800 w-full max-w-md p-8 rounded-t-[2.5rem] sm:rounded-[2.5rem] border-t sm:border border-slate-700 modal-enter shadow-2xl relative">
              <div class="absolute top-4 left-1/2 transform -translate-x-1/2 w-12 h-1.5 bg-slate-600 rounded-full sm:hidden"></div>
