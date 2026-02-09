@@ -1165,7 +1165,7 @@
                     </button>
 
                     <button onclick="openFriendGameModal()" class="btn-main bg-gradient-to-r from-purple-500 to-pink-600 h-12">
-                        <i class="fas fa-user-friends ml-2"></i> اللعب ضد صديلقك
+                        <i class="fas fa-user-friends ml-2"></i> اللعب ضد صديقك
                     </button>
                 </div>
 
@@ -3790,25 +3790,14 @@
         // تحقق من الحالات المختلفة
         if(roomData.status === 'starting') {
             console.log("🚀 بدء المباراة...");
-            // إعطاء وقت للانتقال السلس
-            setTimeout(() => {
-                if(roomData.status === 'starting') {
-                    // تأكد أن كلا اللاعبين لا يزالان جاهزين
-                    if(roomData.creatorReady && roomData.player2Ready) {
-                        startFriendGame(roomData);
-                    }
-                }
-            }, 1500);
+            // يمكن إضافة مؤقت بسيط هنا للانتقال السلس
         }
         
         if(roomData.status === 'active' && !roomGameData) {
-            console.log("🎮 الانتقال إلى المباراة النشطة...");
-            // انتظر لضمان وصول الأسئلة للطرفين
+            // انتظر قليلاً لضمان وصول البيانات للطرفين
             setTimeout(() => {
-                if(!roomGameData) {
-                    startFriendGame(roomData);
-                }
-            }, 2000);
+                startFriendGame(roomData);
+            }, 1000);
         }
         
         if(roomData.status === 'closed') {
@@ -3899,22 +3888,13 @@
         };
 
         async function checkIfBothReady(roomData) {
-    console.log("🔍 تحقق من الجاهزية:", {
-        creatorReady: roomData.creatorReady,
-        player2Ready: roomData.player2Ready,
-        player2Id: roomData.player2Id,
-        status: roomData.status
-    });
-
-    // تحقق إذا كان الاثنان جاهزين والغرفة في حالة انتظار
-    if (roomData.creatorReady && roomData.player2Ready && roomData.player2Id && roomData.status === 'waiting') {
+    // تحقق إذا كان الاثنان جاهزين
+    if(roomData.creatorReady && roomData.player2Ready && roomData.player2Id) {
         console.log("✅ كلا اللاعبين جاهزان، بدء المباراة...");
         
         // أولاً: تحديث حالة الغرفة إلى 'starting' لمنع عمليات متعددة
         await updateDoc(doc(db, "rooms", currentRoomId), {
-            status: 'starting',
-            creatorReady: true,
-            player2Ready: true
+            status: 'starting'
         });
         
         // ثانياً: جلب الأسئلة
@@ -3942,8 +3922,9 @@
             player1Score: 0,
             player2Score: 0,
             currentQuestionIndex: 0,
-            currentQuestionAnswers: {}, // لتتبع الإجابات
-            lastAnswerTime: null
+            player1Answered: false,      // جديد
+            player2Answered: false,      // جديد
+            bothAnswered: false          // جديد
         });
         
         console.log("🎮 بدء المباراة مع", shuffledQs.length, "سؤال");
@@ -3962,12 +3943,10 @@
     if(roomData.gameQuestions && roomData.gameQuestions.length > 0) {
         shuffledQs = roomData.gameQuestions;
     } else {
-        // إذا لم تكن الأسئلة مخزنة، جلبها
         const qDocs = await getQuestions(roomData.subject, roomData.type);
         if(qDocs.length === 0) { 
             showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
             
-            // إعادة تعيين حالة الغرفة
             await updateDoc(doc(db, "rooms", currentRoomId), {
                 creatorReady: false,
                 player2Ready: false,
@@ -3980,7 +3959,6 @@
     
     const isPlayer1 = currentUser.uid === roomData.creatorId;
     const myPlayer = isPlayer1 ? 'player1' : 'player2';
-    const opPlayer = isPlayer1 ? 'player2' : 'player1';
     
     // إنشاء بيانات المباراة المحلية
     roomGameData = {
@@ -3999,13 +3977,8 @@
             photo: roomData.player2Photo
         },
         questions: shuffledQs, 
-        currentIdx: roomData.currentQuestionIndex || 0, 
-        answersCount: 0,
-        roomId: currentRoomId,
-        myPlayer: myPlayer
+        currentIdx: roomData.currentQuestionIndex || 0
     };
-    
-    console.log("🤝 بيانات المباراة جاهزة، عرض شاشة VS...");
     
     // عرض شاشة VS
     await showVSAnimation(
@@ -4021,64 +3994,21 @@
     // بدء عرض الأسئلة
     renderFriendGame(roomGameData, myPlayer);
     
-    // بدء الإستماع لتحديثات النتائج في الوقت الحقيقي
+    // بدء الإستماع لتحديثات النتائج
     listenToScoreUpdates();
-    listenToQuestionUpdates();
-}
-
-function listenToQuestionUpdates() {
-    if(!currentRoomId) return;
-    
-    const roomRef = doc(db, "rooms", currentRoomId);
-    
-    const unsubscribe = onSnapshot(roomRef, (doc) => {
-        if(!doc.exists()) return;
-        
-        const roomData = doc.data();
-        
-        if(roomGameData && roomData.currentQuestionIndex !== undefined) {
-            // تحديث السؤال الحالي إذا تغير
-            if(roomData.currentQuestionIndex !== roomGameData.currentIdx) {
-                console.log("📝 تحديث السؤال من:", roomGameData.currentIdx, "إلى:", roomData.currentQuestionIndex);
-                roomGameData.currentIdx = roomData.currentQuestionIndex;
-                
-                // إعادة تعيين حالة الإجابة للسؤال الجديد
-                hasAnsweredCurrentQ = false;
-                userAnsweredCorrectly = false;
-                currentQuestionCorrectAnswer = null;
-                
-                // إعادة عرض السؤال الجديد
-                if(roomGameData.currentIdx < roomGameData.questions.length) {
-                    setTimeout(() => {
-                        renderFriendGame(roomGameData, roomGameData.myPlayer);
-                    }, 500);
-                }
-            }
-        }
-    });
-    
-    // حفظ المرجع للإلغاء لاحقاً
-    window.questionUpdateListener = unsubscribe;
 }
 
         function renderFriendGame(data, myPlayer) {
     const totalQs = data.questions.length;
     
-    // التحقق من انتهاء الأسئلة
-    if(!data.questions || data.currentIdx >= totalQs) { 
-        console.log("🏁 انتهت الأسئلة، النتيجة النهائية:", {
-            player1: data.player1.score,
-            player2: data.player2.score,
-            currentIdx: data.currentIdx,
-            totalQs: totalQs
-        });
+    // تصحيح: فقط عند الوصول للسؤال 10 أو بعده
+    if(!data.questions || data.currentIdx >= 10) { 
         endFriendGame(data); 
         return; 
     }
     
     const q = data.questions[data.currentIdx];
     if (!q) { 
-        console.error("❌ السؤال غير موجود في الفهرس:", data.currentIdx);
         endFriendGame(data); 
         return; 
     }
@@ -4094,22 +4024,14 @@ function listenToQuestionUpdates() {
 
     const qTextEl = document.getElementById('q-text');
     
-    // إعادة تعيين حالة الإجابة فقط إذا كان السؤال جديداً
-    if(qTextEl.innerText !== q.question || !hasAnsweredCurrentQ) {
-        hasAnsweredCurrentQ = false;
-        userAnsweredCorrectly = false;
-        currentQuestionCorrectAnswer = null;
-        document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
-        document.getElementById('waiting-msg').classList.add('hidden');
-        
-        // إعادة تعيين حالة الإجابة في قاعدة البيانات
-        if(currentRoomId && data.roomId) {
-            updateDoc(doc(db, "rooms", data.roomId), {
-                player1Answered: false,
-                player2Answered: false
-            }).catch(console.error);
-        }
-        
+    // إعادة تعيين حالة الإجابة
+    hasAnsweredCurrentQ = false;
+    userAnsweredCorrectly = false;
+    currentQuestionCorrectAnswer = null;
+    document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
+    document.getElementById('waiting-msg').classList.add('hidden');
+    
+    if(qTextEl.innerText !== q.question) {
         clearInterval(gameTimer);
         let t = 15;
         document.getElementById('game-timer').innerText = t;
@@ -4126,44 +4048,53 @@ function listenToQuestionUpdates() {
         }, 1000);
     }
     
-    document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
+    document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / 10`;
     qTextEl.innerText = q.question;
-    const div = document.getElementById('answers-container');
     
-    // إعادة إنشاء الإجابات فقط إذا تغير السؤال
-    if(div.children.length === 0 || div.getAttribute('data-curr-q') !== q.question) {
-        div.setAttribute('data-curr-q', q.question);
-        div.innerHTML = '';
-        let ansList = [];
-        if(q.type === 'mcq') ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
-        else ansList = [{ txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }];
-        
-        const correctAns = ansList.find(ans => ans.isCorrect);
-        if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
-
-        ansList.sort(() => 0.5 - Math.random());
-        ansList.forEach(ansObj => {
-            const btn = document.createElement('button');
-            btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
-            btn.innerText = ansObj.txt;
-            btn.dataset.value = ansObj.value;
-            btn.onclick = () => { if(hasAnsweredCurrentQ) return; submitFriendAnswer(ansObj, q, data, myPlayer); };
-            div.appendChild(btn);
-        });
+    const div = document.getElementById('answers-container');
+    div.setAttribute('data-curr-q', q.question);
+    div.innerHTML = '';
+    
+    let ansList = [];
+    if(q.type === 'mcq') {
+        ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
+    } else {
+        ansList = [
+            { txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, 
+            { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }
+        ];
     }
+    
+    const correctAns = ansList.find(ans => ans.isCorrect);
+    if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
+
+    ansList.sort(() => 0.5 - Math.random());
+    ansList.forEach(ansObj => {
+        const btn = document.createElement('button');
+        btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
+        btn.innerText = ansObj.txt;
+        btn.dataset.value = ansObj.value;
+        btn.onclick = () => { if(hasAnsweredCurrentQ) return; submitFriendAnswer(ansObj, q, data, myPlayer); };
+        div.appendChild(btn);
+    });
 }
 
-        async function submitFriendAnswer(ansObj, q, matchData, myPlayer) {
+        window.submitFriendAnswer = async function(ansObj, q, matchData, myPlayer) {
     if(hasAnsweredCurrentQ || isExitingGame) return;
     hasAnsweredCurrentQ = true;
     userAnsweredCorrectly = ansObj && ansObj.isCorrect;
     
+    // تحديث الإجابة في الواجهة
     const answerButtons = document.querySelectorAll('#answers-container button');
     answerButtons.forEach(btn => {
         btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
-        if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) btn.classList.add('answer-correct');
-        else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) btn.classList.add('answer-wrong');
-        else btn.classList.add('answer-neutral');
+        if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) {
+            btn.classList.add('answer-correct');
+        } else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) {
+            btn.classList.add('answer-wrong');
+        } else {
+            btn.classList.add('answer-neutral');
+        }
     });
     
     document.getElementById('answers-container').classList.add('pointer-events-none');
@@ -4180,55 +4111,133 @@ function listenToQuestionUpdates() {
         document.getElementById('game-my-score').innerText = isPlayer1 ? matchData.player1.score : matchData.player2.score;
     }
     
-    // تحديث النتيجة في قاعدة البيانات لتزامنها مع الخصم
     try {
         if(currentRoomId) {
             const roomRef = doc(db, "rooms", currentRoomId);
             const roomDoc = await getDoc(roomRef);
+            
             if(roomDoc.exists()) {
                 const roomData = roomDoc.data();
                 
-                // تحديث النتيجة بناءً على اللاعب
+                // تحديث حالة إجابة اللاعب والنتيجة
                 if(myPlayer === 'player1') {
                     await updateDoc(roomRef, {
-                        player1Score: matchData.player1.score
+                        player1Score: matchData.player1.score,
+                        player1Answered: true
                     });
                 } else {
                     await updateDoc(roomRef, {
-                        player2Score: matchData.player2.score
+                        player2Score: matchData.player2.score,
+                        player2Answered: true
                     });
                 }
                 
-                // إضافة إجابة اللاعب الحالية
-                const answersKey = myPlayer === 'player1' ? 'player1Answered' : 'player2Answered';
-                await updateDoc(roomRef, {
-                    [answersKey]: true,
-                    lastAnswerTime: serverTimestamp()
-                });
+                // إظهار رسالة انتظار للخصم
+                document.getElementById('waiting-msg').classList.remove('hidden');
+                document.getElementById('waiting-msg').innerText = "بانتظار إجابة الخصم...";
                 
-                // الانتقال للسؤال التالي إذا كان كلا اللاعبين قد أجابا
-                const bothAnswered = (myPlayer === 'player1' && roomData.player2Answered) || 
-                                   (myPlayer === 'player2' && roomData.player1Answered);
+                // بدء الانتقال التلقائي بعد 10 ثواني (وقت أقصى)
+                setTimeout(async () => {
+                    try {
+                        const updatedRoom = await getDoc(roomRef);
+                        if(updatedRoom.exists()) {
+                            const updatedData = updatedRoom.data();
+                            
+                            // الانتقال للسؤال التالي
+                            const nextIndex = (updatedData.currentQuestionIndex || 0) + 1;
+                            
+                            await updateDoc(roomRef, {
+                                currentQuestionIndex: nextIndex,
+                                player1Answered: false,
+                                player2Answered: false
+                            });
+                            
+                            // تحديث البيانات المحلية
+                            matchData.currentIdx = nextIndex;
+                            
+                            // التحقق من نهاية المباراة
+                            if(nextIndex >= 10) {
+                                endFriendGame(matchData);
+                            } else {
+                                renderFriendGame(matchData, myPlayer);
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Error in auto transition:", error);
+                    }
+                }, 10000); // 10 ثواني كحد أقصى
                 
-                if(bothAnswered) {
-                    // إعادة تعيين حالة الإجابة
-                    await updateDoc(roomRef, {
-                        player1Answered: false,
-                        player2Answered: false,
-                        currentQuestionIndex: roomData.currentQuestionIndex + 1
-                    });
-                    
-                    document.getElementById('waiting-msg').classList.add('hidden');
-                } else {
-                    // إظهار رسالة انتظار للخصم
-                    document.getElementById('waiting-msg').classList.remove('hidden');
-                }
+                // بدء فحص تلقائي لانتقال السؤال
+                startSimpleAnswerCheck(roomRef, matchData, myPlayer);
             }
         }
     } catch (error) {
         console.error("Error updating score in database:", error);
-        document.getElementById('waiting-msg').classList.remove('hidden');
+        // في حالة الخطأ، انتظر 3 ثواني ثم انتقل
+        setTimeout(() => {
+            matchData.currentIdx += 1;
+            if(matchData.currentIdx >= 10) {
+                endFriendGame(matchData);
+            } else {
+                renderFriendGame(matchData, myPlayer);
+            }
+        }, 3000);
     }
+};
+
+// دالة بسيطة للفحص بدون interval معقد
+async function startSimpleAnswerCheck(roomRef, matchData, myPlayer) {
+    let checks = 0;
+    const maxChecks = 30; // 30 ثانية كحد أقصى
+    
+    const checkInterval = setInterval(async () => {
+        checks++;
+        
+        if(checks >= maxChecks) {
+            clearInterval(checkInterval);
+            return;
+        }
+        
+        try {
+            const roomDoc = await getDoc(roomRef);
+            if(!roomDoc.exists()) {
+                clearInterval(checkInterval);
+                return;
+            }
+            
+            const roomData = roomDoc.data();
+            
+            // تحقق إذا كان كلا اللاعبين قد أجابا
+            const bothAnswered = (roomData.player1Answered && roomData.player2Answered) || 
+                               (!roomData.player1Answered && !roomData.player2Answered && checks > 5);
+            
+            if(bothAnswered) {
+                clearInterval(checkInterval);
+                
+                // الانتقال للسؤال التالي
+                const nextIndex = (roomData.currentQuestionIndex || 0) + 1;
+                
+                await updateDoc(roomRef, {
+                    currentQuestionIndex: nextIndex,
+                    player1Answered: false,
+                    player2Answered: false
+                });
+                
+                // تحديث البيانات المحلية
+                matchData.currentIdx = nextIndex;
+                
+                // التحقق من نهاية المباراة
+                if(nextIndex >= 10) {
+                    endFriendGame(matchData);
+                } else {
+                    renderFriendGame(matchData, myPlayer);
+                }
+            }
+        } catch (error) {
+            console.error("Error in simple answer check:", error);
+            clearInterval(checkInterval);
+        }
+    }, 1000); // فحص كل ثانية
 }
 
         function endFriendGame(data) {
@@ -4267,23 +4276,12 @@ function listenToQuestionUpdates() {
     
     resultScreen.classList.remove('hidden');
     
-    // إغلاق الغرفة بعد عرض النتيجة
     setTimeout(async () => {
-        try {
-            if(currentRoomId) {
-                await updateDoc(doc(db, "rooms", currentRoomId), {
-                    status: 'closed'
-                });
-            }
-        } catch (error) {
-            console.error("Error closing room:", error);
-        } finally {
-            roomGameData = null;
-            if(window.questionUpdateListener) {
-                window.questionUpdateListener();
-                window.questionUpdateListener = null;
-            }
-        }
+        await updateDoc(doc(db, "rooms", currentRoomId), {
+            status: 'closed'
+        });
+        
+        roomGameData = null;
     }, 3000);
 }
 
@@ -4298,18 +4296,19 @@ function listenToScoreUpdates() {
         
         const roomData = doc.data();
         
-        // تحديث النقاط في الواجهة في الوقت الحقيقي
         if(roomGameData) {
             roomGameData.player1.score = roomData.player1Score || 0;
             roomGameData.player2.score = roomData.player2Score || 0;
             
             const isPlayer1 = currentUser.uid === roomData.creatorId;
-            const isPlayer1InGame = isPlayer1 ? 'player1' : 'player2';
+            const myPlayer = isPlayer1 ? 'player1' : 'player2';
             
-            // تحديث الواجهة فقط إذا كانت شاشة اللعبة مفتوحة
-            if(document.getElementById('game-overlay').classList.contains('hidden') === false) {
-                document.getElementById('game-my-score').innerText = isPlayer1InGame === 'player1' ? roomGameData.player1.score : roomGameData.player2.score;
-                document.getElementById('game-op-score').innerText = isPlayer1InGame === 'player1' ? roomGameData.player2.score : roomGameData.player1.score;
+            // تحديث الواجهة إذا كانت شاشة اللعبة مفتوحة
+            if(!document.getElementById('game-overlay').classList.contains('hidden')) {
+                document.getElementById('game-my-score').innerText = 
+                    myPlayer === 'player1' ? roomGameData.player1.score : roomGameData.player2.score;
+                document.getElementById('game-op-score').innerText = 
+                    myPlayer === 'player1' ? roomGameData.player2.score : roomGameData.player1.score;
             }
         }
     });
@@ -4363,14 +4362,19 @@ function listenToScoreUpdates() {
         roomTimerInterval = null;
     }
     
+    if(answerCheckInterval) {
+        clearInterval(answerCheckInterval);
+        answerCheckInterval = null;
+    }
+    
     if(friendMatchListener) {
         friendMatchListener();
         friendMatchListener = null;
     }
     
-    if(window.questionUpdateListener) {
-        window.questionUpdateListener();
-        window.questionUpdateListener = null;
+    if(gameTimer) {
+        clearInterval(gameTimer);
+        gameTimer = null;
     }
     
     currentRoomId = null;
@@ -4379,6 +4383,7 @@ function listenToScoreUpdates() {
     roomQType = null;
     roomSubject = null;
     roomGameData = null;
+    hasAnsweredCurrentQ = false;
     
     document.getElementById('room-screen').classList.add('hidden');
 }
