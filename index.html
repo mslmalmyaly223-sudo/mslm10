@@ -5268,60 +5268,68 @@
         }
 
         async function listenToRoomUpdates(roomId) {
-            if(roomListenerUnsubscribe) roomListenerUnsubscribe();
-            
-            roomListenerUnsubscribe = onSnapshot(doc(db, "rooms", roomId), async (doc) => {
-                if (!doc.exists()) {
-                    showBeautifulAlert('info', 'تم الإغلاق', 'تم إغلاق الغرفة من قبل المالك');
-                    closeRoom();
-                    return;
-                }
-
-                const roomData = doc.data();
-                
-                // Update player displays
-                const players = roomData.players || [];
-                
-                document.getElementById('players-count').textContent = `${players.length}/2`;
-                
-                let readyCount = 0;
-                players.forEach(player => {
-                    if (player.ready) readyCount++;
-                });
-                document.getElementById('ready-count').textContent = `${readyCount}/2`;
-                
-                // Update player 1 (owner)
-                if (players[0]) {
-                    document.getElementById('player1-avatar').src = players[0].photo;
-                    document.getElementById('player1-name').textContent = players[0].name;
-                    document.getElementById('player1-status').textContent = players[0].ready ? 'جاهز' : 'بانتظار';
-                    document.getElementById('player1-status').className = `player-status ${players[0].ready ? 'status-ready' : 'status-waiting'}`;
-                }
-                
-                // Update player 2
-                if (players[1]) {
-                    document.getElementById('player2-card').classList.remove('hidden');
-                    document.getElementById('player2-avatar').src = players[1].photo;
-                    document.getElementById('player2-name').textContent = players[1].name;
-                    document.getElementById('player2-status').textContent = players[1].ready ? 'جاهز' : 'بانتظار';
-                    document.getElementById('player2-status').className = `player-status ${players[1].ready ? 'status-ready' : 'status-waiting'}`;
-                } else {
-                    document.getElementById('player2-card').classList.add('hidden');
-                }
-                
-                // Update ready button
-                const currentPlayer = players.find(p => p.uid === currentUser.uid);
-                if (currentPlayer) {
-                    amIReady = currentPlayer.ready;
-                    document.getElementById('ready-text').textContent = amIReady ? 'غير جاهز' : 'جاهز';
-                }
-                
-                // Check if both players are ready
-                if (players.length === 2 && players[0].ready && players[1].ready) {
-                    await startFriendMatch(roomData);
-                }
-            });
+    if(roomListenerUnsubscribe) roomListenerUnsubscribe();
+    
+    roomListenerUnsubscribe = onSnapshot(doc(db, "rooms", roomId), async (doc) => {
+        if (!doc.exists()) {
+            showBeautifulAlert('info', 'تم الإغلاق', 'تم إغلاق الغرفة من قبل المالك');
+            closeRoom();
+            return;
         }
+
+        const roomData = doc.data();
+        
+        // ✅ إضافة فحص: إذا كانت المباراة قد بدأت بالفعل، لا تعيد التشغيل
+        if (roomData.status === 'playing') {
+            return;
+        }
+        
+        // Update player displays
+        const players = roomData.players || [];
+        
+        document.getElementById('players-count').textContent = `${players.length}/2`;
+        
+        let readyCount = 0;
+        players.forEach(player => {
+            if (player.ready) readyCount++;
+        });
+        document.getElementById('ready-count').textContent = `${readyCount}/2`;
+        
+        // Update player 1 (owner)
+        if (players[0]) {
+            document.getElementById('player1-avatar').src = players[0].photo;
+            document.getElementById('player1-name').textContent = players[0].name;
+            document.getElementById('player1-status').textContent = players[0].ready ? 'جاهز' : 'بانتظار';
+            document.getElementById('player1-status').className = `player-status ${players[0].ready ? 'status-ready' : 'status-waiting'}`;
+        }
+        
+        // Update player 2
+        if (players[1]) {
+            document.getElementById('player2-card').classList.remove('hidden');
+            document.getElementById('player2-avatar').src = players[1].photo;
+            document.getElementById('player2-name').textContent = players[1].name;
+            document.getElementById('player2-status').textContent = players[1].ready ? 'جاهز' : 'بانتظار';
+            document.getElementById('player2-status').className = `player-status ${players[1].ready ? 'status-ready' : 'status-waiting'}`;
+        } else {
+            document.getElementById('player2-card').classList.add('hidden');
+        }
+        
+        // Update ready button
+        const currentPlayer = players.find(p => p.uid === currentUser.uid);
+        if (currentPlayer) {
+            amIReady = currentPlayer.ready;
+            document.getElementById('ready-text').textContent = amIReady ? 'غير جاهز' : 'جاهز';
+        }
+        
+        // ✅ إضافة متغير لمنع التكرار
+        if (!window.matchStarting && players.length === 2 && players[0].ready && players[1].ready) {
+            window.matchStarting = true; // منع تشغيل متعدد
+            setTimeout(() => {
+                startFriendMatch(roomData);
+            }, 1000);
+        }
+    });
+}
 
         async function startFriendMatch(roomData) {
             // Start the match
