@@ -3576,46 +3576,50 @@
         };
 
         window.createNewRoom = async function() {
-            const sub = document.getElementById('room-subject').value;
-            if(!sub || !roomQType) {
-                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
-                return;
-            }
+    const sub = document.getElementById('room-subject').value;
+    if(!sub || !roomQType) {
+        showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
+        return;
+    }
 
-            const roomId = Math.floor(10000000 + Math.random() * 90000000).toString();
-            currentRoomId = roomId;
-            isRoomCreator = true;
-            roomSubject = sub;
-            roomReadyStatus = false;
+    const roomId = Math.floor(10000000 + Math.random() * 90000000).toString();
+    currentRoomId = roomId;
+    isRoomCreator = true;
+    roomSubject = sub;
+    roomReadyStatus = false;
+    
+    // وقت إنشاء ثابت يشاركه جميع اللاعبين
+    const roomCreationTimestamp = Date.now();
 
-            try {
-                await setDoc(doc(db, "rooms", roomId), {
-                    id: roomId,
-                    subject: sub,
-                    type: roomQType,
-                    creatorId: currentUser.uid,
-                    creatorName: userData.name,
-                    creatorPhoto: userData.photo,
-                    player2Id: null,
-                    player2Name: null,
-                    player2Photo: null,
-                    creatorReady: false,
-                    player2Ready: false,
-                    status: 'waiting',
-                    createdAt: serverTimestamp(),
-                    expiresAt: Timestamp.fromDate(new Date(Date.now() + 10 * 60 * 1000))
-                });
+    try {
+        await setDoc(doc(db, "rooms", roomId), {
+            id: roomId,
+            subject: sub,
+            type: roomQType,
+            creatorId: currentUser.uid,
+            creatorName: userData.name,
+            creatorPhoto: userData.photo,
+            player2Id: null,
+            player2Name: null,
+            player2Photo: null,
+            creatorReady: false,
+            player2Ready: false,
+            status: 'waiting',
+            createdAt: serverTimestamp(),
+            createdTimestamp: roomCreationTimestamp, // ⬅️ أضف هذا السطر
+            expiresAt: Timestamp.fromDate(new Date(roomCreationTimestamp + 10 * 60 * 1000))
+        });
 
-                closeCreateRoomModal();
-                openRoomScreen(roomId);
-                startRoomTimer();
-                listenToRoomUpdates();
+        closeAllModals();
+        openRoomScreen(roomId);
+        startRoomTimer();
+        listenToRoomUpdates();
 
-            } catch (error) {
-                console.error("Error creating room:", error);
-                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إنشاء الغرفة');
-            }
-        };
+    } catch (error) {
+        console.error("Error creating room:", error);
+        showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إنشاء الغرفة');
+    }
+};
 
         window.joinRoomById = async function() {
             const roomId = document.getElementById('room-id-input').value.trim();
@@ -3691,27 +3695,32 @@
         }
 
         function startRoomTimer() {
-            if(roomTimerInterval) clearInterval(roomTimerInterval);
-            
-            let timeLeft = 10 * 60;
-            const timerEl = document.getElementById('room-timer');
-            
-            function updateTimer() {
-                if(timeLeft <= 0) {
-                    clearInterval(roomTimerInterval);
-                    autoCloseRoom();
-                    return;
-                }
-                
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                timeLeft--;
-            }
-            
-            updateTimer();
-            roomTimerInterval = setInterval(updateTimer, 1000);
+    if(roomTimerInterval) clearInterval(roomTimerInterval);
+    
+    // وقت ثابت للجميع: 10 دقائق من وقت إنشاء الغرفة
+    const roomCreationTime = Date.now();
+    const roomDuration = 10 * 60 * 1000; // 10 دقائق بالميلي ثانية
+    const timerEl = document.getElementById('room-timer');
+    
+    function updateTimer() {
+        const now = Date.now();
+        const elapsed = now - roomCreationTime;
+        const timeLeft = Math.max(0, roomDuration - elapsed);
+        
+        if(timeLeft <= 0) {
+            clearInterval(roomTimerInterval);
+            autoCloseRoom();
+            return;
         }
+        
+        const minutes = Math.floor(timeLeft / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+    
+    updateTimer();
+    roomTimerInterval = setInterval(updateTimer, 1000);
+}
 
         function listenToRoomUpdates() {
     if(friendMatchListener) friendMatchListener();
@@ -3726,17 +3735,56 @@
         const roomData = doc.data();
         updateRoomUI(roomData);
         
+        // مزامنة النتائج عند أي تحديث
+        if (roomData.player1Score !== undefined) {
+            const isPlayer1 = currentUser.uid === roomData.creatorId;
+            const myScore = isPlayer1 ? roomData.player1Score : roomData.player2Score;
+            const opScore = isPlayer1 ? roomData.player2Score : roomData.player1Score;
+            
+            document.getElementById('game-my-score').innerText = myScore || 0;
+            document.getElementById('game-op-score').innerText = opScore || 0;
+        }
+        
         // تحقق من الحالات المختلفة
         if(roomData.status === 'starting') {
             console.log("🚀 بدء المباراة...");
-            // يمكن إضافة مؤقت بسيط هنا للانتقال السلس
         }
         
         if(roomData.status === 'active' && !roomGameData) {
-            // انتظر قليلاً لضمان وصول البيانات للطرفين
-            setTimeout(() => {
-                startFriendGame(roomData);
-            }, 1000);
+            // استخدام نفس الأسئلة المخزنة في قاعدة البيانات
+            const shuffledQs = roomData.gameQuestions || [];
+            
+            const isPlayer1 = currentUser.uid === roomData.creatorId;
+            const myPlayer = isPlayer1 ? 'player1' : 'player2';
+            
+            // إنشاء بيانات المباراة المحلية متزامنة مع قاعدة البيانات
+            roomGameData = {
+                status: 'active',
+                grade: userData.grade,
+                player1: { 
+                    uid: roomData.creatorId, 
+                    name: roomData.creatorName, 
+                    score: roomData.player1Score || 0, 
+                    photo: roomData.creatorPhoto
+                },
+                player2: { 
+                    uid: roomData.player2Id, 
+                    name: roomData.player2Name, 
+                    score: roomData.player2Score || 0, 
+                    photo: roomData.player2Photo
+                },
+                questions: shuffledQs, 
+                currentIdx: roomData.currentQuestionIndex || 0, 
+                answersCount: 0
+            };
+            
+            // الانتقال إلى شاشة اللعبة
+            document.getElementById('room-screen').classList.add('hidden');
+            document.getElementById('game-overlay').classList.remove('hidden');
+            document.getElementById('withdraw-game-btn').classList.remove('hidden');
+            
+            // بدء عرض الأسئلة
+            renderFriendGame(roomGameData, myPlayer);
         }
         
         if(roomData.status === 'closed') {
@@ -3831,12 +3879,12 @@
     if(roomData.creatorReady && roomData.player2Ready && roomData.player2Id) {
         console.log("✅ كلا اللاعبين جاهزان، بدء المباراة...");
         
-        // أولاً: تحديث حالة الغرفة إلى 'starting' لمنع عمليات متعددة
+        // تحديث حالة الغرفة فوراً
         await updateDoc(doc(db, "rooms", currentRoomId), {
             status: 'starting'
         });
         
-        // ثانياً: جلب الأسئلة
+        // جلب الأسئلة
         const qDocs = await getQuestions(roomData.subject, roomData.type);
         
         if(qDocs.length === 0) { 
@@ -3851,7 +3899,7 @@
             return; 
         }
         
-        // ثالثاً: تحديث الغرفة بالمباراة النشطة
+        // تحديث الغرفة بالمباراة النشطة - فوراً بدون تأخير
         const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
         
         await updateDoc(doc(db, "rooms", currentRoomId), {
@@ -3864,9 +3912,6 @@
         });
         
         console.log("🎮 بدء المباراة مع", shuffledQs.length, "سؤال");
-        
-    } else {
-        console.log("⏳ في انتظار اللاعب الآخر...");
     }
 }
 
@@ -3938,107 +3983,126 @@
 }
 
         function renderFriendGame(data, myPlayer) {
-            const totalQs = data.questions.length;
-            if(!data.questions || data.currentIdx >= totalQs) { 
-                endFriendGame(data); 
-                return; 
-            }
-            
-            const q = data.questions[data.currentIdx];
-            if (!q) { 
-                endFriendGame(data); 
-                return; 
-            }
-            
-            const isPlayer1 = myPlayer === 'player1';
-            
-            document.getElementById('p1-name').innerText = isPlayer1 ? data.player1.name : data.player2.name;
-            document.getElementById('game-p1-img').src = isPlayer1 ? data.player1.photo : data.player2.photo;
-            document.getElementById('p2-name').innerText = isPlayer1 ? data.player2.name : data.player1.name;
-            document.getElementById('game-p2-img').src = isPlayer1 ? data.player2.photo : data.player1.photo;
-            document.getElementById('game-my-score').innerText = isPlayer1 ? data.player1.score : data.player2.score;
-            document.getElementById('game-op-score').innerText = isPlayer1 ? data.player2.score : data.player1.score;
+    if (isExitingGame) return;
+    
+    const totalQs = data.questions.length;
+    if(!data.questions || data.currentIdx >= totalQs) { 
+        endFriendGame(data); 
+        return; 
+    }
+    
+    const q = data.questions[data.currentIdx];
+    if (!q) { 
+        endFriendGame(data); 
+        return; 
+    }
+    
+    const isPlayer1 = myPlayer === 'player1';
+    
+    document.getElementById('p1-name').innerText = isPlayer1 ? data.player1.name : data.player2.name;
+    document.getElementById('game-p1-img').src = isPlayer1 ? data.player1.photo : data.player2.photo;
+    document.getElementById('p2-name').innerText = isPlayer1 ? data.player2.name : data.player1.name;
+    document.getElementById('game-p2-img').src = isPlayer1 ? data.player2.photo : data.player1.photo;
+    document.getElementById('game-my-score').innerText = isPlayer1 ? data.player1.score : data.player2.score;
+    document.getElementById('game-op-score').innerText = isPlayer1 ? data.player2.score : data.player1.score;
 
-            const qTextEl = document.getElementById('q-text');
-            if(qTextEl.innerText !== q.question) {
-                hasAnsweredCurrentQ = false;
-                userAnsweredCorrectly = false;
-                currentQuestionCorrectAnswer = null;
-                document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
-                document.getElementById('waiting-msg').classList.add('hidden');
-                
-                clearInterval(gameTimer);
-                let t = 15;
-                document.getElementById('game-timer').innerText = t;
-                gameTimer = setInterval(() => {
-                    if (isExitingGame) { clearInterval(gameTimer); return; }
-                    t--;
-                    document.getElementById('game-timer').innerText = t;
-                    if(t <= 0) { 
-                        clearInterval(gameTimer); 
-                        if(!hasAnsweredCurrentQ) {
-                            submitFriendAnswer(null, q, data, myPlayer);
-                        }
-                    }
-                }, 1000);
+    const qTextEl = document.getElementById('q-text');
+    if(qTextEl.innerText !== q.question) {
+        hasAnsweredCurrentQ = false;
+        userAnsweredCorrectly = false;
+        currentQuestionCorrectAnswer = null;
+        document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
+        document.getElementById('waiting-msg').classList.add('hidden');
+        
+        clearInterval(gameTimer);
+        let t = 15;
+        document.getElementById('game-timer').innerText = t;
+        gameTimer = setInterval(() => {
+            if (isExitingGame) { clearInterval(gameTimer); return; }
+            t--;
+            document.getElementById('game-timer').innerText = t;
+            if(t <= 0) { 
+                clearInterval(gameTimer); 
+                if(!hasAnsweredCurrentQ) {
+                    submitFriendAnswer(null, q, data, myPlayer);
+                }
             }
-            
-            document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
-            qTextEl.innerText = q.question;
-            const div = document.getElementById('answers-container');
-            if(div.children.length === 0 || div.getAttribute('data-curr-q') !== q.question) {
-                div.setAttribute('data-curr-q', q.question);
-                div.innerHTML = '';
-                let ansList = [];
-                if(q.type === 'mcq') ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
-                else ansList = [{ txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }];
-                
-                const correctAns = ansList.find(ans => ans.isCorrect);
-                if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
+        }, 1000);
+    }
+    
+    document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
+    qTextEl.innerText = q.question;
+    
+    const div = document.getElementById('answers-container');
+    if(div.children.length === 0 || div.getAttribute('data-curr-q') !== q.question) {
+        div.setAttribute('data-curr-q', q.question);
+        div.innerHTML = '';
+        let ansList = [];
+        if(q.type === 'mcq') ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
+        else ansList = [{ txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }];
+        
+        const correctAns = ansList.find(ans => ans.isCorrect);
+        if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
 
-                ansList.sort(() => 0.5 - Math.random());
-                ansList.forEach(ansObj => {
-                    const btn = document.createElement('button');
-                    btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
-                    btn.innerText = ansObj.txt;
-                    btn.dataset.value = ansObj.value;
-                    btn.onclick = () => { if(hasAnsweredCurrentQ) return; submitFriendAnswer(ansObj, q, data, myPlayer); };
-                    div.appendChild(btn);
-                });
-            }
-        }
+        ansList.sort(() => 0.5 - Math.random());
+        ansList.forEach(ansObj => {
+            const btn = document.createElement('button');
+            btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
+            btn.innerText = ansObj.txt;
+            btn.dataset.value = ansObj.value;
+            btn.onclick = () => { if(hasAnsweredCurrentQ) return; submitFriendAnswer(ansObj, q, data, myPlayer); };
+            div.appendChild(btn);
+        });
+    }
+}
 
         async function submitFriendAnswer(ansObj, q, matchData, myPlayer) {
-            if(hasAnsweredCurrentQ || isExitingGame) return;
-            hasAnsweredCurrentQ = true;
-            userAnsweredCorrectly = ansObj && ansObj.isCorrect;
-            
-            const answerButtons = document.querySelectorAll('#answers-container button');
-            answerButtons.forEach(btn => {
-                btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
-                if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) btn.classList.add('answer-correct');
-                else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) btn.classList.add('answer-wrong');
-                else btn.classList.add('answer-neutral');
+    if(hasAnsweredCurrentQ || isExitingGame) return;
+    hasAnsweredCurrentQ = true;
+    userAnsweredCorrectly = ansObj && ansObj.isCorrect;
+    
+    // تحديث النقاط في قاعدة البيانات فوراً
+    if(ansObj && ansObj.isCorrect) {
+        if(myPlayer === 'player1') {
+            matchData.player1.score += 1;
+            // تحديث النتيجة في قاعدة البيانات
+            await updateDoc(doc(db, "rooms", currentRoomId), {
+                player1Score: matchData.player1.score
             });
-            
-            document.getElementById('answers-container').classList.add('pointer-events-none');
-
-            if(ansObj && ansObj.isCorrect) {
-                if(myPlayer === 'player1') {
-                    matchData.player1.score += 1;
-                } else {
-                    matchData.player2.score += 1;
-                }
-                
-                const isPlayer1 = myPlayer === 'player1';
-                document.getElementById('game-my-score').innerText = isPlayer1 ? matchData.player1.score : matchData.player2.score;
-            }
-            
-            setTimeout(() => {
-                matchData.currentIdx += 1;
-                renderFriendGame(matchData, myPlayer);
-            }, 2000);
+        } else {
+            matchData.player2.score += 1;
+            // تحديث النتيجة في قاعدة البيانات
+            await updateDoc(doc(db, "rooms", currentRoomId), {
+                player2Score: matchData.player2.score
+            });
         }
+        
+        const isPlayer1 = myPlayer === 'player1';
+        document.getElementById('game-my-score').innerText = isPlayer1 ? matchData.player1.score : matchData.player2.score;
+    }
+    
+    const answerButtons = document.querySelectorAll('#answers-container button');
+    answerButtons.forEach(btn => {
+        btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
+        if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) btn.classList.add('answer-correct');
+        else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) btn.classList.add('answer-wrong');
+        else btn.classList.add('answer-neutral');
+    });
+    
+    document.getElementById('answers-container').classList.add('pointer-events-none');
+    
+    // الانتقال للسؤال التالي بعد ثانيتين
+    setTimeout(async () => {
+        matchData.currentIdx += 1;
+        
+        // تحديث الفهرس الحالي في قاعدة البيانات
+        await updateDoc(doc(db, "rooms", currentRoomId), {
+            currentQuestionIndex: matchData.currentIdx
+        });
+        
+        renderFriendGame(matchData, myPlayer);
+    }, 2000);
+}
 
         function endFriendGame(data) {
             clearInterval(gameTimer);
@@ -5585,6 +5649,17 @@
                 showBeautifulAlert('error', 'خطأ', 'حدث خطأ في رفض السؤال');
             }
         };
+        
+        window.closeAllModals = function() {
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.classList.add('hidden');
+    });
+    document.getElementById('friend-game-modal').classList.add('hidden');
+    document.getElementById('create-room-modal').classList.add('hidden');
+    document.getElementById('join-room-modal').classList.add('hidden');
+};
+
+
     </script>
 </body>
 </html>
