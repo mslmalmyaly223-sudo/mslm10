@@ -2293,6 +2293,7 @@
         let allLeaderboardUsers = [];
         let leaderboardLimit = 50;
         let displayedLeaderboardCount = 25;
+        
 
         let premiumInterval = null;
         const BADGES_LIST = ["سجاج", "سجاجة", "دكتور", "دكتورة", "كسلان", "كسولة", "شطور", "شطورة", "نايم", "نايمة", "نعسان", "نعسانة", "ماكو واهس", "مهندس", "مهندسة", "واحد عراق", "صگاركم", "صگارتكم", "فستقة", "المحامي", "المحامية"];
@@ -2332,6 +2333,15 @@
         let amIReady = false;
         let roomListenerUnsubscribe = null;
         let connectionCheckInterval = null;
+        // أضف هذه المتغيرات مع المتغيرات الأخرى في الأعلى
+let matchStarting = false;
+let vsScreenShown = false;
+let matchAlreadyStarted = false;
+
+// وفي دالة closeRoom، أضف إعادة تعيين:
+window.matchStarting = false;
+window.vsScreenShown = false;
+window.matchAlreadyStarted = false;
 
         onAuthStateChanged(auth, async (user) => {
             const intro = document.getElementById('intro-screen');
@@ -3393,29 +3403,34 @@
         }
 
         function showVSAnimation(p1, p2) {
-            return new Promise(resolve => {
-                document.getElementById('searching-ui').classList.add('hidden');
-                document.getElementById('searching-ui').style.display = 'none';
-                
-                const isP1 = p1.uid === currentUser.uid;
-                const me = isP1 ? p1 : p2;
-                const op = isP1 ? p2 : p1;
+    return new Promise(resolve => {
+        console.log("🎭 Showing VS animation");
+        
+        document.getElementById('searching-ui').classList.add('hidden');
+        document.getElementById('searching-ui').style.display = 'none';
+        
+        const isP1 = p1.uid === currentUser.uid;
+        const me = isP1 ? p1 : p2;
+        const op = isP1 ? p2 : p1;
 
-                document.getElementById('vs-p1-img').src = me.photo;
-                document.getElementById('vs-p1-name').innerText = me.name;
-                
-                document.getElementById('vs-p2-img').src = op.photo;
-                document.getElementById('vs-p2-name').innerText = op.name;
+        document.getElementById('vs-p1-img').src = me.photo;
+        document.getElementById('vs-p1-name').innerText = me.name;
+        
+        document.getElementById('vs-p2-img').src = op.photo;
+        document.getElementById('vs-p2-name').innerText = op.name;
 
-                const screen = document.getElementById('vs-screen');
-                screen.classList.remove('hidden');
-                
-                setTimeout(() => {
-                    screen.classList.add('hidden');
-                    resolve();
-                }, 2500); 
-            });
-        }
+        const screen = document.getElementById('vs-screen');
+        screen.classList.remove('hidden');
+        screen.classList.add('active'); // ✅ إضافة class active
+        
+        setTimeout(() => {
+            screen.classList.add('hidden');
+            screen.classList.remove('active'); // ✅ إزالة class active
+            console.log("🎭 VS animation completed");
+            resolve();
+        }, 2500); 
+    });
+}
 
         function renderGame(data) {
             if (isExitingGame) return;
@@ -5332,84 +5347,187 @@
 }
 
         async function startFriendMatch(roomData) {
-            // Start the match
-            showBeautifulAlert('info', 'بدء المباراة', 'جاري بدء المباراة...');
-            
-            // Get questions
-            const qDocs = await getQuestions(roomData.subject, roomData.questionType);
-            if(qDocs.length === 0) { 
-                showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم'); 
-                return; 
-            }
-            
-            const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
-            
-            // Create match document
-            const matchId = `friend_${currentRoomId}_${Date.now()}`;
-            
-            await setDoc(doc(db, "matches", matchId), {
-                id: matchId,
-                roomId: currentRoomId,
-                players: roomData.players.map(p => ({
-                    ...p,
-                    score: 0,
-                    answers: []
-                })),
-                questions: shuffledQs,
-                currentQuestion: 0,
-                status: 'active',
-                startedAt: serverTimestamp()
-            });
-            
-            // Update room status
-            await updateDoc(doc(db, "rooms", currentRoomId), {
-                status: 'playing',
-                matchId: matchId
-            });
-            
-            // Start the game
-            startFriendGame(matchId, roomData);
+    try {
+        // ✅ تأكد من أننا في الغرفة الصحيحة
+        if (currentRoomId !== roomData.id) {
+            console.warn("Room ID mismatch, skipping match start");
+            window.matchStarting = false;
+            return;
         }
+        
+        // ✅ إضافة فحص مزدوج لمنع التكرار
+        if (window.matchAlreadyStarted) {
+            console.warn("Match already started, skipping");
+            window.matchStarting = false;
+            return;
+        }
+        
+        window.matchAlreadyStarted = true;
+        
+        console.log("🎮 Starting friend match for room:", currentRoomId);
+        
+        // Start the match
+        showBeautifulAlert('info', 'بدء المباراة', 'جاري بدء المباراة...');
+        
+        // ✅ تحديث حالة الغرفة أولاً لمنع التكرار
+        await updateDoc(doc(db, "rooms", currentRoomId), {
+            status: 'starting'
+        });
+        
+        // Get questions
+        const qDocs = await getQuestions(roomData.subject, roomData.questionType);
+        if(qDocs.length === 0) { 
+            showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم'); 
+            window.matchStarting = false;
+            window.matchAlreadyStarted = false;
+            
+            // إعادة حالة الغرفة
+            await updateDoc(doc(db, "rooms", currentRoomId), {
+                status: 'waiting'
+            });
+            return; 
+        }
+        
+        const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
+        
+        // Create match document
+        const matchId = `friend_${currentRoomId}_${Date.now()}`;
+        
+        await setDoc(doc(db, "matches", matchId), {
+            id: matchId,
+            roomId: currentRoomId,
+            players: roomData.players.map(p => ({
+                ...p,
+                score: 0,
+                answers: []
+            })),
+            questions: shuffledQs,
+            currentQuestion: 0,
+            status: 'starting',
+            startedAt: serverTimestamp()
+        });
+        
+        // ✅ تحديث حالة الغرفة نهائياً
+        await updateDoc(doc(db, "rooms", currentRoomId), {
+            status: 'playing',
+            matchId: matchId
+        });
+        
+        // ✅ تحديث حالة المباراة
+        await updateDoc(doc(db, "matches", matchId), {
+            status: 'active'
+        });
+        
+        console.log("✅ Match started successfully, matchId:", matchId);
+        
+        // Start the game بعد تأخير قصير
+        setTimeout(() => {
+            startFriendGame(matchId, roomData);
+        }, 1500);
+        
+    } catch (error) {
+        console.error("❌ Error in startFriendMatch:", error);
+        showBeautifulAlert('error', 'خطأ', 'حدث خطأ في بدء المباراة');
+        
+        // إعادة تعيين المتغيرات في حالة الخطأ
+        window.matchStarting = false;
+        window.matchAlreadyStarted = false;
+        
+        // إعادة حالة الغرفة
+        if (currentRoomId) {
+            try {
+                await updateDoc(doc(db, "rooms", currentRoomId), {
+                    status: 'waiting',
+                    matchId: null
+                });
+            } catch (e) {
+                console.error("Error resetting room:", e);
+            }
+        }
+    }
+}
 
         async function startFriendGame(matchId, roomData) {
-            // Close room lobby
-            document.getElementById('room-lobby').classList.add('hidden');
-            
-            // Setup game
-            const opponent = roomData.players.find(p => p.uid !== currentUser.uid);
-            
-            localMatchData = {
-                status: 'active',
-                grade: userData.grade,
-                player1: { 
-                    uid: currentUser.uid, 
-                    name: userData.name, 
-                    score: 0, 
-                    photo: userData.photo,
-                    grade: userData.grade
-                },
-                player2: { 
-                    uid: opponent.uid, 
-                    name: opponent.name, 
-                    score: 0, 
-                    photo: opponent.photo,
-                    grade: roomData.grade
-                },
-                questions: [], // Will be loaded from match document
-                currentIdx: 0, 
-                answersCount: 0,
-                matchId: matchId
-            };
-            
-            // Show VS animation
-            await showVSAnimation(localMatchData.player1, localMatchData.player2);
+    // ✅ فحص: إذا كان VS screen مفتوحاً بالفعل، لا تفتحه مجدداً
+    if (document.getElementById('vs-screen').classList.contains('active')) {
+        console.log("VS screen already active, skipping");
+        return;
+    }
+    
+    console.log("🎬 Starting friend game with matchId:", matchId);
+    
+    // Close room lobby
+    document.getElementById('room-lobby').classList.add('hidden');
+    
+    // Setup game
+    const opponent = roomData.players.find(p => p.uid !== currentUser.uid);
+    
+    localMatchData = {
+        status: 'active',
+        grade: userData.grade,
+        player1: { 
+            uid: currentUser.uid, 
+            name: userData.name, 
+            score: 0, 
+            photo: userData.photo,
+            grade: userData.grade
+        },
+        player2: { 
+            uid: opponent.uid, 
+            name: opponent.name, 
+            score: 0, 
+            photo: opponent.photo,
+            grade: roomData.grade
+        },
+        questions: [],
+        currentIdx: 0, 
+        answersCount: 0,
+        matchId: matchId
+    };
+    
+    // ✅ إضافة فحص: تأكد أن VS screen يظهر مرة واحدة فقط
+    if (!window.vsScreenShown) {
+        window.vsScreenShown = true;
+        
+        // Show VS animation
+        await showVSAnimation(localMatchData.player1, localMatchData.player2);
+        
+        // ✅ إخفاء VS screen بعد الأنيميشن
+        setTimeout(() => {
+            document.getElementById('vs-screen').classList.add('hidden');
+            window.vsScreenShown = false;
             
             // Start listening to match updates
             listenToMatchUpdates(matchId);
             
             // Show game overlay
             document.getElementById('game-overlay').classList.remove('hidden');
+            
+            // ✅ تحميل الأسئلة
+            loadMatchQuestions(matchId);
+            
+        }, 2500); // نفس مدة الأنيميشن
+    }
+}
+
+async function loadMatchQuestions(matchId) {
+    try {
+        const matchDoc = await getDoc(doc(db, "matches", matchId));
+        if (!matchDoc.exists()) return;
+        
+        const matchData = matchDoc.data();
+        localMatchData.questions = matchData.questions || [];
+        
+        // عرض السؤال الأول
+        if (localMatchData.questions.length > 0) {
+            showQuestion(localMatchData.questions[0]);
         }
+        
+    } catch (error) {
+        console.error("Error loading match questions:", error);
+    }
+}
+
 
         function listenToMatchUpdates(matchId) {
             if(matchListenerUnsubscribe) matchListenerUnsubscribe();
