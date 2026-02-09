@@ -934,6 +934,39 @@
             .input-box { font-size: 1.1rem; }
             .auth-overlay > div { max-width: 500px; }
         }
+        
+        .pointer-events-none {
+    pointer-events: none;
+}
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+/* تأثيرات إضافية للأزرار */
+.answer-neutral:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+}
+
+.answer-correct:hover, .answer-wrong:hover {
+    transform: none;
+}
+
+/* تحسينات للواجهة */
+#game-overlay {
+    transition: opacity 0.3s ease;
+}
+
+#waiting-msg {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
     </style>
 </head>
 <body>
@@ -1132,7 +1165,7 @@
                     </button>
 
                     <button onclick="openFriendGameModal()" class="btn-main bg-gradient-to-r from-purple-500 to-pink-600 h-12">
-                        <i class="fas fa-user-friends ml-2"></i> اللعب ضد صديقك
+                        <i class="fas fa-user-friends ml-2"></i> اللعب ضد صد  يقك
                     </button>
                 </div>
 
@@ -3588,8 +3621,13 @@
     roomSubject = sub;
     roomReadyStatus = false;
 
+    // إغلاق النافذة المنبثقة فوراً
+    document.getElementById('create-room-modal').classList.add('hidden');
+    document.getElementById('friend-game-modal').classList.add('hidden');
+
     try {
-        const startTime = new Date();
+        // تعيين وقت انتهاء متزامن (10 دقائق من الآن)
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
         
         await setDoc(doc(db, "rooms", roomId), {
             id: roomId,
@@ -3605,17 +3643,11 @@
             player2Ready: false,
             status: 'waiting',
             createdAt: serverTimestamp(),
-            roomStartTime: Timestamp.fromDate(startTime),
-            expiresAt: Timestamp.fromDate(new Date(startTime.getTime() + 10 * 60 * 1000))
+            expiresAt: Timestamp.fromDate(expiresAt) // وقت انتهاء متزامن
         });
 
-        // إخفاء جميع النوافذ المنبثقة
-        document.getElementById('create-room-modal').classList.add('hidden');
-        document.getElementById('friend-game-modal').classList.add('hidden');
-        document.getElementById('join-room-modal').classList.add('hidden');
-        
         openRoomScreen(roomId);
-        startRoomTimer(roomId);
+        startRoomTimer();
         listenToRoomUpdates();
 
     } catch (error) {
@@ -3624,7 +3656,7 @@
     }
 };
 
-window.joinRoomById = async function() {
+        window.joinRoomById = async function() {
     const roomId = document.getElementById('room-id-input').value.trim();
     if(!roomId || roomId.length !== 8) {
         showBeautifulAlert('warning', 'تنبيه', 'يرجى إدخال رقم غرفة صحيح (8 أرقام)');
@@ -3655,6 +3687,10 @@ window.joinRoomById = async function() {
             return;
         }
 
+        // إغلاق النافذة المنبثقة فوراً
+        document.getElementById('join-room-modal').classList.add('hidden');
+        document.getElementById('friend-game-modal').classList.add('hidden');
+
         await updateDoc(doc(db, "rooms", roomId), {
             player2Id: currentUser.uid,
             player2Name: userData.name,
@@ -3668,13 +3704,8 @@ window.joinRoomById = async function() {
         roomQType = roomData.type;
         roomReadyStatus = false;
 
-        // إخفاء جميع النوافذ المنبثقة
-        document.getElementById('join-room-modal').classList.add('hidden');
-        document.getElementById('friend-game-modal').classList.add('hidden');
-        document.getElementById('create-room-modal').classList.add('hidden');
-        
         openRoomScreen(roomId);
-        startRoomTimer(roomId);
+        startRoomTimer();
         listenToRoomUpdates();
 
     } catch (error) {
@@ -3682,61 +3713,6 @@ window.joinRoomById = async function() {
         showBeautifulAlert('error', 'خطأ', 'حدث خطأ في الانضمام للغرفة');
     }
 };
-
-        window.joinRoomById = async function() {
-            const roomId = document.getElementById('room-id-input').value.trim();
-            if(!roomId || roomId.length !== 8) {
-                showBeautifulAlert('warning', 'تنبيه', 'يرجى إدخال رقم غرفة صحيح (8 أرقام)');
-                return;
-            }
-
-            try {
-                const roomDoc = await getDoc(doc(db, "rooms", roomId));
-                if(!roomDoc.exists()) {
-                    showBeautifulAlert('error', 'خطأ', 'الغرفة غير موجودة');
-                    return;
-                }
-
-                const roomData = roomDoc.data();
-                
-                if(roomData.status !== 'waiting') {
-                    showBeautifulAlert('error', 'خطأ', 'الغرفة غير متاحة للانضمام');
-                    return;
-                }
-
-                if(roomData.player2Id !== null) {
-                    showBeautifulAlert('error', 'خطأ', 'الغرفة ممتلئة');
-                    return;
-                }
-
-                if(roomData.creatorId === currentUser.uid) {
-                    showBeautifulAlert('error', 'خطأ', 'لا يمكنك الانضمام إلى غرفتك الخاصة');
-                    return;
-                }
-
-                await updateDoc(doc(db, "rooms", roomId), {
-                    player2Id: currentUser.uid,
-                    player2Name: userData.name,
-                    player2Photo: userData.photo,
-                    player2Ready: false
-                });
-
-                currentRoomId = roomId;
-                isRoomCreator = false;
-                roomSubject = roomData.subject;
-                roomQType = roomData.type;
-                roomReadyStatus = false;
-
-                closeJoinRoomModal();
-                openRoomScreen(roomId);
-                startRoomTimer();
-                listenToRoomUpdates();
-
-            } catch (error) {
-                console.error("Error joining room:", error);
-                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في الانضمام للغرفة');
-            }
-        };
 
         function openRoomScreen(roomId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -3756,49 +3732,46 @@ window.joinRoomById = async function() {
             updateRoomUI();
         }
 
-        function startRoomTimer(roomId) {
+        function startRoomTimer() {
     if(roomTimerInterval) clearInterval(roomTimerInterval);
     
-    const timerEl = document.getElementById('room-timer');
+    // الحصول على وقت الغرفة من قاعدة البيانات
+    const roomRef = doc(db, "rooms", currentRoomId);
     
-    async function updateTimer() {
-        try {
-            const roomDoc = await getDoc(doc(db, "rooms", roomId));
-            if(!roomDoc.exists()) {
-                clearInterval(roomTimerInterval);
-                return;
-            }
-            
-            const roomData = roomDoc.data();
-            
-            if (!roomData.roomStartTime) {
-                timerEl.textContent = "10:00";
-                return;
-            }
-            
-            const startTime = roomData.roomStartTime.toDate();
+    async function syncTimer() {
+        const roomDoc = await getDoc(roomRef);
+        if(!roomDoc.exists()) return;
+        
+        const roomData = roomDoc.data();
+        let timeLeft = 10 * 60; // 10 دقائق افتراضياً
+        
+        // إذا كان هناك وقت انتهاء محدد في قاعدة البيانات
+        if(roomData.expiresAt) {
+            const expiresAt = roomData.expiresAt.toDate();
             const now = new Date();
-            const elapsed = (now - startTime) / 1000;
-            let timeLeft = 10 * 60 - elapsed;
-            
+            timeLeft = Math.max(0, Math.floor((expiresAt - now) / 1000));
+        }
+        
+        const timerEl = document.getElementById('room-timer');
+        
+        function updateTimer() {
             if(timeLeft <= 0) {
                 clearInterval(roomTimerInterval);
-                timerEl.textContent = "00:00";
                 autoCloseRoom();
                 return;
             }
             
             const minutes = Math.floor(timeLeft / 60);
-            const seconds = Math.floor(timeLeft % 60);
+            const seconds = timeLeft % 60;
             timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            
-        } catch (error) {
-            console.error("Error updating timer:", error);
+            timeLeft--;
         }
+        
+        updateTimer();
+        roomTimerInterval = setInterval(updateTimer, 1000);
     }
     
-    updateTimer();
-    roomTimerInterval = setInterval(updateTimer, 1000);
+    syncTimer();
 }
 
         function listenToRoomUpdates() {
@@ -3814,50 +3787,17 @@ window.joinRoomById = async function() {
         const roomData = doc.data();
         updateRoomUI(roomData);
         
-        // تحقق من الحالة الجاهزة وبدء المباراة فوراً
-        if(roomData.status === 'waiting' && roomData.creatorReady && roomData.player2Ready && roomData.player2Id) {
-            console.log("🚀 كلا اللاعبين جاهزان، بدء المباراة فوراً...");
-            
-            // تحديث حالة الغرفة إلى 'starting' فوراً
-            await updateDoc(doc(db, "rooms", currentRoomId), {
-                status: 'starting'
-            });
-            
-            // جلب الأسئلة مباشرة
-            const qDocs = await getQuestions(roomData.subject, roomData.type);
-            
-            if(qDocs.length === 0) { 
-                showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
-                
-                await updateDoc(doc(db, "rooms", currentRoomId), {
-                    creatorReady: false,
-                    player2Ready: false,
-                    status: 'waiting'
-                });
-                return; 
-            }
-            
-            // تحديث الغرفة بالمباراة النشطة
-            const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
-            
-            await updateDoc(doc(db, "rooms", currentRoomId), {
-                status: 'active',
-                gameQuestions: shuffledQs,
-                gameStartTime: serverTimestamp(),
-                player1Score: 0,
-                player2Score: 0,
-                currentQuestionIndex: 0,
-                player1Answered: false,
-                player2Answered: false,
-                questionStartTime: serverTimestamp()
-            });
-            
-            console.log("🎮 بدء المباراة مع", shuffledQs.length, "سؤال");
+        // تحقق من الحالات المختلفة
+        if(roomData.status === 'starting') {
+            console.log("🚀 بدء المباراة...");
+            // يمكن إضافة مؤقت بسيط هنا للانتقال السلس
         }
         
         if(roomData.status === 'active' && !roomGameData) {
-            // بدء المباراة مباشرة بدون تأخير
-            startFriendGame(roomData);
+            // انتظر قليلاً لضمان وصول البيانات للطرفين
+            setTimeout(() => {
+                startFriendGame(roomData);
+            }, 1000);
         }
         
         if(roomData.status === 'closed') {
@@ -3994,13 +3934,54 @@ window.joinRoomById = async function() {
         async function startFriendGame(roomData) {
     console.log("🎮 بدء المباراة ضد صديق...");
     
+    // تأكد أن لدينا بيانات الأسئلة
+    let shuffledQs = [];
+    
+    if(roomData.gameQuestions && roomData.gameQuestions.length > 0) {
+        shuffledQs = roomData.gameQuestions;
+    } else {
+        // إذا لم تكن الأسئلة مخزنة، جلبها
+        const qDocs = await getQuestions(roomData.subject, roomData.type);
+        if(qDocs.length === 0) { 
+            showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
+            
+            // إعادة تعيين حالة الغرفة
+            await updateDoc(doc(db, "rooms", currentRoomId), {
+                creatorReady: false,
+                player2Ready: false,
+                status: 'waiting'
+            });
+            return; 
+        }
+        shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
+    }
+    
     const isPlayer1 = currentUser.uid === roomData.creatorId;
     const myPlayer = isPlayer1 ? 'player1' : 'player2';
+    const opPlayer = isPlayer1 ? 'player2' : 'player1';
     
-    // الانتقال إلى شاشة اللعبة مباشرة
-    document.getElementById('room-screen').classList.add('hidden');
-    document.getElementById('game-overlay').classList.remove('hidden');
-    document.getElementById('withdraw-game-btn').classList.remove('hidden');
+    // إنشاء بيانات المباراة المحلية
+    roomGameData = {
+        status: 'active',
+        grade: userData.grade,
+        player1: { 
+            uid: roomData.creatorId, 
+            name: roomData.creatorName, 
+            score: roomData.player1Score || 0, 
+            photo: roomData.creatorPhoto
+        },
+        player2: { 
+            uid: roomData.player2Id, 
+            name: roomData.player2Name, 
+            score: roomData.player2Score || 0, 
+            photo: roomData.player2Photo
+        },
+        questions: shuffledQs, 
+        currentIdx: roomData.currentQuestionIndex || 0, 
+        answersCount: 0
+    };
+    
+    console.log("🤝 بيانات المباراة جاهزة، عرض شاشة VS...");
     
     // عرض شاشة VS
     await showVSAnimation(
@@ -4008,279 +3989,176 @@ window.joinRoomById = async function() {
         { photo: roomData.player2Photo, name: roomData.player2Name }
     );
     
-    // استمع لتحديثات المباراة من قاعدة البيانات
-    listenToGameUpdates(roomData.id, myPlayer);
+    // الانتقال إلى شاشة اللعبة
+    document.getElementById('room-screen').classList.add('hidden');
+    document.getElementById('game-overlay').classList.remove('hidden');
+    document.getElementById('withdraw-game-btn').classList.remove('hidden');
+    
+// بدء عرض الأسئلة
+    renderFriendGame(roomGameData, myPlayer);
+    
+    // بدء الإستماع لتحديثات النتائج في الوقت الحقيقي
+    listenToScoreUpdates();
 }
 
-function listenToGameUpdates(roomId, myPlayer) {
-    const gameListener = onSnapshot(doc(db, "rooms", roomId), async (doc) => {
-        if(!doc.exists()) return;
-        
-        const roomData = doc.data();
-        
-        if(roomData.status !== 'active') {
-            if(gameListener) gameListener();
-            return;
-        }
-        
-        // تحديث النتائج من قاعدة البيانات
-        updateGameUI(roomData, myPlayer);
-        
-        // إذا كان هناك سؤال نشط، تحقق من الإجابات
-        if(roomData.currentQuestionIndex !== undefined && roomData.currentQuestionIndex < (roomData.gameQuestions?.length || 0)) {
-            renderGameQuestion(roomData, myPlayer);
-        }
-        
-        // تحقق إذا انتهت المباراة
-        if(roomData.currentQuestionIndex >= (roomData.gameQuestions?.length || 10)) {
-            if(gameListener) gameListener();
-            endFriendGameFromDB(roomData, myPlayer);
-        }
-    });
-}
-
-function updateGameUI(roomData, myPlayer) {
+        function renderFriendGame(data, myPlayer) {
+    const totalQs = data.questions.length;
+    if(!data.questions || data.currentIdx >= totalQs) { 
+        endFriendGame(data); 
+        return; 
+    }
+    
+    const q = data.questions[data.currentIdx];
+    if (!q) { 
+        endFriendGame(data); 
+        return; 
+    }
+    
     const isPlayer1 = myPlayer === 'player1';
     
-    document.getElementById('p1-name').innerText = isPlayer1 ? roomData.creatorName : roomData.player2Name;
-    document.getElementById('game-p1-img').src = isPlayer1 ? roomData.creatorPhoto : roomData.player2Photo;
-    document.getElementById('p2-name').innerText = isPlayer1 ? roomData.player2Name : roomData.creatorName;
-    document.getElementById('game-p2-img').src = isPlayer1 ? roomData.player2Photo : roomData.creatorPhoto;
-    document.getElementById('game-my-score').innerText = isPlayer1 ? roomData.player1Score : roomData.player2Score;
-    document.getElementById('game-op-score').innerText = isPlayer1 ? roomData.player2Score : roomData.player1Score;
-}
+    document.getElementById('p1-name').innerText = isPlayer1 ? data.player1.name : data.player2.name;
+    document.getElementById('game-p1-img').src = isPlayer1 ? data.player1.photo : data.player2.photo;
+    document.getElementById('p2-name').innerText = isPlayer1 ? data.player2.name : data.player1.name;
+    document.getElementById('game-p2-img').src = isPlayer1 ? data.player2.photo : data.player1.photo;
+    document.getElementById('game-my-score').innerText = isPlayer1 ? data.player1.score : data.player2.score;
+    document.getElementById('game-op-score').innerText = isPlayer1 ? data.player2.score : data.player1.score;
 
-async function renderGameQuestion(roomData, myPlayer) {
-    const questions = roomData.gameQuestions;
-    const currentIndex = roomData.currentQuestionIndex || 0;
+    const qTextEl = document.getElementById('q-text');
+    if(qTextEl.innerText !== q.question) {
+        hasAnsweredCurrentQ = false;
+        userAnsweredCorrectly = false;
+        currentQuestionCorrectAnswer = null;
+        document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
+        document.getElementById('waiting-msg').classList.add('hidden');
+        
+        clearInterval(gameTimer);
+        let t = 15;
+        document.getElementById('game-timer').innerText = t;
+        gameTimer = setInterval(() => {
+            if (isExitingGame) { clearInterval(gameTimer); return; }
+            t--;
+            document.getElementById('game-timer').innerText = t;
+            if(t <= 0) { 
+                clearInterval(gameTimer); 
+                if(!hasAnsweredCurrentQ) {
+                    submitFriendAnswer(null, q, data, myPlayer);
+                }
+            }
+        }, 1000);
+    }
     
-    if(!questions || currentIndex >= questions.length) return;
-    
-    const q = questions[currentIndex];
-    
-    // عرض رقم السؤال الحالي
-    document.getElementById('q-progress').innerText = `${currentIndex + 1} / ${questions.length}`;
-    document.getElementById('q-text').innerText = q.question;
-    
-    // تحقق إذا كان اللاعب قد أجاب بالفعل
-    const isPlayer1 = myPlayer === 'player1';
-    const hasAnswered = isPlayer1 ? roomData.player1Answered : roomData.player2Answered;
-    
-    // إذا لم يجب اللاعب بعد، اعرض الخيارات
-    if(!hasAnswered) {
-        const div = document.getElementById('answers-container');
+    document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
+    qTextEl.innerText = q.question;
+    const div = document.getElementById('answers-container');
+    if(div.children.length === 0 || div.getAttribute('data-curr-q') !== q.question) {
+        div.setAttribute('data-curr-q', q.question);
         div.innerHTML = '';
-        
         let ansList = [];
-        if(q.type === 'mcq') {
-            ansList = q.answers.map((txt, idx) => ({ 
-                txt, 
-                isCorrect: idx === q.correct, 
-                value: idx 
-            }));
-        } else {
-            ansList = [
-                { txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, 
-                { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }
-            ];
-        }
+        if(q.type === 'mcq') ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
+        else ansList = [{ txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }];
         
+        const correctAns = ansList.find(ans => ans.isCorrect);
+        if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
+
         ansList.sort(() => 0.5 - Math.random());
         ansList.forEach(ansObj => {
             const btn = document.createElement('button');
             btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
             btn.innerText = ansObj.txt;
             btn.dataset.value = ansObj.value;
-            btn.onclick = () => submitAnswerToDB(ansObj, q, roomData.id, myPlayer);
+            btn.onclick = () => { if(hasAnsweredCurrentQ) return; submitFriendAnswer(ansObj, q, data, myPlayer); };
             div.appendChild(btn);
         });
-        
-        // بدء المؤقت
-        startQuestionTimer(roomData, myPlayer);
-        
-        // تحقق إذا كان الخصم يفكر
-        const opponentAnswered = isPlayer1 ? roomData.player2Answered : roomData.player1Answered;
-        if(opponentAnswered) {
-            document.getElementById('waiting-msg').classList.remove('hidden');
-            document.getElementById('waiting-msg').textContent = 'خصمك يفكر...';
-            document.getElementById('answers-container').classList.add('pointer-events-none', 'opacity-50');
-        } else {
-            document.getElementById('waiting-msg').classList.add('hidden');
-            document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
-        }
-    } else {
-        // إذا كان اللاعب قد أجاب، اعرض النتيجة وانتظر الخصم
-        document.getElementById('answers-container').classList.add('pointer-events-none', 'opacity-50');
-        document.getElementById('waiting-msg').classList.remove('hidden');
-        document.getElementById('waiting-msg').textContent = 'بانتظار إجابة الخصم...';
-        
-        // تحقق إذا كان الخصم قد أجاب
-        const opponentAnswered = isPlayer1 ? roomData.player2Answered : roomData.player1Answered;
-        if(opponentAnswered) {
-            // إذا أجاب الخصم، تقدم للسؤال التالي بعد تأخير قصير
-            setTimeout(async () => {
-                await advanceToNextQuestion(roomData.id);
-            }, 2000);
-        }
     }
 }
 
-function startQuestionTimer(roomData, myPlayer) {
-    clearInterval(gameTimer);
+        async function submitFriendAnswer(ansObj, q, matchData, myPlayer) {
+    if(hasAnsweredCurrentQ || isExitingGame) return;
+    hasAnsweredCurrentQ = true;
+    userAnsweredCorrectly = ansObj && ansObj.isCorrect;
     
-    // حساب الوقت المتبقي بناءً على وقت بدء السؤال في قاعدة البيانات
-    const questionStartTime = roomData.questionStartTime?.toDate() || new Date();
-    const now = new Date();
-    const elapsed = (now - questionStartTime) / 1000;
-    let timeLeft = 15 - elapsed;
-    
-    if(timeLeft <= 0) {
-        handleQuestionTimeout(roomData.id, myPlayer);
-        return;
-    }
-    
-    document.getElementById('game-timer').innerText = Math.floor(timeLeft);
-    
-    gameTimer = setInterval(() => {
-        timeLeft--;
-        document.getElementById('game-timer').innerText = timeLeft;
-        
-        if(timeLeft <= 0) {
-            clearInterval(gameTimer);
-            handleQuestionTimeout(roomData.id, myPlayer);
-        }
-    }, 1000);
-}
-
-async function handleQuestionTimeout(roomId, myPlayer) {
-    const isPlayer1 = myPlayer === 'player1';
-    
-    // تحديث حالة الإجابة إلى false (خطأ)
-    await updateDoc(doc(db, "rooms", roomId), {
-        [isPlayer1 ? 'player1Answered' : 'player2Answered']: false,
-        [isPlayer1 ? 'player1AnswerCorrect' : 'player2AnswerCorrect']: false
-    });
-    
-    // تحقق إذا كان كلا اللاعبين قد أجابا
-    const roomDoc = await getDoc(doc(db, "rooms", roomId));
-    const roomData = roomDoc.data();
-    
-    if((roomData.player1Answered !== undefined) && (roomData.player2Answered !== undefined)) {
-        await updateScoresAndAdvance(roomId);
-    }
-}
-
-async function submitAnswerToDB(ansObj, question, roomId, myPlayer) {
-    const isPlayer1 = myPlayer === 'player1';
-    const isCorrect = ansObj.isCorrect;
-    
-    // تحديث إجابة اللاعب في قاعدة البيانات
-    await updateDoc(doc(db, "rooms", roomId), {
-        [isPlayer1 ? 'player1Answered' : 'player2Answered']: true,
-        [isPlayer1 ? 'player1AnswerCorrect' : 'player2AnswerCorrect']: isCorrect
-    });
-    
-    // عرض نتيجة الإجابة
     const answerButtons = document.querySelectorAll('#answers-container button');
     answerButtons.forEach(btn => {
         btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
-        
-        // عرض الإجابة الصحيحة
-        if (question.type === 'mcq') {
-            if (parseInt(btn.dataset.value) === question.correct) {
-                btn.classList.add('answer-correct');
-            } else if (btn.dataset.value.toString() === ansObj.value.toString()) {
-                btn.classList.add(ansObj.isCorrect ? 'answer-correct' : 'answer-wrong');
-            } else {
-                btn.classList.add('answer-neutral');
-            }
-        } else {
-            const correctAnswer = question.correct === 'true' || question.correct === true ? 'true' : 'false';
-            if (btn.dataset.value === correctAnswer) {
-                btn.classList.add('answer-correct');
-            } else if (btn.dataset.value === ansObj.value) {
-                btn.classList.add(ansObj.isCorrect ? 'answer-correct' : 'answer-wrong');
-            } else {
-                btn.classList.add('answer-neutral');
-            }
-        }
+        if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) btn.classList.add('answer-correct');
+        else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) btn.classList.add('answer-wrong');
+        else btn.classList.add('answer-neutral');
     });
     
     document.getElementById('answers-container').classList.add('pointer-events-none');
-    document.getElementById('waiting-msg').classList.remove('hidden');
-    document.getElementById('waiting-msg').textContent = 'بانتظار إجابة الخصم...';
     
-    // تحقق إذا كان الخصم قد أجاب
-    const roomDoc = await getDoc(doc(db, "rooms", roomId));
-    const roomData = roomDoc.data();
-    
-    const opponentAnswered = isPlayer1 ? roomData.player2Answered : roomData.player1Answered;
-    
-    if(opponentAnswered !== undefined) {
-        // إذا أجاب الخصم، تحديث النقاط وتقدم للسؤال التالي
-        setTimeout(async () => {
-            await updateScoresAndAdvance(roomId);
-        }, 2000);
+    // تحديث النتيجة المحلية
+    if(ansObj && ansObj.isCorrect) {
+        if(myPlayer === 'player1') {
+            matchData.player1.score += 1;
+        } else {
+            matchData.player2.score += 1;
+        }
+        
+        const isPlayer1 = myPlayer === 'player1';
+        document.getElementById('game-my-score').innerText = isPlayer1 ? matchData.player1.score : matchData.player2.score;
     }
+    
+    // تحديث النتيجة في قاعدة البيانات لتزامنها مع الخصم
+    try {
+        if(currentRoomId) {
+            const roomRef = doc(db, "rooms", currentRoomId);
+            const roomDoc = await getDoc(roomRef);
+            if(roomDoc.exists()) {
+                const roomData = roomDoc.data();
+                
+                // تحديث النتيجة بناءً على اللاعب
+                if(myPlayer === 'player1') {
+                    await updateDoc(roomRef, {
+                        player1Score: matchData.player1.score
+                    });
+                } else {
+                    await updateDoc(roomRef, {
+                        player2Score: matchData.player2.score
+                    });
+                }
+                
+                // الانتقال للسؤال التالي إذا كان كلا اللاعبين قد أجابا
+                await updateDoc(roomRef, {
+                    currentQuestionIndex: roomData.currentQuestionIndex + 1
+                });
+            }
+        }
+    } catch (error) {
+        console.error("Error updating score in database:", error);
+    }
+    
+    // إظهار رسالة انتظار للخصم
+    document.getElementById('waiting-msg').classList.remove('hidden');
+    
+    // الانتقال للسؤال التالي بعد 3 ثواني (أو عند إجابة الخصم)
+    setTimeout(async () => {
+        try {
+            if(currentRoomId) {
+                const roomRef = doc(db, "rooms", currentRoomId);
+                const roomDoc = await getDoc(roomRef);
+                
+                if(roomDoc.exists()) {
+                    const roomData = roomDoc.data();
+                    matchData.currentIdx = roomData.currentQuestionIndex || 0;
+                    renderFriendGame(matchData, myPlayer);
+                }
+            }
+        } catch (error) {
+            console.error("Error moving to next question:", error);
+            matchData.currentIdx += 1;
+            renderFriendGame(matchData, myPlayer);
+        }
+    }, 3000);
 }
 
-async function updateScoresAndAdvance(roomId) {
-    const roomDoc = await getDoc(doc(db, "rooms", roomId));
-    const roomData = roomDoc.data();
-    
-    let player1Score = roomData.player1Score || 0;
-    let player2Score = roomData.player2Score || 0;
-    
-    // تحديث النقاط بناءً على الإجابات الصحيحة
-    if(roomData.player1AnswerCorrect === true) player1Score++;
-    if(roomData.player2AnswerCorrect === true) player2Score++;
-    
-    // الانتقال للسؤال التالي
-    const currentIndex = roomData.currentQuestionIndex || 0;
-    
-    await updateDoc(doc(db, "rooms", roomId), {
-        player1Score: player1Score,
-        player2Score: player2Score,
-        currentQuestionIndex: currentIndex + 1,
-        player1Answered: false,
-        player2Answered: false,
-        player1AnswerCorrect: null,
-        player2AnswerCorrect: null,
-        questionStartTime: serverTimestamp()
-    });
-}
-
-async function advanceToNextQuestion(roomId) {
-    const roomDoc = await getDoc(doc(db, "rooms", roomId));
-    const roomData = roomDoc.data();
-    
-    const currentIndex = roomData.currentQuestionIndex || 0;
-    
-    await updateDoc(doc(db, "rooms", roomId), {
-        currentQuestionIndex: currentIndex + 1,
-        player1Answered: false,
-        player2Answered: false,
-        player1AnswerCorrect: null,
-        player2AnswerCorrect: null,
-        questionStartTime: serverTimestamp()
-    });
-}
-
-async function endFriendGameFromDB(roomData, myPlayer) {
-    const isPlayer1 = myPlayer === 'player1';
-    const myScore = isPlayer1 ? roomData.player1Score : roomData.player2Score;
-    const opScore = isPlayer1 ? roomData.player2Score : roomData.player1Score;
-    
-    // إغلاق الغرفة
-    await updateDoc(doc(db, "rooms", currentRoomId), {
-        status: 'closed',
-        gameEndTime: serverTimestamp()
-    });
-    
-    // عرض النتيجة
+        function endFriendGame(data) {
     clearInterval(gameTimer);
     document.getElementById('game-overlay').classList.add('hidden');
     document.getElementById('withdraw-game-btn').classList.add('hidden');
+    
+    let myScore = data.player1.score;
+    let opScore = data.player2.score;
     
     const resultScreen = document.getElementById('result-screen');
     const iconContainer = document.getElementById('result-icon-container');
@@ -4305,181 +4183,47 @@ async function endFriendGameFromDB(roomData, myPlayer) {
     resultMsg.innerText = "مباراة ودية - لا توجد نقاط";
     finalMyScore.innerText = myScore;
     finalOpScore.innerText = opScore;
-    finalOpName.innerText = isPlayer1 ? roomData.player2Name : roomData.creatorName;
+    finalOpName.innerText = data.player2.name;
     pointsGainedText.innerText = "+0";
     
     resultScreen.classList.remove('hidden');
     
-    // تنظيف
-    roomGameData = null;
-    if(friendMatchListener) friendMatchListener();
+    setTimeout(async () => {
+        await updateDoc(doc(db, "rooms", currentRoomId), {
+            status: 'closed'
+        });
+        
+        roomGameData = null;
+    }, 3000);
 }
 
-        function renderFriendGame(data, myPlayer) {
-            const totalQs = data.questions.length;
-            if(!data.questions || data.currentIdx >= totalQs) { 
-                endFriendGame(data); 
-                return; 
-            }
-            
-            const q = data.questions[data.currentIdx];
-            if (!q) { 
-                endFriendGame(data); 
-                return; 
-            }
-            
-            const isPlayer1 = myPlayer === 'player1';
-            
-            document.getElementById('p1-name').innerText = isPlayer1 ? data.player1.name : data.player2.name;
-            document.getElementById('game-p1-img').src = isPlayer1 ? data.player1.photo : data.player2.photo;
-            document.getElementById('p2-name').innerText = isPlayer1 ? data.player2.name : data.player1.name;
-            document.getElementById('game-p2-img').src = isPlayer1 ? data.player2.photo : data.player1.photo;
-            document.getElementById('game-my-score').innerText = isPlayer1 ? data.player1.score : data.player2.score;
-            document.getElementById('game-op-score').innerText = isPlayer1 ? data.player2.score : data.player1.score;
-
-            const qTextEl = document.getElementById('q-text');
-            if(qTextEl.innerText !== q.question) {
-                hasAnsweredCurrentQ = false;
-                userAnsweredCorrectly = false;
-                currentQuestionCorrectAnswer = null;
-                document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
-                document.getElementById('waiting-msg').classList.add('hidden');
-                
-                clearInterval(gameTimer);
-                let t = 15;
-                document.getElementById('game-timer').innerText = t;
-                gameTimer = setInterval(() => {
-                    if (isExitingGame) { clearInterval(gameTimer); return; }
-                    t--;
-                    document.getElementById('game-timer').innerText = t;
-                    if(t <= 0) { 
-                        clearInterval(gameTimer); 
-                        if(!hasAnsweredCurrentQ) {
-                            submitFriendAnswer(null, q, data, myPlayer);
-                        }
-                    }
-                }, 1000);
-            }
-            
-            document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
-            qTextEl.innerText = q.question;
-            const div = document.getElementById('answers-container');
-            if(div.children.length === 0 || div.getAttribute('data-curr-q') !== q.question) {
-                div.setAttribute('data-curr-q', q.question);
-                div.innerHTML = '';
-                let ansList = [];
-                if(q.type === 'mcq') ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
-                else ansList = [{ txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }];
-                
-                const correctAns = ansList.find(ans => ans.isCorrect);
-                if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
-
-                ansList.sort(() => 0.5 - Math.random());
-                ansList.forEach(ansObj => {
-                    const btn = document.createElement('button');
-                    btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
-                    btn.innerText = ansObj.txt;
-                    btn.dataset.value = ansObj.value;
-                    btn.onclick = () => { if(hasAnsweredCurrentQ) return; submitFriendAnswer(ansObj, q, data, myPlayer); };
-                    div.appendChild(btn);
-                });
-            }
-        }
+// دالة للإستماع لتحديثات النتائج في الوقت الحقيقي
+function listenToScoreUpdates() {
+    if(!currentRoomId) return;
+    
+    const roomRef = doc(db, "rooms", currentRoomId);
+    
+    onSnapshot(roomRef, (doc) => {
+        if(!doc.exists()) return;
         
-        // أضف هذه الدالة في بداية الأحداث
-window.closeAllModals = function() {
-    document.getElementById('friend-game-modal').classList.add('hidden');
-    document.getElementById('create-room-modal').classList.add('hidden');
-    document.getElementById('join-room-modal').classList.add('hidden');
-    document.getElementById('add-subscription-modal').classList.add('hidden');
-    document.getElementById('edit-bio-modal').classList.add('hidden');
-    document.getElementById('edit-name-modal').classList.add('hidden');
-    document.getElementById('badge-selector-modal').classList.add('hidden');
-    document.getElementById('bg-selector-modal').classList.add('hidden');
-    document.getElementById('edit-modal').classList.add('hidden');
-    document.getElementById('premium-details-modal').classList.add('hidden');
-};
-
-// استدع هذه الدالة عند إنشاء أو الانضمام للغرفة
-// في createNewRoom و joinRoomById:
-window.closeAllModals();
-
-        async function submitFriendAnswer(ansObj, q, matchData, myPlayer) {
-            if(hasAnsweredCurrentQ || isExitingGame) return;
-            hasAnsweredCurrentQ = true;
-            userAnsweredCorrectly = ansObj && ansObj.isCorrect;
+        const roomData = doc.data();
+        
+        // تحديث النقاط في الواجهة في الوقت الحقيقي
+        if(roomGameData) {
+            roomGameData.player1.score = roomData.player1Score || 0;
+            roomGameData.player2.score = roomData.player2Score || 0;
             
-            const answerButtons = document.querySelectorAll('#answers-container button');
-            answerButtons.forEach(btn => {
-                btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
-                if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) btn.classList.add('answer-correct');
-                else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) btn.classList.add('answer-wrong');
-                else btn.classList.add('answer-neutral');
-            });
+            const isPlayer1 = currentUser.uid === roomData.creatorId;
+            const isPlayer1InGame = isPlayer1 ? 'player1' : 'player2';
             
-            document.getElementById('answers-container').classList.add('pointer-events-none');
-
-            if(ansObj && ansObj.isCorrect) {
-                if(myPlayer === 'player1') {
-                    matchData.player1.score += 1;
-                } else {
-                    matchData.player2.score += 1;
-                }
-                
-                const isPlayer1 = myPlayer === 'player1';
-                document.getElementById('game-my-score').innerText = isPlayer1 ? matchData.player1.score : matchData.player2.score;
+            // تحديث الواجهة فقط إذا كانت شاشة اللعبة مفتوحة
+            if(document.getElementById('game-overlay').classList.contains('hidden') === false) {
+                document.getElementById('game-my-score').innerText = isPlayer1InGame === 'player1' ? roomGameData.player1.score : roomGameData.player2.score;
+                document.getElementById('game-op-score').innerText = isPlayer1InGame === 'player1' ? roomGameData.player2.score : roomGameData.player1.score;
             }
-            
-            setTimeout(() => {
-                matchData.currentIdx += 1;
-                renderFriendGame(matchData, myPlayer);
-            }, 2000);
         }
-
-        function endFriendGame(data) {
-            clearInterval(gameTimer);
-            document.getElementById('game-overlay').classList.add('hidden');
-            document.getElementById('withdraw-game-btn').classList.add('hidden');
-            
-            let myScore = data.player1.score;
-            let opScore = data.player2.score;
-            
-            const resultScreen = document.getElementById('result-screen');
-            const iconContainer = document.getElementById('result-icon-container');
-            const title = document.getElementById('result-title');
-            const resultMsg = document.getElementById('result-msg');
-            const finalMyScore = document.getElementById('final-my-score');
-            const finalOpScore = document.getElementById('final-op-score');
-            const finalOpName = document.getElementById('final-op-name');
-            const pointsGainedText = document.getElementById('result-points-gained-text');
-            
-            if (myScore > opScore) { 
-                iconContainer.innerText = "🏆";
-                title.innerText = "فوز ساحق!";
-            } else if (myScore < opScore) { 
-                iconContainer.innerText = "😢";
-                title.innerText = "حظ أوفر!";
-            } else { 
-                iconContainer.innerText = "🤝";
-                title.innerText = "تعادل!";
-            }
-            
-            resultMsg.innerText = "مباراة ودية - لا توجد نقاط";
-            finalMyScore.innerText = myScore;
-            finalOpScore.innerText = opScore;
-            finalOpName.innerText = data.player2.name;
-            pointsGainedText.innerText = "+0";
-            
-            resultScreen.classList.remove('hidden');
-            
-            setTimeout(async () => {
-                await updateDoc(doc(db, "rooms", currentRoomId), {
-                    status: 'closed'
-                });
-                
-                roomGameData = null;
-            }, 3000);
-        }
+    });
+}
 
         window.leaveRoom = async function() {
             if(!currentRoomId) return;
