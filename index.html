@@ -96,6 +96,26 @@
         .bg-love::before { content: '❤'; position: absolute; font-size: 20px; color: rgba(255,255,255,0.6); animation: float 2s infinite; top: 20px; left: 20%; }
         .bg-love::after { content: '💖'; position: absolute; font-size: 30px; opacity: 0.5; animation: float 3s infinite reverse; bottom: 10px; right: 20%; }
 
+        .bg-galaxy { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); position: relative; overflow: hidden; }
+        .bg-galaxy::before { content: '✨'; position: absolute; font-size: 40px; color: rgba(255,255,255,0.3); animation: float 5s infinite; top: 10px; left: 15%; }
+        .bg-galaxy::after { content: '⭐'; position: absolute; font-size: 30px; opacity: 0.4; animation: spin-slow 15s infinite; bottom: 10px; right: 15%; }
+
+        .bg-ocean { background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%); position: relative; overflow: hidden; }
+        .bg-ocean::before { content: '🌊'; position: absolute; font-size: 45px; opacity: 0.3; animation: float 4s infinite; top: 5px; right: 20px; }
+        .bg-ocean::after { content: '🐬'; position: absolute; font-size: 35px; opacity: 0.3; animation: float 6s infinite reverse; bottom: 5px; left: 20px; }
+
+        .bg-sunset { background: linear-gradient(135deg, #f97316 0%, #db2777 100%); position: relative; overflow: hidden; }
+        .bg-sunset::before { content: '🌅'; position: absolute; font-size: 40px; opacity: 0.4; animation: float 5s infinite; top: 10px; left: 10%; }
+        .bg-sunset::after { content: '🌇'; position: absolute; font-size: 35px; opacity: 0.3; animation: float 7s infinite reverse; bottom: 10px; right: 10%; }
+
+        .bg-forest { background: linear-gradient(135deg, #15803d 0%, #22c55e 100%); position: relative; overflow: hidden; }
+        .bg-forest::before { content: '🌳'; position: absolute; font-size: 40px; opacity: 0.3; animation: float 4s infinite; top: 5px; right: 15%; }
+        .bg-forest::after { content: '🍃'; position: absolute; font-size: 30px; opacity: 0.3; animation: spin-slow 10s infinite; bottom: 5px; left: 15%; }
+
+        .bg-neon { background: linear-gradient(135deg, #00ff88 0%, #0088ff 100%); position: relative; overflow: hidden; }
+        .bg-neon::before { content: '💠'; position: absolute; font-size: 45px; opacity: 0.4; animation: pulse-border 1.5s infinite; top: 10px; right: 10px; }
+        .bg-neon::after { content: '🔷'; position: absolute; font-size: 35px; opacity: 0.3; animation: spin-slow 8s infinite reverse; bottom: 10px; left: 10px; }
+
         .bg-rank-default { background: white; }
 
         .premium-badge {
@@ -760,213 +780,294 @@
             50% { opacity: 0.7; }
         }
 
-        .room-card {
-            background: linear-gradient(145deg, #ffffff, #f8fafc);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            border: 2px solid #e5e7eb;
-            position: relative;
+        .withdraw-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .withdraw-btn:hover {
+            background: #dc2626;
+        }
+
+        .room-lobby {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
         }
 
         .room-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f1f5f9;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
 
         .room-id {
-            font-family: monospace;
-            font-weight: 900;
-            font-size: 1.5rem;
-            color: #4f46e5;
-            background: #f1f5f9;
-            padding: 5px 15px;
-            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 10px;
         }
 
-        .room-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .room-timer {
+            font-size: 1.5rem;
             font-weight: bold;
+            color: #ffd700;
         }
 
         .players-container {
             display: flex;
             justify-content: space-around;
-            align-items: center;
             margin: 30px 0;
         }
 
         .player-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            width: 45%;
             text-align: center;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .player-card.owner {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
         }
 
         .player-avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            border: 4px solid #fff;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 10px;
+            border: 3px solid white;
+            margin: 0 auto 15px;
         }
 
         .player-name {
+            font-size: 1.2rem;
             font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
         .player-status {
-            font-size: 0.9rem;
-            padding: 3px 10px;
+            padding: 8px 15px;
             border-radius: 20px;
             font-weight: bold;
+            margin-top: 10px;
         }
 
-        .ready {
+        .status-ready {
             background: #10b981;
-            color: white;
         }
 
-        .not-ready {
-            background: #ef4444;
-            color: white;
+        .status-waiting {
+            background: #f59e0b;
         }
 
         .room-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 25px;
+            justify-content: space-around;
         }
 
-        .room-btn {
+        .control-btn {
             padding: 15px 30px;
-            border-radius: 12px;
+            border-radius: 15px;
             font-weight: bold;
-            font-size: 1.1rem;
             border: none;
             cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
             min-width: 150px;
-            justify-content: center;
+            transition: all 0.3s;
         }
 
-        .room-btn.ready-btn {
+        .ready-btn {
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
         }
 
-        .room-btn.leave-btn {
+        .leave-btn {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
         }
 
-        .room-btn.delete-btn {
+        .delete-btn {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
         }
 
-        .room-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .room-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
         }
 
-        .room-info {
+        .players-count {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        .connected {
+            background: #10b981;
+            color: white;
+        }
+
+        .disconnected {
+            background: #ef4444;
+            color: white;
+        }
+
+        .friend-match-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .friend-match-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .friend-match-btn {
+            padding: 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .create-room-btn {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+        }
+
+        .find-room-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .create-room-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .room-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .room-option {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 15px;
             background: #f8fafc;
-            padding: 10px 20px;
-            border-radius: 12px;
-            margin-top: 15px;
-            font-size: 0.9rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
 
-        .room-timer {
-            font-family: monospace;
+        .find-room-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .room-code-input {
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            text-align: center;
             font-weight: bold;
-            font-size: 1.2rem;
-            color: #4f46e5;
         }
 
-        .withdraw-btn {
-    position: fixed;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: white;
-    padding: 12px 25px;
-    border-radius: 12px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    z-index: 200;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-    transition: all 0.3s;
-    font-size: 1rem;
-    min-width: 120px;
-}
+        .save-image-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
 
-.withdraw-btn:hover {
-    transform: translateX(-50%) scale(1.05);
-    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-}
+        .save-image-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .schedule-buttons-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .schedule-buttons-row button {
+            flex: 1;
+        }
+
+        .bio-edit-icon {
+            margin-right: 5px;
+            color: #4f46e5;
+            cursor: pointer;
+        }
 
         @media (min-width: 768px) {
             .input-box { font-size: 1.1rem; }
             .auth-overlay > div { max-width: 500px; }
         }
-        
-        .pointer-events-none {
-    pointer-events: none;
-}
-
-.opacity-50 {
-    opacity: 0.5;
-}
-
-/* تأثيرات إضافية للأزرار */
-.answer-neutral:hover {
-    background: #f8fafc;
-    transform: translateY(-2px);
-}
-
-.answer-correct:hover, .answer-wrong:hover {
-    transform: none;
-}
-
-/* تحسينات للواجهة */
-#game-overlay {
-    transition: opacity 0.3s ease;
-}
-
-#waiting-msg {
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
     </style>
 </head>
 <body>
@@ -974,6 +1075,7 @@
     <div id="ban-screen" class="ban-overlay hidden">
         <i class="fas fa-ban ban-icon"></i>
         <h1 class="text-3xl font-black mb-4">تم حظر حسابك</h1>
+        <p class="text-gray-400 mb-6">لقد تم حظر جهازك وحسابك من استخدام التطبيق بشكل نهائي لانتهاك الشروط.</p>
         <div class="bg-red-900 bg-opacity-50 p-4 rounded-xl border border-red-700">
             <p class="text-red-300 text-sm font-bold">لا يمكن التراجع عن هذا الإجراء</p>
         </div>
@@ -1116,6 +1218,133 @@
         </div>
     </div>
 
+    <!-- Friend Match Modal -->
+    <div id="friend-match-modal" class="modal-overlay hidden">
+        <div class="friend-match-modal">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-user-friends text-3xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-black text-gray-800">العب ضد صديقك</h3>
+                <p class="text-gray-500 mt-2">اختر طريقة اللعب</p>
+            </div>
+            
+            <div class="friend-match-buttons">
+                <button onclick="createFriendRoom()" class="friend-match-btn create-room-btn">
+                    <i class="fas fa-plus-circle ml-2"></i> إنشاء غرفة
+                </button>
+                <button onclick="findFriendRoom()" class="friend-match-btn find-room-btn">
+                    <i class="fas fa-search ml-2"></i> ابحث عن غرفة
+                </button>
+            </div>
+            
+            <button onclick="closeFriendMatchModal()" class="w-full mt-6 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
+                إلغاء
+            </button>
+        </div>
+    </div>
+
+    <!-- Create Room Modal -->
+    <div id="create-room-modal" class="modal-overlay hidden">
+        <div class="create-room-modal">
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-black text-gray-800">إنشاء غرفة جديدة</h3>
+                <p class="text-gray-500 text-sm mt-2">اختر إعدادات الغرفة</p>
+            </div>
+            
+            <div class="room-options">
+                <div class="room-option">
+                    <span>المادة</span>
+                    <select id="room-subject" class="input-box w-32">
+                        <option value="">اختر المادة</option>
+                    </select>
+                </div>
+                
+                <div class="room-option">
+                    <span>نوع الأسئلة</span>
+                    <div class="flex gap-2">
+                        <button onclick="setRoomQType('mcq')" id="room-btn-mcq" class="px-4 py-2 rounded-lg border border-indigo-100 text-gray-500 font-bold">اختيارات</button>
+                        <button onclick="setRoomQType('tf')" id="room-btn-tf" class="px-4 py-2 rounded-lg border border-indigo-100 text-gray-500 font-bold">صح/خطأ</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeCreateRoomModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
+                    إلغاء
+                </button>
+                <button onclick="proceedToRoom()" class="flex-1 bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-bold shadow-md hover:opacity-90 transition">
+                    التالي
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Find Room Modal -->
+    <div id="find-room-modal" class="modal-overlay hidden">
+        <div class="find-room-modal">
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-black text-gray-800">البحث عن غرفة</h3>
+                <p class="text-gray-500 text-sm mt-2">أدخل كود الغرفة للانضمام</p>
+            </div>
+            
+            <div class="mb-6">
+                <input type="text" id="room-code-input" placeholder="أدخل كود الغرفة" class="input-box room-code-input uppercase" maxlength="8">
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="closeFindRoomModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
+                    إلغاء
+                </button>
+                <button onclick="joinRoomByCode()" class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold shadow-md hover:opacity-90 transition">
+                    انضمام
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Lobby -->
+    <div id="room-lobby" class="room-lobby hidden">
+        <div class="room-header">
+            <div>
+                <h2 class="text-xl font-bold">غرفة المباراة</h2>
+                <div class="room-id">رقم الغرفة: <span id="room-id-display">20482827</span></div>
+            </div>
+            <div class="room-timer" id="room-timer">10:00</div>
+        </div>
+        
+        <div class="room-info">
+            <div class="players-count">المستخدمين: <span id="players-count">1/2</span></div>
+            <div class="text-sm mt-2">الجاهزين: <span id="ready-count">0/2</span></div>
+        </div>
+        
+        <div class="players-container">
+            <div class="player-card owner" id="player1-card">
+                <img id="player1-avatar" src="" class="player-avatar">
+                <div class="player-name" id="player1-name">المالك</div>
+                <div class="player-status status-waiting" id="player1-status">...</div>
+            </div>
+            
+            <div class="player-card" id="player2-card">
+                <img id="player2-avatar" src="https://ui-avatars.com/api/?name=Player&background=random&size=128" class="player-avatar">
+                <div class="player-name" id="player2-name">بانتظار لاعب...</div>
+                <div class="player-status status-waiting" id="player2-status">...</div>
+            </div>
+        </div>
+        
+        <div class="room-controls">
+            <button onclick="toggleReady()" class="control-btn ready-btn" id="ready-btn">
+                <i class="fas fa-check ml-2"></i> <span id="ready-text">جاهز</span>
+            </button>
+            <button onclick="leaveRoom()" class="control-btn leave-btn" id="leave-btn">
+                <i class="fas fa-sign-out-alt ml-2"></i> مغادرة
+            </button>
+            <button onclick="deleteRoom()" class="control-btn delete-btn hidden" id="delete-btn">
+                <i class="fas fa-trash ml-2"></i> حذف الغرفة
+            </button>
+        </div>
+    </div>
+
     <div id="main-app" class="hidden w-full h-full relative">
         
         <div class="absolute top-0 w-full h-20 bg-white/95 backdrop-blur-sm shadow-sm z-30 flex items-center justify-between px-5 pt-2">
@@ -1164,8 +1393,8 @@
                         <span id="ai-remaining" class="text-xs bg-white text-green-600 px-2 py-1 rounded-full mr-2">10</span>
                     </button>
 
-                    <button onclick="openFriendGameModal()" class="btn-main bg-gradient-to-r from-purple-500 to-pink-600 h-12">
-                        <i class="fas fa-user-friends ml-2"></i> اللعب ضد اصديقك
+                    <button onclick="openFriendMatch()" class="btn-main bg-gradient-to-r from-purple-500 to-pink-600 h-12">
+                        <i class="fas fa-user-friends ml-2"></i> اللعب ضد صديقك
                     </button>
                 </div>
 
@@ -1213,10 +1442,9 @@
                 <p id="ai-thinking-msg" class="text-center text-green-600 text-sm hidden animate-pulse mt-4 font-bold">الذكاء الاصطناعي يفكر...</p>
             </div>
 
-            <!-- أضيف هذا الزر بعد beautiful-alert مباشرة -->
-<button id="withdraw-game-btn" onclick="withdrawFromGame()" class="withdraw-btn hidden">
-    <i class="fas fa-sign-out-alt"></i> انسحاب
-</button>
+            <button id="withdraw-game-btn" onclick="withdrawFromGame()" class="withdraw-btn">
+                <i class="fas fa-sign-out-alt"></i> انسحاب
+            </button>
         </div>
 
         <div id="result-screen" class="fixed inset-0 bg-white z-[200] hidden">
@@ -1245,67 +1473,10 @@
                     <i class="fas fa-gem"></i>
                 </div>
                 
-                <button onclick="closeResultScreen()" class="beautiful-btn">
+                <button onclick="closeResultScreen()" class="beautiful-alert-btn">
                     <i class="fas fa-home"></i>
                     <span>العودة للصفحة الرئيسية</span>
                 </button>
-            </div>
-        </div>
-
-        <div id="room-screen" class="screen pt-20 hidden">
-            <div class="scroll-container px-5 py-6">
-                <div class="room-card">
-                    <div class="room-header">
-                        <div>
-                            <h2 class="text-xl font-black text-indigo-900">غرفة المباراة</h2>
-                            <div class="room-id" id="room-id-display">#20482827</div>
-                        </div>
-                        <div class="room-status">
-                            <span class="text-gray-600">الحالة:</span>
-                            <span class="text-green-500 font-bold" id="room-status-text">في انتظار اللاعبين</span>
-                        </div>
-                    </div>
-
-                    <div class="room-info">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-users text-indigo-600"></i>
-                            <span id="room-players-count">1/2</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-check-circle text-green-600"></i>
-                            <span id="room-ready-count">0/2</span>
-                        </div>
-                        <div class="room-timer" id="room-timer">10:00</div>
-                    </div>
-
-                    <div class="players-container">
-                        <div class="player-card">
-                            <img id="player1-avatar" src="" class="player-avatar">
-                            <p id="player1-name" class="player-name">mslm_m6</p>
-                            <span id="player1-status" class="player-status ready">المالك ✅</span>
-                        </div>
-
-                        <div class="text-3xl font-black text-gray-300">VS</div>
-
-                        <div class="player-card">
-                            <img id="player2-avatar" src="" class="player-avatar">
-                            <p id="player2-name" class="player-name">...</p>
-                            <span id="player2-status" class="player-status not-ready">جاهزة ❌</span>
-                        </div>
-                    </div>
-
-                    <div class="room-controls">
-                        <button id="room-ready-btn" onclick="toggleReady()" class="room-btn ready-btn">
-                            <i class="fas fa-check"></i> جاهز
-                        </button>
-                        <button id="room-leave-btn" onclick="leaveRoom()" class="room-btn leave-btn">
-                            <i class="fas fa-sign-out-alt"></i> مغادرة
-                        </button>
-                        <button id="room-delete-btn" onclick="deleteRoom()" class="room-btn delete-btn hidden">
-                            <i class="fas fa-trash"></i> حذف الغرفة
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -1324,7 +1495,7 @@
                     <i class="fas fa-trophy text-4xl opacity-50"></i>
                 </div>
                 <div id="leaderboard-list" class="space-y-4 pb-10 flex flex-col"></div>
-                <button id="load-more-leaderboard" onclick="loadMoreLeaderboard()" class="beautiful-btn secondary hidden mt-4 mb-10">
+                <button id="load-more-leaderboard" onclick="loadMoreLeaderboard()" class="beautiful-alert-btn secondary hidden mt-4 mb-10">
                     <i class="fas fa-chevron-down"></i> عرض المزيد
                 </button>
             </div>
@@ -1429,11 +1600,11 @@
                         </div>
                     </div>
 
-                    <div id="schedule-action-buttons" class="flex gap-3">
-                        <button onclick="downloadScheduleAsImage()" class="flex-1 bg-indigo-100 text-indigo-700 font-bold py-3 rounded-xl hover:bg-indigo-200 flex items-center justify-center gap-2">
+                    <div class="schedule-buttons-row">
+                        <button onclick="downloadScheduleAsImage()" class="save-image-btn">
                             <i class="fa-solid fa-download"></i> حفظ كصورة
                         </button>
-                        <button onclick="resetSchedule()" class="flex-1 bg-white text-red-500 border border-red-200 font-bold py-3 rounded-xl hover:bg-red-50 flex items-center justify-center gap-2">
+                        <button onclick="resetSchedule()" class="w-full bg-white text-red-500 border border-red-200 font-bold py-3 rounded-xl hover:bg-red-50 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-trash-can"></i> حذف وإنشاء جديد
                         </button>
                     </div>
@@ -1456,7 +1627,7 @@
                         <p class="text-xs text-gray-400 mt-1" id="profile-id-text">ID: ...</p>
                         <div class="flex items-center justify-center gap-1 mt-2">
                             <p class="text-xs text-gray-600 max-w-xs mx-auto" id="profile-bio-text">لا يوجد سيرة ذاتية</p>
-                            <button onclick="editProfileBio()" class="text-indigo-600 hover:text-indigo-800">
+                            <button onclick="editProfileBio()" class="bio-edit-icon">
                                 <i class="fas fa-pen text-xs"></i>
                             </button>
                         </div>
@@ -1868,7 +2039,7 @@
                             </div>
                         </div>
 
-                        <button onclick="goToUploadStep2()" class="beautiful-btn">
+                        <button onclick="goToUploadStep2()" class="beautiful-alert-btn">
                             <i class="fas fa-arrow-left"></i> التالي
                         </button>
                     </div>
@@ -1904,10 +2075,10 @@
                         </div>
 
                         <div class="flex gap-3">
-                            <button onclick="goToUploadStep1()" class="beautiful-btn secondary flex-1">
+                            <button onclick="goToUploadStep1()" class="beautiful-alert-btn secondary flex-1">
                                 <i class="fas fa-arrow-right"></i> رجوع
                             </button>
-                            <button onclick="submitQuestionMCQ()" class="beautiful-btn flex-1">
+                            <button onclick="submitQuestionMCQ()" class="beautiful-alert-btn flex-1">
                                 <i class="fas fa-paper-plane"></i> إرسال للمراجعة
                             </button>
                         </div>
@@ -1928,10 +2099,10 @@
                         </div>
 
                         <div class="flex gap-3">
-                            <button onclick="goToUploadStep1()" class="beautiful-btn secondary flex-1">
+                            <button onclick="goToUploadStep1()" class="beautiful-alert-btn secondary flex-1">
                                 <i class="fas fa-arrow-right"></i> رجوع
                             </button>
-                            <button onclick="submitQuestionTF()" class="beautiful-btn flex-1">
+                            <button onclick="submitQuestionTF()" class="beautiful-alert-btn flex-1">
                                 <i class="fas fa-paper-plane"></i> إرسال للمراجعة
                             </button>
                         </div>
@@ -2064,72 +2235,15 @@
             </div>
         </div>
 
-        <div id="friend-game-modal" class="modal-overlay hidden">
-            <div class="modal-content relative bg-gradient-to-br from-indigo-50 to-purple-50">
-                <button onclick="closeFriendGameModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-                <h3 class="font-bold text-2xl mb-6 text-indigo-800 text-center">🎮 اللعب ضد صديقك</h3>
-                
-                <div class="grid grid-cols-1 gap-4">
-                    <button onclick="openCreateRoomModal()" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6 rounded-2xl shadow-lg hover:scale-105 transition flex flex-col items-center gap-3">
-                        <i class="fas fa-plus-circle text-3xl"></i>
-                        <span class="text-xl font-bold">إنشاء غرفة</span>
-                        <p class="text-sm opacity-90 text-center">أنشئ غرفة خاصة وادعو صديقك للعب</p>
-                    </button>
-                    
-                    <button onclick="openJoinRoomModal()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg hover:scale-105 transition flex flex-col items-center gap-3">
-                        <i class="fas fa-search text-3xl"></i>
-                        <span class="text-xl font-bold">البحث عن غرفة</span>
-                        <p class="text-sm opacity-90 text-center">ادخل برقم الغرفة للانضمام</p>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="create-room-modal" class="modal-overlay hidden">
-            <div class="modal-content relative bg-white">
-                <button onclick="closeCreateRoomModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-                <h3 class="font-bold text-xl mb-6 text-indigo-800 text-center">إنشاء غرفة جديدة</h3>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-gray-600 mb-2">المادة</label>
-                    <select id="room-subject" class="input-box mb-4 bg-gray-50"></select>
-                </div>
-                
-                <div class="mb-6">
-                    <label class="block text-sm font-bold text-gray-600 mb-2">نوع السؤال</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="setRoomQType('mcq')" id="room-btn-mcq" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition">اختيارات</button>
-                        <button onclick="setRoomQType('tf')" id="room-btn-tf" class="py-3 rounded-xl border-2 border-indigo-100 text-gray-500 font-bold active:scale-95 transition">صح وخطأ</button>
-                    </div>
-                </div>
-                
-                <button onclick="createNewRoom()" class="btn-main bg-gradient-to-r from-indigo-600 to-purple-600">
-                    <i class="fas fa-plus ml-2"></i> إنشاء الغرفة
-                </button>
-            </div>
-        </div>
-
-        <div id="join-room-modal" class="modal-overlay hidden">
-            <div class="modal-content relative bg-white">
-                <button onclick="closeJoinRoomModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-                <h3 class="font-bold text-xl mb-6 text-indigo-800 text-center">الانضمام إلى غرفة</h3>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-gray-600 mb-2">رقم الغرفة</label>
-                    <input type="text" id="room-id-input" placeholder="أدخل رقم الغرفة (مثال: 20482827)" class="input-box text-center font-mono text-lg">
-                </div>
-                
-                <button onclick="joinRoomById()" class="btn-main bg-gradient-to-r from-green-600 to-emerald-600">
-                    <i class="fas fa-door-open ml-2"></i> الانضمام
-                </button>
-            </div>
-        </div>
-
         <div id="beautiful-alert" class="beautiful-alert hidden">
             <div id="beautiful-alert-icon" class="beautiful-alert-icon">!</div>
             <h3 id="beautiful-alert-title" class="beautiful-alert-title">تنبيه</h3>
             <p id="beautiful-alert-message" class="beautiful-alert-message">...</p>
             <button id="beautiful-alert-ok-btn" class="beautiful-alert-btn">حسناً</button>
+        </div>
+
+        <div id="connection-status" class="connection-status hidden">
+            <i class="fas fa-wifi"></i> <span>جاري الاتصال...</span>
         </div>
     </div>
 
@@ -2177,6 +2291,8 @@
         let userAnsweredCorrectly = false; 
         let leaderboardOffset = 0;
         let allLeaderboardUsers = [];
+        let leaderboardLimit = 50;
+        let displayedLeaderboardCount = 25;
 
         let premiumInterval = null;
         const BADGES_LIST = ["سجاج", "سجاجة", "دكتور", "دكتورة", "كسلان", "كسولة", "شطور", "شطورة", "نايم", "نايمة", "نعسان", "نعسانة", "ماكو واهس", "مهندس", "مهندسة", "واحد عراق", "صگاركم", "صگارتكم", "فستقة", "المحامي", "المحامية"];
@@ -2186,7 +2302,12 @@
             { id: 'bg-edu', name: 'تعليم (أخضر)', class: 'bg-edu' },
             { id: 'bg-eng', name: 'هندسة (أصفر)', class: 'bg-eng' },
             { id: 'bg-smart', name: 'ذكي (برتقالي)', class: 'bg-smart' },
-            { id: 'bg-love', name: 'حب (وردي)', class: 'bg-love' }
+            { id: 'bg-love', name: 'حب (وردي)', class: 'bg-love' },
+            { id: 'bg-galaxy', name: 'مجرة (ليلي)', class: 'bg-galaxy' },
+            { id: 'bg-ocean', name: 'محيط (أزرق)', class: 'bg-ocean' },
+            { id: 'bg-sunset', name: 'غروب (برتقالي)', class: 'bg-sunset' },
+            { id: 'bg-forest', name: 'غابة (أخضر)', class: 'bg-forest' },
+            { id: 'bg-neon', name: 'نيون (ملون)', class: 'bg-neon' }
         ];
 
         const subjects = {
@@ -2203,15 +2324,14 @@
         let dailyAIRemaining = 10;
         let uploadSubject = null;
 
+        // Room variables
         let currentRoomId = null;
         let roomTimerInterval = null;
-        let roomReadyStatus = false;
-        let roomQType = null;
-        let roomSubject = null;
-        let isRoomCreator = false;
-        let roomGameData = null;
-        let friendMatchListener = null;
-        let netCheckInterval = null;
+        let roomTimeLeft = 600; // 10 minutes in seconds
+        let isRoomOwner = false;
+        let amIReady = false;
+        let roomListenerUnsubscribe = null;
+        let connectionCheckInterval = null;
 
         onAuthStateChanged(auth, async (user) => {
             const intro = document.getElementById('intro-screen');
@@ -2262,7 +2382,6 @@
                             document.getElementById('header-grade-badge').innerText = getGradeName(userData.grade);
                             document.getElementById('header-grade-badge').classList.remove('hidden');
                             populateSubjects(userData.grade, 'challenge-subject');
-                            populateSubjects(userData.grade, 'room-subject');
                         } else {
                             document.getElementById('grade-selector-card').classList.remove('hidden');
                             document.getElementById('challenge-active-card').classList.add('hidden');
@@ -2484,11 +2603,13 @@
             alertMessage.textContent = message;
             
             alert.classList.remove('hidden');
-            
-            document.getElementById('beautiful-alert-ok-btn').onclick = function() {
-                alert.classList.add('hidden');
-            };
         }
+
+        function closeBeautifulAlert() {
+            document.getElementById('beautiful-alert').classList.add('hidden');
+        }
+        
+        document.getElementById('beautiful-alert-ok-btn').addEventListener('click', closeBeautifulAlert);
 
         window.openForgotPassword = function() {
             document.getElementById('forgot-password-modal').classList.remove('hidden');
@@ -2523,6 +2644,7 @@
                 case 'auth/user-not-found': return 'المستخدم غير موجود';
                 case 'auth/wrong-password': return 'كلمة المرور غير صحيحة';
                 case 'auth/too-many-requests': return 'محاولات كثيرة جداً، حاول لاحقاً';
+                case 'auth/network-request-failed': return 'فشل الاتصال بالشبكة';
                 case 'auth/operation-not-allowed': return 'العملية غير مسموحة';
                 case 'storage/unauthorized': return 'غير مصرح بتخزين الصور';
                 case 'storage/canceled': return 'تم إلغاء رفع الصورة';
@@ -2690,9 +2812,9 @@
             if(adminListenerUnsubscribe) adminListenerUnsubscribe(); 
             if(matchListenerUnsubscribe) matchListenerUnsubscribe();
             if(premiumInterval) clearInterval(premiumInterval);
-            if(friendMatchListener) friendMatchListener();
+            if(roomListenerUnsubscribe) roomListenerUnsubscribe();
             if(roomTimerInterval) clearInterval(roomTimerInterval);
-            if(netCheckInterval) clearInterval(netCheckInterval);
+            if(connectionCheckInterval) clearInterval(connectionCheckInterval);
             signOut(auth);
         };
 
@@ -2709,7 +2831,16 @@
             if (userData.lastRewardDayKey === currentDayKey) return; 
 
             let userDaysClaimed = userData.daysClaimedInMonth || 0;
-            if (userData.rewardMonthKey !== currentMonthKey) userDaysClaimed = 0;
+            if (userData.rewardMonthKey !== currentMonthKey) {
+                userDaysClaimed = 0;
+                // Reset to day 1 if new month
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    daysClaimedInMonth: 0,
+                    rewardMonthKey: currentMonthKey
+                });
+                userData.daysClaimedInMonth = 0;
+                userData.rewardMonthKey = currentMonthKey;
+            }
 
             const nextDayToClaim = userDaysClaimed + 1;
             const grid = document.getElementById('reward-grid-container');
@@ -2828,7 +2959,6 @@
             document.getElementById('header-grade-badge').innerText = getGradeName(g);
             document.getElementById('header-grade-badge').classList.remove('hidden');
             populateSubjects(g, 'challenge-subject');
-            populateSubjects(g, 'room-subject');
         };
 
         function getGradeName(code) { 
@@ -3146,13 +3276,13 @@
             document.getElementById('btn-tf').className = `py-3 rounded-xl border-2 font-bold transition flex-1 ${t==='tf'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
         };
 
-        window.setRoomQType = (t) => {
-            roomQType = t;
-            document.getElementById('room-btn-mcq').className = `py-3 rounded-xl border-2 font-bold transition flex-1 ${t==='mcq'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
-            document.getElementById('room-btn-tf').className = `py-3 rounded-xl border-2 font-bold transition flex-1 ${t==='tf'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
-        };
-
         window.startMatchmaking = async (mode) => {
+            // Check if points are negative
+            if (userData.points < 0) {
+                showBeautifulAlert('error', 'نقاط سلبية', 'لا يمكنك اللعب لأن نقاطك سالبة. قم برفع أسئلة للحصول على 5 نقاط لكل سؤال يتم قبوله.');
+                return;
+            }
+
             const sub = document.getElementById('challenge-subject').value;
             if(!sub || !selectedQType) {
                 showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
@@ -3160,11 +3290,6 @@
             }
 
             if (mode === 'ai') {
-                if ((userData.points || 0) < 0) {
-                    showBeautifulAlert('error', 'نقاط سالبة', '❌ لا يمكنك اللعب لأن نقاطك سالبة! قم برفع أسئلة للحصول على نقاط إضافية.');
-                    return;
-                }
-
                 if (dailyAIRemaining <= 0) {
                     showBeautifulAlert('error', 'انتهت المحاولات', 'لقد استنفدت جميع محاولات الذكاء الاصطناعي لهذا اليوم. يرجى العودة غداً أو اشتراك مميز للحصول على 15 محاولة يومية.');
                     return;
@@ -3183,18 +3308,9 @@
             document.getElementById('challenge-active-card').classList.add('hidden');
             document.getElementById('searching-ui').classList.remove('hidden');
             document.getElementById('searching-ui').style.display = 'flex'; 
-            document.getElementById('search-msg').innerText = mode === 'ai' ? "جاري تحضير البوت..." : "جاري البحث عن خصم...";
+            document.getElementById('search-msg').innerText = "جاري تحضير البوت...";
 
-            const grade = userData.grade;
-            let group = `${grade}_${sub}`;
-            
-            if(sharedSubjects.includes(sub) && (grade === '6sci' || grade === '6lit')) {
-                group = `6shared_${sub}`;
-            }
-
-            if (mode === 'ai') {
-                startAIMatch(sub);
-            }
+            startAIMatch(sub);
         };
 
         async function startAIMatch(sub) {
@@ -3232,7 +3348,6 @@
             
             await showVSAnimation(localMatchData.player1, localMatchData.player2);
             document.getElementById('game-overlay').classList.remove('hidden');
-            document.getElementById('withdraw-game-btn').classList.remove('hidden');
             renderGame(localMatchData);
         }
 
@@ -3243,6 +3358,8 @@
             }
             
             let gradeCondition = userData.grade;
+            
+            // Check if subject is shared between 6sci and 6lit
             if(sharedSubjects.includes(sub) && (userData.grade === '6sci' || userData.grade === '6lit')) {
                 gradeCondition = ['6sci', '6lit'];
             }
@@ -3436,27 +3553,7 @@
                 userData.points += penalty;
                 setupHeaderUI();
                 
-                isExitingGame = true;
-                clearInterval(gameTimer);
-                clearTimeout(aiTimeoutId);
-                document.getElementById('game-overlay').classList.add('hidden');
-                document.getElementById('searching-ui').classList.add('hidden');
-                document.getElementById('result-screen').classList.add('hidden');
-                
-                document.getElementById('challenge-active-card').classList.remove('hidden');
-                if(currentUser) {
-                    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-                    if(userDoc.exists()) { 
-                        userData = userDoc.data(); 
-                        checkAIRemaining();
-                        setupHeaderUI(); 
-                        setupProfileUI(); 
-                    }
-                }
-                
-                showBeautifulAlert('info', 'انسحاب', 'تم الانسحاب وخصم 10 نقاط من رصيدك.');
-                
-                setTimeout(() => { isExitingGame = false; }, 500);
+                showWithdrawalResult();
                 
             } catch (error) {
                 console.error("Error withdrawing:", error);
@@ -3464,10 +3561,33 @@
             }
         };
 
+        function showWithdrawalResult() {
+            clearInterval(gameTimer);
+            document.getElementById('game-overlay').classList.add('hidden');
+            
+            const resultScreen = document.getElementById('result-screen');
+            const iconContainer = document.getElementById('result-icon-container');
+            const title = document.getElementById('result-title');
+            const msg = document.getElementById('result-msg');
+            const myScore = document.getElementById('final-my-score');
+            const opScore = document.getElementById('final-op-score');
+            const opName = document.getElementById('final-op-name');
+            const pointsGained = document.getElementById('result-points-gained-text');
+            
+            iconContainer.innerText = "😢";
+            title.innerText = "انسحاب";
+            msg.innerText = "لقد انسحبت من المباراة";
+            myScore.innerText = "0";
+            opScore.innerText = "10";
+            opName.innerText = "الخصم";
+            pointsGained.innerText = "-10";
+            
+            resultScreen.classList.remove('hidden');
+        }
+
         async function endGame(d) {
             clearInterval(gameTimer);
             document.getElementById('game-overlay').classList.add('hidden');
-            document.getElementById('withdraw-game-btn').classList.add('hidden');
             if (isExitingGame) return;
             
             let myScore = localMatchData.player1.score;
@@ -3475,6 +3595,7 @@
             let opName = localMatchData.player2.name;
             
             let pointsGained = 0; 
+            let pointsLost = 0;
             let msg = ""; 
             let icon = "";
             
@@ -3485,8 +3606,14 @@
             } else if (myScore < opScore) { 
                 msg = "حظ أوفر!"; 
                 icon = "😢"; 
-                let penalty = Math.floor(opScore / 2);
-                pointsGained = -penalty;
+                // Deduct half of opponent's score
+                pointsLost = Math.floor(opScore / 2);
+                if (pointsLost > 0) {
+                    await updateDoc(doc(db, "users", currentUser.uid), { 
+                        points: increment(-pointsLost) 
+                    });
+                    userData.points -= pointsLost;
+                }
             } else { 
                 if(myScore > 0) { 
                     msg = "تعادل إيجابي!"; 
@@ -3503,7 +3630,7 @@
                  pointsGained = pointsGained * 2;
             }
 
-            if(pointsGained !== 0) {
+            if(pointsGained > 0) {
                 await updateDoc(doc(db, "users", currentUser.uid), { points: increment(pointsGained) });
                 userData.points += pointsGained;
                 setupHeaderUI();
@@ -3525,17 +3652,12 @@
             finalOpScore.innerText = opScore;
             finalOpName.innerText = opName;
             
-            if (pointsGained > 0) {
-                pointsGainedText.innerText = `+${pointsGained}`;
-                pointsGainedText.className = "result-points-gained";
-            } else if (pointsGained < 0) {
-                pointsGainedText.innerText = `${pointsGained}`;
-                pointsGainedText.className = "result-points-gained";
-                pointsGainedText.style.background = "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)";
-                pointsGainedText.style.color = "#991b1b";
+            if (pointsLost > 0) {
+                pointsGainedText.innerText = `-${pointsLost}`;
+                pointsGainedText.style.color = "#ef4444";
             } else {
-                pointsGainedText.innerText = `+0`;
-                pointsGainedText.className = "result-points-gained";
+                pointsGainedText.innerText = `+${pointsGained}`;
+                pointsGainedText.style.color = "#10b981";
             }
             
             if (isPremiumValid(userData) && pointsGained > 0) {
@@ -3575,896 +3697,6 @@
              switchTab('challenges');
              setTimeout(() => { isExitingGame = false; }, 500);
         };
-
-        window.openFriendGameModal = function() {
-            if ((userData.points || 0) < 0) {
-                showBeautifulAlert('error', 'نقاط سالبة', '❌ لا يمكنك اللعب لأن نقاطك سالبة! قم برفع أسئلة للحصول على نقاط إضافية.');
-                return;
-            }
-            document.getElementById('friend-game-modal').classList.remove('hidden');
-        };
-
-        window.closeFriendGameModal = function() {
-            document.getElementById('friend-game-modal').classList.add('hidden');
-        };
-
-        window.openCreateRoomModal = function() {
-            document.getElementById('friend-game-modal').classList.add('hidden');
-            document.getElementById('create-room-modal').classList.remove('hidden');
-        };
-
-        window.closeCreateRoomModal = function() {
-            document.getElementById('create-room-modal').classList.add('hidden');
-            document.getElementById('friend-game-modal').classList.remove('hidden');
-        };
-
-        window.openJoinRoomModal = function() {
-            document.getElementById('friend-game-modal').classList.add('hidden');
-            document.getElementById('join-room-modal').classList.remove('hidden');
-        };
-
-        window.closeJoinRoomModal = function() {
-            document.getElementById('join-room-modal').classList.add('hidden');
-            document.getElementById('friend-game-modal').classList.remove('hidden');
-        };
-
-        window.createNewRoom = async function() {
-    const sub = document.getElementById('room-subject').value;
-    if(!sub || !roomQType) {
-        showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
-        return;
-    }
-
-    const roomId = Math.floor(10000000 + Math.random() * 90000000).toString();
-    currentRoomId = roomId;
-    isRoomCreator = true;
-    roomSubject = sub;
-    roomReadyStatus = false;
-
-    // إغلاق النافذة المنبثقة فوراً
-    document.getElementById('create-room-modal').classList.add('hidden');
-    document.getElementById('friend-game-modal').classList.add('hidden');
-
-    try {
-        // تعيين وقت انتهاء متزامن (10 دقائق من الآن)
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-        
-        await setDoc(doc(db, "rooms", roomId), {
-            id: roomId,
-            subject: sub,
-            type: roomQType,
-            creatorId: currentUser.uid,
-            creatorName: userData.name,
-            creatorPhoto: userData.photo,
-            player2Id: null,
-            player2Name: null,
-            player2Photo: null,
-            creatorReady: false,
-            player2Ready: false,
-            status: 'waiting',
-            createdAt: serverTimestamp(),
-            expiresAt: Timestamp.fromDate(expiresAt) // وقت انتهاء متزامن
-        });
-
-        openRoomScreen(roomId);
-        startRoomTimer();
-        listenToRoomUpdates();
-
-    } catch (error) {
-        console.error("Error creating room:", error);
-        showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إنشاء الغرفة');
-    }
-};
-
-        window.joinRoomById = async function() {
-    const roomId = document.getElementById('room-id-input').value.trim();
-    if(!roomId || roomId.length !== 8) {
-        showBeautifulAlert('warning', 'تنبيه', 'يرجى إدخال رقم غرفة صحيح (8 أرقام)');
-        return;
-    }
-
-    try {
-        const roomDoc = await getDoc(doc(db, "rooms", roomId));
-        if(!roomDoc.exists()) {
-            showBeautifulAlert('error', 'خطأ', 'الغرفة غير موجودة');
-            return;
-        }
-
-        const roomData = roomDoc.data();
-        
-        if(roomData.status !== 'waiting') {
-            showBeautifulAlert('error', 'خطأ', 'الغرفة غير متاحة للانضمام');
-            return;
-        }
-
-        if(roomData.player2Id !== null) {
-            showBeautifulAlert('error', 'خطأ', 'الغرفة ممتلئة');
-            return;
-        }
-
-        if(roomData.creatorId === currentUser.uid) {
-            showBeautifulAlert('error', 'خطأ', 'لا يمكنك الانضمام إلى غرفتك الخاصة');
-            return;
-        }
-
-        // إغلاق النافذة المنبثقة فوراً
-        document.getElementById('join-room-modal').classList.add('hidden');
-        document.getElementById('friend-game-modal').classList.add('hidden');
-
-        await updateDoc(doc(db, "rooms", roomId), {
-            player2Id: currentUser.uid,
-            player2Name: userData.name,
-            player2Photo: userData.photo,
-            player2Ready: false
-        });
-
-        currentRoomId = roomId;
-        isRoomCreator = false;
-        roomSubject = roomData.subject;
-        roomQType = roomData.type;
-        roomReadyStatus = false;
-
-        openRoomScreen(roomId);
-        startRoomTimer();
-        listenToRoomUpdates();
-
-    } catch (error) {
-        console.error("Error joining room:", error);
-        showBeautifulAlert('error', 'خطأ', 'حدث خطأ في الانضمام للغرفة');
-    }
-};
-
-        function openRoomScreen(roomId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('room-screen').classList.remove('hidden');
-            document.getElementById('room-screen').classList.add('active');
-            
-            document.getElementById('room-id-display').textContent = `#${roomId}`;
-            
-            if(isRoomCreator) {
-                document.getElementById('room-leave-btn').classList.add('hidden');
-                document.getElementById('room-delete-btn').classList.remove('hidden');
-            } else {
-                document.getElementById('room-leave-btn').classList.remove('hidden');
-                document.getElementById('room-delete-btn').classList.add('hidden');
-            }
-            
-            updateRoomUI();
-        }
-
-        function startRoomTimer() {
-    if(roomTimerInterval) clearInterval(roomTimerInterval);
-    
-    // الحصول على وقت الغرفة من قاعدة البيانات
-    const roomRef = doc(db, "rooms", currentRoomId);
-    
-    async function syncTimer() {
-        const roomDoc = await getDoc(roomRef);
-        if(!roomDoc.exists()) return;
-        
-        const roomData = roomDoc.data();
-        let timeLeft = 10 * 60; // 10 دقائق افتراضياً
-        
-        // إذا كان هناك وقت انتهاء محدد في قاعدة البيانات
-        if(roomData.expiresAt) {
-            const expiresAt = roomData.expiresAt.toDate();
-            const now = new Date();
-            timeLeft = Math.max(0, Math.floor((expiresAt - now) / 1000));
-        }
-        
-        const timerEl = document.getElementById('room-timer');
-        
-        function updateTimer() {
-            if(timeLeft <= 0) {
-                clearInterval(roomTimerInterval);
-                autoCloseRoom();
-                return;
-            }
-            
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            timeLeft--;
-        }
-        
-        updateTimer();
-        roomTimerInterval = setInterval(updateTimer, 1000);
-    }
-    
-    syncTimer();
-}
-
-        function listenToRoomUpdates() {
-    if(friendMatchListener) friendMatchListener();
-    
-    friendMatchListener = onSnapshot(doc(db, "rooms", currentRoomId), async (doc) => {
-        if(!doc.exists()) {
-            showBeautifulAlert('info', 'تم الإغلاق', 'تم إغلاق الغرفة من قبل المالك');
-            leaveRoom();
-            return;
-        }
-        
-        const roomData = doc.data();
-        updateRoomUI(roomData);
-        
-        // تحقق من الحالات المختلفة
-        if(roomData.status === 'starting') {
-            console.log("🚀 بدء المباراة...");
-            // يمكن إضافة مؤقت بسيط هنا للانتقال السلس
-        }
-        
-        if(roomData.status === 'active' && !roomGameData) {
-            // انتظر قليلاً لضمان وصول البيانات للطرفين
-            setTimeout(() => {
-                startFriendGame(roomData);
-            }, 1000);
-        }
-        
-        if(roomData.status === 'closed') {
-            showBeautifulAlert('info', 'انتهت المباراة', 'تم إنهاء المباراة');
-            leaveRoom();
-        }
-    });
-}
-
-        function updateRoomUI(roomData = null) {
-            if(!roomData) {
-                document.getElementById('player1-name').textContent = userData.name;
-                document.getElementById('player1-avatar').src = userData.photo;
-                document.getElementById('player1-status').textContent = "المالك ✅";
-                document.getElementById('player1-status').className = "player-status ready";
-                
-                document.getElementById('player2-name').textContent = "...";
-                document.getElementById('player2-avatar').src = "https://ui-avatars.com/api/?name=??&background=ccc&color=fff";
-                document.getElementById('player2-status').textContent = "جاهزة ❌";
-                document.getElementById('player2-status').className = "player-status not-ready";
-                
-                document.getElementById('room-players-count').textContent = "1/2";
-                document.getElementById('room-ready-count').textContent = "0/2";
-                document.getElementById('room-status-text').textContent = "في انتظار اللاعبين";
-                return;
-            }
-            
-            document.getElementById('player1-name').textContent = roomData.creatorName;
-            document.getElementById('player1-avatar').src = roomData.creatorPhoto;
-            document.getElementById('player1-status').textContent = roomData.creatorReady ? "المالك ✅" : "المالك ❌";
-            document.getElementById('player1-status').className = `player-status ${roomData.creatorReady ? 'ready' : 'not-ready'}`;
-            
-            if(roomData.player2Id) {
-                document.getElementById('player2-name').textContent = roomData.player2Name;
-                document.getElementById('player2-avatar').src = roomData.player2Photo;
-                document.getElementById('player2-status').textContent = roomData.player2Ready ? "جاهزة ✅" : "جاهزة ❌";
-                document.getElementById('player2-status').className = `player-status ${roomData.player2Ready ? 'ready' : 'not-ready'}`;
-                
-                document.getElementById('room-players-count').textContent = "2/2";
-                document.getElementById('room-ready-count').textContent = `${(roomData.creatorReady ? 1 : 0) + (roomData.player2Ready ? 1 : 0)}/2`;
-                
-                if(roomData.creatorReady && roomData.player2Ready) {
-                    document.getElementById('room-status-text').textContent = "جاهز للبدء";
-                    document.getElementById('room-status-text').className = "text-green-500 font-bold";
-                } else {
-                    document.getElementById('room-status-text').textContent = "في انتظار الجميع";
-                    document.getElementById('room-status-text').className = "text-yellow-500 font-bold";
-                }
-            } else {
-                document.getElementById('player2-name').textContent = "...";
-                document.getElementById('player2-avatar').src = "https://ui-avatars.com/api/?name=??&background=ccc&color=fff";
-                document.getElementById('player2-status').textContent = "جاهزة ❌";
-                document.getElementById('player2-status').className = "player-status not-ready";
-                
-                document.getElementById('room-players-count').textContent = "1/2";
-                document.getElementById('room-ready-count').textContent = `${roomData.creatorReady ? 1 : 0}/2`;
-                document.getElementById('room-status-text').textContent = "في انتظار اللاعبين";
-                document.getElementById('room-status-text').className = "text-yellow-500 font-bold";
-            }
-        }
-
-        window.toggleReady = async function() {
-            if(!currentRoomId) return;
-            
-            try {
-                const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
-                if(!roomDoc.exists()) return;
-                
-                const roomData = roomDoc.data();
-                
-                if(isRoomCreator) {
-                    await updateDoc(doc(db, "rooms", currentRoomId), {
-                        creatorReady: !roomData.creatorReady
-                    });
-                    roomReadyStatus = !roomData.creatorReady;
-                } else {
-                    await updateDoc(doc(db, "rooms", currentRoomId), {
-                        player2Ready: !roomData.player2Ready
-                    });
-                    roomReadyStatus = !roomData.player2Ready;
-                }
-                
-                checkIfBothReady(roomData);
-                
-            } catch (error) {
-                console.error("Error toggling ready:", error);
-            }
-        };
-
-        async function checkIfBothReady(roomData) {
-    // تحقق إذا كان الاثنان جاهزين
-    if(roomData.creatorReady && roomData.player2Ready && roomData.player2Id) {
-        console.log("✅ كلا اللاعبين جاهزان، بدء المباراة...");
-        
-        // أولاً: تحديث حالة الغرفة إلى 'starting' لمنع عمليات متعددة
-        await updateDoc(doc(db, "rooms", currentRoomId), {
-            status: 'starting'
-        });
-        
-        // ثانياً: جلب الأسئلة
-        const qDocs = await getQuestions(roomData.subject, roomData.type);
-        
-        if(qDocs.length === 0) { 
-            showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
-            
-            // إعادة تعيين حالة الجاهزية
-            await updateDoc(doc(db, "rooms", currentRoomId), {
-                creatorReady: false,
-                player2Ready: false,
-                status: 'waiting'
-            });
-            return; 
-        }
-        
-        // ثالثاً: تحديث الغرفة بالمباراة النشطة
-        const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
-        
-        await updateDoc(doc(db, "rooms", currentRoomId), {
-            status: 'active',
-            gameQuestions: shuffledQs,
-            gameStartTime: serverTimestamp(),
-            player1Score: 0,
-            player2Score: 0,
-            currentQuestionIndex: 0,
-            player1Answered: false,
-            player2Answered: false,
-            player1Answer: null,
-            player2Answer: null,
-            player1AnswerCorrect: null,
-            player2AnswerCorrect: null
-        });
-        
-        console.log("🎮 بدء المباراة مع", shuffledQs.length, "سؤال");
-        
-    } else {
-        console.log("⏳ في انتظار اللاعب الآخر...");
-    }
-}
-
-        async function startFriendGame(roomData) {
-    console.log("🎮 بدء المباراة ضد صديق...");
-    
-    // تأكد أن لدينا بيانات الأسئلة
-    let shuffledQs = [];
-    
-    if(roomData.gameQuestions && roomData.gameQuestions.length > 0) {
-        shuffledQs = roomData.gameQuestions;
-    } else {
-        // إذا لم تكن الأسئلة مخزنة، جلبها
-        const qDocs = await getQuestions(roomData.subject, roomData.type);
-        if(qDocs.length === 0) { 
-            showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم');
-            
-            // إعادة تعيين حالة الغرفة
-            await updateDoc(doc(db, "rooms", currentRoomId), {
-                creatorReady: false,
-                player2Ready: false,
-                status: 'waiting'
-            });
-            return; 
-        }
-        shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
-    }
-    
-    const isPlayer1 = currentUser.uid === roomData.creatorId;
-    const myPlayer = isPlayer1 ? 'player1' : 'player2';
-    const opPlayer = isPlayer1 ? 'player2' : 'player1';
-    
-    // إنشاء بيانات المباراة المحلية
-    roomGameData = {
-        status: 'active',
-        grade: userData.grade,
-        player1: { 
-            uid: roomData.creatorId, 
-            name: roomData.creatorName, 
-            score: roomData.player1Score || 0, 
-            photo: roomData.creatorPhoto,
-            hasAnsweredCurrent: false,
-            currentAnswer: null,
-            answerCorrect: false
-        },
-        player2: { 
-            uid: roomData.player2Id, 
-            name: roomData.player2Name, 
-            score: roomData.player2Score || 0, 
-            photo: roomData.player2Photo,
-            hasAnsweredCurrent: false,
-            currentAnswer: null,
-            answerCorrect: false
-        },
-        questions: shuffledQs, 
-        currentIdx: roomData.currentQuestionIndex || 0, 
-        answersCount: 0,
-        questionStartTime: Date.now(),
-        timeRemaining: 15,
-        waitingForOpponent: false
-    };
-    
-    console.log("🤝 بيانات المباراة جاهزة، عرض شاشة VS...");
-    
-    // عرض شاشة VS
-    await showVSAnimation(
-        { photo: roomData.creatorPhoto, name: roomData.creatorName },
-        { photo: roomData.player2Photo, name: roomData.player2Name }
-    );
-    
-    // الانتقال إلى شاشة اللعبة
-    document.getElementById('room-screen').classList.add('hidden');
-    document.getElementById('game-overlay').classList.remove('hidden');
-    document.getElementById('withdraw-game-btn').classList.remove('hidden');
-    
-    // بدء عرض الأسئلة
-    renderFriendGame(roomGameData, myPlayer);
-    
-    // بدء الإستماع لتحديثات النتائج في الوقت الحقيقي
-    listenToScoreUpdates();
-    
-    // إضافة استماع لتحديثات إجابات اللاعبين
-    listenToPlayerAnswers();
-}
-
-        function renderFriendGame(data, myPlayer) {
-    const totalQs = data.questions.length;
-    if(!data.questions || data.currentIdx >= totalQs) { 
-        endFriendGame(data); 
-        return; 
-    }
-    
-    const q = data.questions[data.currentIdx];
-    if (!q) { 
-        endFriendGame(data); 
-        return; 
-    }
-    
-    const isPlayer1 = myPlayer === 'player1';
-    const me = isPlayer1 ? data.player1 : data.player2;
-    const op = isPlayer1 ? data.player2 : data.player1;
-    
-    // إعادة تعيين حالة الإجابة للاعب الحالي
-    me.hasAnsweredCurrent = false;
-    me.currentAnswer = null;
-    me.answerCorrect = false;
-    
-    document.getElementById('p1-name').innerText = isPlayer1 ? data.player1.name : data.player2.name;
-    document.getElementById('game-p1-img').src = isPlayer1 ? data.player1.photo : data.player2.photo;
-    document.getElementById('p2-name').innerText = isPlayer1 ? data.player2.name : data.player1.name;
-    document.getElementById('game-p2-img').src = isPlayer1 ? data.player2.photo : data.player1.photo;
-    document.getElementById('game-my-score').innerText = isPlayer1 ? data.player1.score : data.player2.score;
-    document.getElementById('game-op-score').innerText = isPlayer1 ? data.player2.score : data.player1.score;
-
-    const qTextEl = document.getElementById('q-text');
-    if(qTextEl.innerText !== q.question) {
-        hasAnsweredCurrentQ = false;
-        userAnsweredCorrectly = false;
-        currentQuestionCorrectAnswer = null;
-        document.getElementById('answers-container').classList.remove('pointer-events-none', 'opacity-50');
-        document.getElementById('waiting-msg').classList.add('hidden');
-        document.getElementById('ai-thinking-msg').classList.add('hidden');
-        
-        // إعادة تعيين حالة الانتظار
-        data.waitingForOpponent = false;
-        
-        clearInterval(gameTimer);
-        let t = 15;
-        data.timeRemaining = t;
-        data.questionStartTime = Date.now();
-        document.getElementById('game-timer').innerText = t;
-        
-        gameTimer = setInterval(() => {
-            if (isExitingGame) { 
-                clearInterval(gameTimer); 
-                return; 
-            }
-            
-            t--;
-            data.timeRemaining = t;
-            document.getElementById('game-timer').innerText = t;
-            
-            if(t <= 0) { 
-                clearInterval(gameTimer); 
-                checkAndMoveToNextQuestion(data, myPlayer);
-            }
-        }, 1000);
-    }
-    
-    document.getElementById('q-progress').innerText = `${data.currentIdx + 1} / ${totalQs}`;
-    qTextEl.innerText = q.question;
-    const div = document.getElementById('answers-container');
-    if(div.children.length === 0 || div.getAttribute('data-curr-q') !== q.question) {
-        div.setAttribute('data-curr-q', q.question);
-        div.innerHTML = '';
-        let ansList = [];
-        if(q.type === 'mcq') ansList = q.answers.map((txt, idx) => ({ txt, isCorrect: idx === q.correct, value: idx }));
-        else ansList = [{ txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }];
-        
-        const correctAns = ansList.find(ans => ans.isCorrect);
-        if (correctAns) currentQuestionCorrectAnswer = correctAns.value;
-
-        ansList.sort(() => 0.5 - Math.random());
-        ansList.forEach(ansObj => {
-            const btn = document.createElement('button');
-            btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
-            btn.innerText = ansObj.txt;
-            btn.dataset.value = ansObj.value;
-            btn.onclick = () => { 
-                if(hasAnsweredCurrentQ || me.hasAnsweredCurrent) return; 
-                submitFriendAnswer(ansObj, q, data, myPlayer); 
-            };
-            div.appendChild(btn);
-        });
-    }
-    
-    // تحديث واجهة بناءً على حالة الإجابة
-    if (me.hasAnsweredCurrent) {
-        document.getElementById('answers-container').classList.add('pointer-events-none', 'opacity-50');
-        document.getElementById('waiting-msg').classList.remove('hidden');
-        document.getElementById('waiting-msg').innerText = "بانتظار إجابة الخصم...";
-    }
-}
-
-        async function submitFriendAnswer(ansObj, q, matchData, myPlayer) {
-    if(hasAnsweredCurrentQ || isExitingGame) return;
-    
-    const isPlayer1 = myPlayer === 'player1';
-    const me = isPlayer1 ? matchData.player1 : matchData.player2;
-    
-    if (me.hasAnsweredCurrent) return;
-    
-    me.hasAnsweredCurrent = true;
-    me.currentAnswer = ansObj.value;
-    me.answerCorrect = ansObj && ansObj.isCorrect;
-    userAnsweredCorrectly = me.answerCorrect;
-    
-    // تحديث النتيجة المحلية إذا كانت الإجابة صحيحة
-    if(me.answerCorrect) {
-        if(myPlayer === 'player1') {
-            matchData.player1.score += 1;
-        } else {
-            matchData.player2.score += 1;
-        }
-        
-        const isPlayer1 = myPlayer === 'player1';
-        document.getElementById('game-my-score').innerText = isPlayer1 ? matchData.player1.score : matchData.player2.score;
-    }
-    
-    // تحديث الواجهة
-    const answerButtons = document.querySelectorAll('#answers-container button');
-    answerButtons.forEach(btn => {
-        btn.classList.remove('answer-correct', 'answer-wrong', 'answer-neutral');
-        if (btn.dataset.value.toString() === currentQuestionCorrectAnswer.toString()) {
-            btn.classList.add('answer-correct');
-        } else if (ansObj && btn.dataset.value.toString() === (ansObj.value?.toString())) {
-            btn.classList.add('answer-wrong');
-        } else {
-            btn.classList.add('answer-neutral');
-        }
-    });
-    
-    document.getElementById('answers-container').classList.add('pointer-events-none');
-    document.getElementById('waiting-msg').classList.remove('hidden');
-    document.getElementById('waiting-msg').innerText = "بانتظار إجابة الخصم...";
-    
-    // حفظ الإجابة في قاعدة البيانات
-    try {
-        if(currentRoomId) {
-            const roomRef = doc(db, "rooms", currentRoomId);
-            const roomDoc = await getDoc(roomRef);
-            if(roomDoc.exists()) {
-                const roomData = roomDoc.data();
-                
-                // حفظ إجابة اللاعب
-                const answerField = myPlayer === 'player1' ? 'player1Answer' : 'player2Answer';
-                const answerStatusField = myPlayer === 'player1' ? 'player1Answered' : 'player2Answered';
-                const answerCorrectField = myPlayer === 'player1' ? 'player1AnswerCorrect' : 'player2AnswerCorrect';
-                
-                await updateDoc(roomRef, {
-                    [answerField]: ansObj.value,
-                    [answerStatusField]: true,
-                    [answerCorrectField]: me.answerCorrect,
-                    lastAnswerTime: serverTimestamp()
-                });
-                
-                // تحديث النتيجة
-                if(myPlayer === 'player1') {
-                    await updateDoc(roomRef, {
-                        player1Score: matchData.player1.score
-                    });
-                } else {
-                    await updateDoc(roomRef, {
-                        player2Score: matchData.player2.score
-                    });
-                }
-                
-                // تحقق إذا كان كلا اللاعبين قد أجابا
-                const bothAnswered = (myPlayer === 'player1' && roomData.player2Answered) || 
-                                    (myPlayer === 'player2' && roomData.player1Answered);
-                
-                if (bothAnswered) {
-                    // كلا اللاعبين أجابا، انتقل للسؤال التالي بعد 2 ثانية
-                    setTimeout(async () => {
-                        await moveToNextQuestion(matchData, myPlayer);
-                    }, 2000);
-                }
-            }
-        }
-    } catch (error) {
-        console.error("Error saving answer:", error);
-    }
-}
-
-async function checkAndMoveToNextQuestion(data, myPlayer) {
-    if (isExitingGame) return;
-    
-    // إذا انتهى الوقت، تحقق من الإجابات وانتقل للسؤال التالي
-    const isPlayer1 = myPlayer === 'player1';
-    const me = isPlayer1 ? data.player1 : data.player2;
-    const op = isPlayer1 ? data.player2 : data.player1;
-    
-    // إذا لم يجب اللاعب الحالي بعد، فسيتم اعتبار أنه لم يجب
-    if (!me.hasAnsweredCurrent) {
-        me.hasAnsweredCurrent = true;
-        me.currentAnswer = null;
-        me.answerCorrect = false;
-    }
-    
-    // انتقل للسؤال التالي
-    await moveToNextQuestion(data, myPlayer);
-}
-
-async function moveToNextQuestion(data, myPlayer) {
-    try {
-        if(currentRoomId) {
-            const roomRef = doc(db, "rooms", currentRoomId);
-            const roomDoc = await getDoc(roomRef);
-            
-            if(roomDoc.exists()) {
-                const roomData = roomDoc.data();
-                
-                // الانتقال للسؤال التالي
-                const nextIdx = (roomData.currentQuestionIndex || 0) + 1;
-                
-                await updateDoc(roomRef, {
-                    currentQuestionIndex: nextIdx,
-                    player1Answered: false,
-                    player2Answered: false,
-                    player1Answer: null,
-                    player2Answer: null,
-                    player1AnswerCorrect: null,
-                    player2AnswerCorrect: null
-                });
-                
-                // تحديث البيانات المحلية
-                data.currentIdx = nextIdx;
-                data.player1.hasAnsweredCurrent = false;
-                data.player2.hasAnsweredCurrent = false;
-                data.player1.currentAnswer = null;
-                data.player2.currentAnswer = null;
-                data.player1.answerCorrect = false;
-                data.player2.answerCorrect = false;
-                
-                // إعادة عرض السؤال الجديد
-                renderFriendGame(data, myPlayer);
-            }
-        }
-    } catch (error) {
-        console.error("Error moving to next question:", error);
-        // في حالة الخطأ، انتقل للسؤال التالي محلياً
-        data.currentIdx += 1;
-        data.player1.hasAnsweredCurrent = false;
-        data.player2.hasAnsweredCurrent = false;
-        data.player1.currentAnswer = null;
-        data.player2.currentAnswer = null;
-        data.player1.answerCorrect = false;
-        data.player2.answerCorrect = false;
-        
-        renderFriendGame(data, myPlayer);
-    }
-}
-
-function listenToPlayerAnswers() {
-    if(!currentRoomId) return;
-    
-    const roomRef = doc(db, "rooms", currentRoomId);
-    
-    onSnapshot(roomRef, (doc) => {
-        if(!doc.exists()) return;
-        
-        const roomData = doc.data();
-        
-        if (!roomGameData) return;
-        
-        const isPlayer1 = currentUser.uid === roomData.creatorId;
-        const myPlayer = isPlayer1 ? 'player1' : 'player2';
-        const opPlayer = isPlayer1 ? 'player2' : 'player1';
-        
-        // تحديث حالة إجابة اللاعب الآخر
-        const opAnsweredField = isPlayer1 ? 'player2Answered' : 'player1Answered';
-        const opAnswerField = isPlayer1 ? 'player2Answer' : 'player1Answer';
-        const opCorrectField = isPlayer1 ? 'player2AnswerCorrect' : 'player1AnswerCorrect';
-        
-        const me = isPlayer1 ? roomGameData.player1 : roomGameData.player2;
-        const op = isPlayer1 ? roomGameData.player2 : roomGameData.player1;
-        
-        // إذا كان الخصم قد أجاب بينما أنا لم أجب بعد
-        if (roomData[opAnsweredField] && !me.hasAnsweredCurrent) {
-            document.getElementById('waiting-msg').classList.remove('hidden');
-            document.getElementById('waiting-msg').innerText = "الخصم يفكر...";
-        }
-        
-        // تحديث النقاط في الوقت الحقيقي
-        if(roomGameData) {
-            roomGameData.player1.score = roomData.player1Score || 0;
-            roomGameData.player2.score = roomData.player2Score || 0;
-            
-            // تحديث الواجهة فقط إذا كانت شاشة اللعبة مفتوحة
-            if(document.getElementById('game-overlay').classList.contains('hidden') === false) {
-                document.getElementById('game-my-score').innerText = myPlayer === 'player1' ? roomGameData.player1.score : roomGameData.player2.score;
-                document.getElementById('game-op-score').innerText = myPlayer === 'player1' ? roomGameData.player2.score : roomGameData.player1.score;
-            }
-        }
-    });
-}
-
-        function endFriendGame(data) {
-    clearInterval(gameTimer);
-    document.getElementById('game-overlay').classList.add('hidden');
-    document.getElementById('withdraw-game-btn').classList.add('hidden');
-    
-    let myScore = data.player1.score;
-    let opScore = data.player2.score;
-    
-    const resultScreen = document.getElementById('result-screen');
-    const iconContainer = document.getElementById('result-icon-container');
-    const title = document.getElementById('result-title');
-    const resultMsg = document.getElementById('result-msg');
-    const finalMyScore = document.getElementById('final-my-score');
-    const finalOpScore = document.getElementById('final-op-score');
-    const finalOpName = document.getElementById('final-op-name');
-    const pointsGainedText = document.getElementById('result-points-gained-text');
-    
-    if (myScore > opScore) { 
-        iconContainer.innerText = "🏆";
-        title.innerText = "فوز ساحق!";
-    } else if (myScore < opScore) { 
-        iconContainer.innerText = "😢";
-        title.innerText = "حظ أوفر!";
-    } else { 
-        iconContainer.innerText = "🤝";
-        title.innerText = "تعادل!";
-    }
-    
-    resultMsg.innerText = "مباراة ودية - لا توجد نقاط";
-    finalMyScore.innerText = myScore;
-    finalOpScore.innerText = opScore;
-    finalOpName.innerText = data.player2.name;
-    pointsGainedText.innerText = "+0";
-    
-    resultScreen.classList.remove('hidden');
-    
-    setTimeout(async () => {
-        await updateDoc(doc(db, "rooms", currentRoomId), {
-            status: 'closed'
-        });
-        
-        roomGameData = null;
-    }, 3000);
-}
-
-// دالة للإستماع لتحديثات النتائج في الوقت الحقيقي
-function listenToScoreUpdates() {
-    if(!currentRoomId) return;
-    
-    const roomRef = doc(db, "rooms", currentRoomId);
-    
-    onSnapshot(roomRef, (doc) => {
-        if(!doc.exists()) return;
-        
-        const roomData = doc.data();
-        
-        // تحديث النقاط في الواجهة في الوقت الحقيقي
-        if(roomGameData) {
-            roomGameData.player1.score = roomData.player1Score || 0;
-            roomGameData.player2.score = roomData.player2Score || 0;
-            
-            const isPlayer1 = currentUser.uid === roomData.creatorId;
-            const isPlayer1InGame = isPlayer1 ? 'player1' : 'player2';
-            
-            // تحديث الواجهة فقط إذا كانت شاشة اللعبة مفتوحة
-            if(document.getElementById('game-overlay').classList.contains('hidden') === false) {
-                document.getElementById('game-my-score').innerText = isPlayer1InGame === 'player1' ? roomGameData.player1.score : roomGameData.player2.score;
-                document.getElementById('game-op-score').innerText = isPlayer1InGame === 'player1' ? roomGameData.player2.score : roomGameData.player1.score;
-            }
-        }
-    });
-}
-
-        window.leaveRoom = async function() {
-            if(!currentRoomId) return;
-            
-            try {
-                if(isRoomCreator) {
-                    await deleteDoc(doc(db, "rooms", currentRoomId));
-                } else {
-                    await updateDoc(doc(db, "rooms", currentRoomId), {
-                        player2Id: null,
-                        player2Name: null,
-                        player2Photo: null,
-                        player2Ready: false
-                    });
-                }
-                
-                cleanupRoom();
-                switchTab('challenges');
-                
-            } catch (error) {
-                console.error("Error leaving room:", error);
-                cleanupRoom();
-                switchTab('challenges');
-            }
-        };
-
-        window.deleteRoom = async function() {
-            if(!currentRoomId || !isRoomCreator) return;
-            
-            if(!confirm('هل أنت متأكد من حذف الغرفة؟')) return;
-            
-            try {
-                await deleteDoc(doc(db, "rooms", currentRoomId));
-                cleanupRoom();
-                switchTab('challenges');
-                
-            } catch (error) {
-                console.error("Error deleting room:", error);
-                cleanupRoom();
-                switchTab('challenges');
-            }
-        };
-
-        function cleanupRoom() {
-            if(roomTimerInterval) {
-                clearInterval(roomTimerInterval);
-                roomTimerInterval = null;
-            }
-            
-            if(friendMatchListener) {
-                friendMatchListener();
-                friendMatchListener = null;
-            }
-            
-            currentRoomId = null;
-            isRoomCreator = false;
-            roomReadyStatus = false;
-            roomQType = null;
-            roomSubject = null;
-            roomGameData = null;
-            
-            document.getElementById('room-screen').classList.add('hidden');
-        }
-
-        function autoCloseRoom() {
-            if(currentRoomId && isRoomCreator) {
-                deleteDoc(doc(db, "rooms", currentRoomId)).catch(() => {});
-            }
-            cleanupRoom();
-            switchTab('challenges');
-            showBeautifulAlert('info', 'انتهى الوقت', 'انتهى وقت الغرفة (10 دقائق)');
-        }
 
         window.openPage = async (screenId) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -4712,6 +3944,7 @@ function listenToScoreUpdates() {
             const loadMoreBtn = document.getElementById('load-more-leaderboard');
             div.innerHTML = '<p class="text-center text-gray-400 mt-10">تحميل...</p>';
             leaderboardOffset = 0;
+            displayedLeaderboardCount = 25;
             
             try {
                 const q = query(collection(db, "users"), orderBy("points", "desc"), limit(150));
@@ -4727,9 +3960,9 @@ function listenToScoreUpdates() {
                 if(myIndex !== -1) document.getElementById('my-rank-text').innerText = "#" + (myIndex + 1);
                 else document.getElementById('my-rank-text').innerText = "#" + (allLeaderboardUsers.length + 1);
 
-                renderLeaderboardChunk(0, 25);
+                renderLeaderboardChunk(0, displayedLeaderboardCount);
                 
-                if (allLeaderboardUsers.length > 25) {
+                if (allLeaderboardUsers.length > displayedLeaderboardCount && allLeaderboardUsers.length <= leaderboardLimit) {
                     loadMoreBtn.classList.remove('hidden');
                 } else {
                     loadMoreBtn.classList.add('hidden');
@@ -4745,12 +3978,10 @@ function listenToScoreUpdates() {
             const div = document.getElementById('leaderboard-list');
             div.innerHTML = '';
             
-            const usersToShow = allLeaderboardUsers.slice(start, end);
+            const usersToShow = allLeaderboardUsers.slice(start, Math.min(end, leaderboardLimit));
             
             usersToShow.forEach((u, index) => {
                 const globalIndex = start + index;
-                if(globalIndex >= 50) return;
-                
                 let frameClass = "frame-rank-common";
                 let crown = "";
                 let rankBadge = `<div class="rank-badge-top">${globalIndex + 1}</div>`;
@@ -4830,58 +4061,10 @@ function listenToScoreUpdates() {
         }
 
         window.loadMoreLeaderboard = function() {
-            leaderboardOffset += 25;
-            const nextChunk = allLeaderboardUsers.slice(leaderboardOffset, leaderboardOffset + 25);
+            displayedLeaderboardCount += 25;
+            renderLeaderboardChunk(0, Math.min(displayedLeaderboardCount, leaderboardLimit));
             
-            nextChunk.forEach((u, index) => {
-                const globalIndex = leaderboardOffset + index;
-                if(globalIndex >= 50) return;
-                
-                let frameClass = "frame-rank-common";
-                let rankBadge = `<div class="rank-badge-top">${globalIndex + 1}</div>`;
-                let backgroundClass = 'bg-rank-default';
-                
-                if (u.isPremium && u.premiumExpiry && u.premiumExpiry.toDate() > new Date()) {
-                    backgroundClass = u.selectedBgTheme || 'bg-rank-default';
-                }
-                
-                let badgeHtml = "";
-                if (u.isPremium && u.premiumExpiry && u.premiumExpiry.toDate() > new Date() && u.selectedBadge) {
-                    badgeHtml = `<span class="premium-badge" style="background-color: ${u.selectedBadgeColor || '#f59e0b'}">${u.selectedBadge}</span>`;
-                }
-                
-                let resetBtn = "";
-                if (currentUser && userData && userData.email === ADMIN_EMAIL) {
-                    resetBtn = `<button onclick="resetUserPoints('${u.id}', '${u.name}')" class="w-6 h-6 rounded bg-red-100 text-red-500 flex items-center justify-center mr-2"><i class="fas fa-trash-alt text-xs"></i></button>`;
-                }
-                
-                const div = document.getElementById('leaderboard-list');
-                div.innerHTML += `
-                    <div class="flex items-center justify-between p-4 rounded-xl shadow-sm mb-3 relative overflow-hidden ${backgroundClass}">
-                        <div class="flex items-center gap-4 z-10">
-                            <div class="rank-img-container">
-                                ${rankBadge}
-                                <img src="${u.photo}" class="rank-img ${frameClass}">
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-800 text-sm flex items-center">
-                                    ${u.name}
-                                    ${badgeHtml}
-                                </p>
-                                <p class="text-[10px] text-gray-600">ID: ${u.uniqueId}</p>
-                                <p class="text-[10px] text-gray-500 mt-1">${u.bio || ""}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center z-10">
-                            ${resetBtn}
-                            <div class="text-right">
-                                <span class="font-black text-indigo-600 text-lg">${u.points || 0} 💎</span>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-            
-            if (leaderboardOffset + 25 >= 50) {
+            if (displayedLeaderboardCount >= Math.min(allLeaderboardUsers.length, leaderboardLimit)) {
                 document.getElementById('load-more-leaderboard').classList.add('hidden');
             }
         };
@@ -5291,6 +4474,12 @@ function listenToScoreUpdates() {
         
         window.handleScheduleFormSubmit = function(e) {
             e.preventDefault();
+            
+            const needSleepSelect = document.getElementById('needSleep');
+            if (needSleepSelect.value === "") {
+                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار خيار وقت النوم');
+                return;
+            }
             
             scheduleData.subject = document.getElementById('subjectName').value;
             scheduleData.totalHours = parseFloat(document.getElementById('totalHours').value);
@@ -5708,6 +4897,8 @@ function listenToScoreUpdates() {
                     return;
                 }
                 
+                console.log(`✅ تم العثور على ${snapshot.size} سؤال للمراجعة`);
+                
                 let questions = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
@@ -5720,6 +4911,8 @@ function listenToScoreUpdates() {
                 });
                 
                 questions.sort((a, b) => b.timestamp - a.timestamp);
+                
+                console.log("📊 الأسئلة بعد الترتيب:", questions);
                 
                 let html = `
                     <div class="mb-4 p-3 bg-indigo-50 rounded-xl border border-indigo-100">
@@ -5894,6 +5087,722 @@ function listenToScoreUpdates() {
                 showBeautifulAlert('error', 'خطأ', 'حدث خطأ في رفض السؤال');
             }
         };
+
+        // Friend Match System
+        window.openFriendMatch = function() {
+            document.getElementById('friend-match-modal').classList.remove('hidden');
+        };
+
+        window.closeFriendMatchModal = function() {
+            document.getElementById('friend-match-modal').classList.add('hidden');
+        };
+
+        window.createFriendRoom = function() {
+            closeFriendMatchModal();
+            document.getElementById('create-room-modal').classList.remove('hidden');
+            populateSubjects(userData.grade, 'room-subject');
+            setRoomQType('mcq');
+        };
+
+        window.setRoomQType = function(t) {
+            document.getElementById('room-btn-mcq').className = `px-4 py-2 rounded-lg border font-bold ${t==='mcq'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
+            document.getElementById('room-btn-tf').className = `px-4 py-2 rounded-lg border font-bold ${t==='tf'?'border-indigo-600 bg-indigo-50 text-indigo-600':'border-indigo-100 text-gray-500'}`;
+            selectedQType = t;
+        };
+
+        window.closeCreateRoomModal = function() {
+            document.getElementById('create-room-modal').classList.add('hidden');
+        };
+
+        window.proceedToRoom = async function() {
+            const sub = document.getElementById('room-subject').value;
+            if(!sub || !selectedQType) {
+                showBeautifulAlert('warning', 'تنبيه', 'يرجى اختيار المادة ونوع الأسئلة');
+                return;
+            }
+
+            try {
+                const roomCode = generateRoomCode();
+                currentRoomId = roomCode;
+                isRoomOwner = true;
+                
+                await setDoc(doc(db, "rooms", roomCode), {
+                    id: roomCode,
+                    ownerId: currentUser.uid,
+                    ownerName: userData.name,
+                    ownerPhoto: userData.photo,
+                    subject: sub,
+                    questionType: selectedQType,
+                    grade: userData.grade,
+                    players: [{
+                        uid: currentUser.uid,
+                        name: userData.name,
+                        photo: userData.photo,
+                        ready: false,
+                        score: 0
+                    }],
+                    status: 'waiting',
+                    createdAt: serverTimestamp(),
+                    expiresAt: Timestamp.fromDate(new Date(Date.now() + 10 * 60 * 1000)) // 10 minutes
+                });
+
+                closeCreateRoomModal();
+                openRoomLobby(roomCode);
+                
+            } catch (error) {
+                console.error("Error creating room:", error);
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في إنشاء الغرفة');
+            }
+        };
+
+        function generateRoomCode() {
+            const chars = '0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        window.findFriendRoom = function() {
+            closeFriendMatchModal();
+            document.getElementById('find-room-modal').classList.remove('hidden');
+        };
+
+        window.closeFindRoomModal = function() {
+            document.getElementById('find-room-modal').classList.add('hidden');
+        };
+
+        window.joinRoomByCode = async function() {
+            const roomCode = document.getElementById('room-code-input').value.trim();
+            if(!roomCode || roomCode.length !== 8) {
+                showBeautifulAlert('warning', 'تنبيه', 'يرجى إدخال كود غرفة صحيح (8 أرقام)');
+                return;
+            }
+
+            try {
+                const roomDoc = await getDoc(doc(db, "rooms", roomCode));
+                if(!roomDoc.exists()) {
+                    showBeautifulAlert('error', 'خطأ', '❌ الغرفة غير موجودة');
+                    return;
+                }
+
+                const roomData = roomDoc.data();
+                
+                // Check grade compatibility
+                if (roomData.grade !== userData.grade) {
+                    // Check if subject is shared
+                    if (!sharedSubjects.includes(roomData.subject)) {
+                        showBeautifulAlert('error', 'خطأ', '❌ لا يمكنك الانضمام إلى غرفة من مرحلة دراسية مختلفة');
+                        return;
+                    }
+                }
+
+                if (roomData.players.length >= 2) {
+                    showBeautifulAlert('error', 'خطأ', '❌ الغرفة ممتلئة');
+                    return;
+                }
+
+                currentRoomId = roomCode;
+                isRoomOwner = false;
+                
+                await updateDoc(doc(db, "rooms", roomCode), {
+                    players: [...roomData.players, {
+                        uid: currentUser.uid,
+                        name: userData.name,
+                        photo: userData.photo,
+                        ready: false,
+                        score: 0
+                    }]
+                });
+
+                closeFindRoomModal();
+                openRoomLobby(roomCode);
+                
+            } catch (error) {
+                console.error("Error joining room:", error);
+                showBeautifulAlert('error', 'خطأ', 'حدث خطأ في الانضمام إلى الغرفة');
+            }
+        };
+
+        function openRoomLobby(roomId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('room-lobby').classList.remove('hidden');
+            
+            document.getElementById('room-id-display').textContent = roomId;
+            
+            if (isRoomOwner) {
+                document.getElementById('delete-btn').classList.remove('hidden');
+                document.getElementById('leave-btn').classList.add('hidden');
+            } else {
+                document.getElementById('delete-btn').classList.add('hidden');
+                document.getElementById('leave-btn').classList.remove('hidden');
+            }
+            
+            startRoomTimer();
+            listenToRoomUpdates(roomId);
+            startConnectionCheck();
+        }
+
+        function startRoomTimer() {
+            if(roomTimerInterval) clearInterval(roomTimerInterval);
+            roomTimeLeft = 600; // 10 minutes
+            
+            function updateTimer() {
+                roomTimeLeft--;
+                const minutes = Math.floor(roomTimeLeft / 60);
+                const seconds = roomTimeLeft % 60;
+                document.getElementById('room-timer').textContent = 
+                    `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                
+                if (roomTimeLeft <= 0) {
+                    clearInterval(roomTimerInterval);
+                    closeRoom();
+                    showBeautifulAlert('warning', 'انتهى الوقت', 'انتهى وقت الغرفة (10 دقائق)');
+                }
+            }
+            
+            updateTimer();
+            roomTimerInterval = setInterval(updateTimer, 1000);
+        }
+
+        async function listenToRoomUpdates(roomId) {
+            if(roomListenerUnsubscribe) roomListenerUnsubscribe();
+            
+            roomListenerUnsubscribe = onSnapshot(doc(db, "rooms", roomId), async (doc) => {
+                if (!doc.exists()) {
+                    showBeautifulAlert('info', 'تم الإغلاق', 'تم إغلاق الغرفة من قبل المالك');
+                    closeRoom();
+                    return;
+                }
+
+                const roomData = doc.data();
+                
+                // Update player displays
+                const players = roomData.players || [];
+                
+                document.getElementById('players-count').textContent = `${players.length}/2`;
+                
+                let readyCount = 0;
+                players.forEach(player => {
+                    if (player.ready) readyCount++;
+                });
+                document.getElementById('ready-count').textContent = `${readyCount}/2`;
+                
+                // Update player 1 (owner)
+                if (players[0]) {
+                    document.getElementById('player1-avatar').src = players[0].photo;
+                    document.getElementById('player1-name').textContent = players[0].name;
+                    document.getElementById('player1-status').textContent = players[0].ready ? 'جاهز' : 'بانتظار';
+                    document.getElementById('player1-status').className = `player-status ${players[0].ready ? 'status-ready' : 'status-waiting'}`;
+                }
+                
+                // Update player 2
+                if (players[1]) {
+                    document.getElementById('player2-card').classList.remove('hidden');
+                    document.getElementById('player2-avatar').src = players[1].photo;
+                    document.getElementById('player2-name').textContent = players[1].name;
+                    document.getElementById('player2-status').textContent = players[1].ready ? 'جاهز' : 'بانتظار';
+                    document.getElementById('player2-status').className = `player-status ${players[1].ready ? 'status-ready' : 'status-waiting'}`;
+                } else {
+                    document.getElementById('player2-card').classList.add('hidden');
+                }
+                
+                // Update ready button
+                const currentPlayer = players.find(p => p.uid === currentUser.uid);
+                if (currentPlayer) {
+                    amIReady = currentPlayer.ready;
+                    document.getElementById('ready-text').textContent = amIReady ? 'غير جاهز' : 'جاهز';
+                }
+                
+                // Check if both players are ready
+                if (players.length === 2 && players[0].ready && players[1].ready) {
+                    await startFriendMatch(roomData);
+                }
+            });
+        }
+
+        async function startFriendMatch(roomData) {
+            // Start the match
+            showBeautifulAlert('info', 'بدء المباراة', 'جاري بدء المباراة...');
+            
+            // Get questions
+            const qDocs = await getQuestions(roomData.subject, roomData.questionType);
+            if(qDocs.length === 0) { 
+                showBeautifulAlert('warning', 'تنبيه', 'لا توجد أسئلة كافية في هذا القسم'); 
+                return; 
+            }
+            
+            const shuffledQs = qDocs.sort(() => 0.5 - Math.random()).slice(0, 10);
+            
+            // Create match document
+            const matchId = `friend_${currentRoomId}_${Date.now()}`;
+            
+            await setDoc(doc(db, "matches", matchId), {
+                id: matchId,
+                roomId: currentRoomId,
+                players: roomData.players.map(p => ({
+                    ...p,
+                    score: 0,
+                    answers: []
+                })),
+                questions: shuffledQs,
+                currentQuestion: 0,
+                status: 'active',
+                startedAt: serverTimestamp()
+            });
+            
+            // Update room status
+            await updateDoc(doc(db, "rooms", currentRoomId), {
+                status: 'playing',
+                matchId: matchId
+            });
+            
+            // Start the game
+            startFriendGame(matchId, roomData);
+        }
+
+        async function startFriendGame(matchId, roomData) {
+            // Close room lobby
+            document.getElementById('room-lobby').classList.add('hidden');
+            
+            // Setup game
+            const opponent = roomData.players.find(p => p.uid !== currentUser.uid);
+            
+            localMatchData = {
+                status: 'active',
+                grade: userData.grade,
+                player1: { 
+                    uid: currentUser.uid, 
+                    name: userData.name, 
+                    score: 0, 
+                    photo: userData.photo,
+                    grade: userData.grade
+                },
+                player2: { 
+                    uid: opponent.uid, 
+                    name: opponent.name, 
+                    score: 0, 
+                    photo: opponent.photo,
+                    grade: roomData.grade
+                },
+                questions: [], // Will be loaded from match document
+                currentIdx: 0, 
+                answersCount: 0,
+                matchId: matchId
+            };
+            
+            // Show VS animation
+            await showVSAnimation(localMatchData.player1, localMatchData.player2);
+            
+            // Start listening to match updates
+            listenToMatchUpdates(matchId);
+            
+            // Show game overlay
+            document.getElementById('game-overlay').classList.remove('hidden');
+        }
+
+        function listenToMatchUpdates(matchId) {
+            if(matchListenerUnsubscribe) matchListenerUnsubscribe();
+            
+            matchListenerUnsubscribe = onSnapshot(doc(db, "matches", matchId), (doc) => {
+                if (!doc.exists()) return;
+                
+                const matchData = doc.data();
+                
+                // Update scores
+                matchData.players.forEach(player => {
+                    if (player.uid === currentUser.uid) {
+                        localMatchData.player1.score = player.score || 0;
+                        document.getElementById('game-my-score').textContent = player.score || 0;
+                    } else {
+                        localMatchData.player2.score = player.score || 0;
+                        document.getElementById('game-op-score').textContent = player.score || 0;
+                    }
+                });
+                
+                // Update current question
+                if (matchData.currentQuestion !== undefined) {
+                    localMatchData.currentIdx = matchData.currentQuestion;
+                    document.getElementById('q-progress').textContent = 
+                        `${matchData.currentQuestion + 1} / ${matchData.questions.length}`;
+                    
+                    // Show question if not already shown
+                    if (matchData.questions && matchData.questions[matchData.currentQuestion]) {
+                        const q = matchData.questions[matchData.currentQuestion];
+                        if (document.getElementById('q-text').textContent !== q.question) {
+                            showQuestion(q);
+                        }
+                    }
+                }
+                
+                // Check if match ended
+                if (matchData.status === 'ended') {
+                    endFriendMatch(matchData);
+                }
+            });
+        }
+
+        function showQuestion(q) {
+            document.getElementById('q-text').textContent = q.question;
+            
+            const div = document.getElementById('answers-container');
+            div.innerHTML = '';
+            
+            let ansList = [];
+            if(q.type === 'mcq') {
+                ansList = q.answers.map((txt, idx) => ({ 
+                    txt, 
+                    isCorrect: idx === q.correct, 
+                    value: idx 
+                }));
+            } else {
+                ansList = [
+                    { txt: 'صح', isCorrect: q.correct === 'true' || q.correct === true, value: 'true' }, 
+                    { txt: 'خطأ', isCorrect: q.correct === 'false' || q.correct === false, value: 'false' }
+                ];
+            }
+            
+            ansList.sort(() => 0.5 - Math.random());
+            
+            ansList.forEach(ansObj => {
+                const btn = document.createElement('button');
+                btn.className = "answer-neutral w-full py-4 border-2 rounded-xl text-lg font-bold shadow-sm active:scale-95 transition";
+                btn.innerText = ansObj.txt;
+                btn.dataset.value = ansObj.value;
+                btn.onclick = () => submitFriendAnswer(ansObj, q);
+                div.appendChild(btn);
+            });
+            
+            // Start timer
+            startQuestionTimer();
+        }
+
+        function startQuestionTimer() {
+            clearInterval(gameTimer);
+            let t = 15;
+            document.getElementById('game-timer').textContent = t;
+            
+            gameTimer = setInterval(() => {
+                t--;
+                document.getElementById('game-timer').textContent = t;
+                
+                if (t <= 0) {
+                    clearInterval(gameTimer);
+                    // Time's up - submit empty answer
+                    submitFriendAnswer(null, null);
+                }
+            }, 1000);
+        }
+
+        async function submitFriendAnswer(ansObj, q) {
+            if (hasAnsweredCurrentQ) return;
+            hasAnsweredCurrentQ = true;
+            
+            clearInterval(gameTimer);
+            
+            // Submit answer to match document
+            try {
+                const matchDoc = await getDoc(doc(db, "matches", localMatchData.matchId));
+                if (!matchDoc.exists()) return;
+                
+                const matchData = matchDoc.data();
+                const currentPlayer = matchData.players.find(p => p.uid === currentUser.uid);
+                
+                if (currentPlayer) {
+                    const answers = currentPlayer.answers || [];
+                    answers.push({
+                        questionIndex: localMatchData.currentIdx,
+                        answer: ansObj ? ansObj.value : null,
+                        isCorrect: ansObj ? ansObj.isCorrect : false,
+                        time: new Date().toISOString()
+                    });
+                    
+                    // Update score if correct
+                    let newScore = currentPlayer.score || 0;
+                    if (ansObj && ansObj.isCorrect) {
+                        newScore += 1;
+                    }
+                    
+                    // Update player in match
+                    const playerIndex = matchData.players.findIndex(p => p.uid === currentUser.uid);
+                    const updatedPlayers = [...matchData.players];
+                    updatedPlayers[playerIndex] = {
+                        ...updatedPlayers[playerIndex],
+                        score: newScore,
+                        answers: answers
+                    };
+                    
+                    await updateDoc(doc(db, "matches", localMatchData.matchId), {
+                        players: updatedPlayers
+                    });
+                    
+                    // Check if both players answered
+                    checkNextQuestion(matchData);
+                }
+            } catch (error) {
+                console.error("Error submitting answer:", error);
+            }
+        }
+
+        async function checkNextQuestion(matchData) {
+            // Check if all players have answered current question
+            const allAnswered = matchData.players.every(player => {
+                const playerAnswer = (player.answers || []).find(a => a.questionIndex === localMatchData.currentIdx);
+                return playerAnswer !== undefined;
+            });
+            
+            if (allAnswered) {
+                // Move to next question after delay
+                setTimeout(async () => {
+                    const nextQuestion = localMatchData.currentIdx + 1;
+                    
+                    if (nextQuestion >= matchData.questions.length) {
+                        // End match
+                        await updateDoc(doc(db, "matches", localMatchData.matchId), {
+                            status: 'ended',
+                            endedAt: serverTimestamp()
+                        });
+                    } else {
+                        // Move to next question
+                        await updateDoc(doc(db, "matches", localMatchData.matchId), {
+                            currentQuestion: nextQuestion
+                        });
+                        
+                        // Reset answer flag
+                        hasAnsweredCurrentQ = false;
+                    }
+                }, 2000);
+            }
+        }
+
+        async function endFriendMatch(matchData) {
+            clearInterval(gameTimer);
+            
+            // Show result
+            const myPlayer = matchData.players.find(p => p.uid === currentUser.uid);
+            const opponent = matchData.players.find(p => p.uid !== currentUser.uid);
+            
+            const resultScreen = document.getElementById('result-screen');
+            const iconContainer = document.getElementById('result-icon-container');
+            const title = document.getElementById('result-title');
+            const resultMsg = document.getElementById('result-msg');
+            const finalMyScore = document.getElementById('final-my-score');
+            const finalOpScore = document.getElementById('final-op-score');
+            const finalOpName = document.getElementById('final-op-name');
+            const pointsGained = document.getElementById('result-points-gained-text');
+            
+            if (myPlayer.score > opponent.score) {
+                iconContainer.innerText = "🏆";
+                title.innerText = "فوز ساحق!";
+                resultMsg.innerText = "لقد تفوقت على صديقك";
+            } else if (myPlayer.score < opponent.score) {
+                iconContainer.innerText = "😢";
+                title.innerText = "حظ أوفر!";
+                resultMsg.innerText = "صديقك كان أفضل هذه المرة";
+            } else {
+                iconContainer.innerText = "🤝";
+                title.innerText = "تعادل!";
+                resultMsg.innerText = "نتيجة متقاربة جداً";
+            }
+            
+            finalMyScore.textContent = myPlayer.score;
+            finalOpScore.textContent = opponent.score;
+            finalOpName.textContent = opponent.name;
+            pointsGained.textContent = "0"; // No points in friend matches
+            
+            document.getElementById('game-overlay').classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            
+            // Clean up
+            if (matchListenerUnsubscribe) {
+                matchListenerUnsubscribe();
+                matchListenerUnsubscribe = null;
+            }
+            
+            // Return to room lobby after result
+            document.getElementById('result-screen').querySelector('button').onclick = () => {
+                closeResultScreen();
+                returnToRoomLobby();
+            };
+        }
+
+        function returnToRoomLobby() {
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('room-lobby').classList.remove('hidden');
+            
+            // Reset ready status
+            amIReady = false;
+            document.getElementById('ready-text').textContent = 'جاهز';
+            
+            // Reset players' ready status in room
+            resetRoomReadyStatus();
+        }
+
+        async function resetRoomReadyStatus() {
+            try {
+                const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
+                if (!roomDoc.exists()) return;
+                
+                const roomData = roomDoc.data();
+                const updatedPlayers = roomData.players.map(player => ({
+                    ...player,
+                    ready: false
+                }));
+                
+                await updateDoc(doc(db, "rooms", currentRoomId), {
+                    players: updatedPlayers,
+                    status: 'waiting',
+                    matchId: null
+                });
+            } catch (error) {
+                console.error("Error resetting room:", error);
+            }
+        }
+
+        window.toggleReady = async function() {
+            try {
+                const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
+                if (!roomDoc.exists()) return;
+                
+                const roomData = roomDoc.data();
+                const playerIndex = roomData.players.findIndex(p => p.uid === currentUser.uid);
+                
+                if (playerIndex === -1) return;
+                
+                const updatedPlayers = [...roomData.players];
+                updatedPlayers[playerIndex] = {
+                    ...updatedPlayers[playerIndex],
+                    ready: !updatedPlayers[playerIndex].ready
+                };
+                
+                await updateDoc(doc(db, "rooms", currentRoomId), {
+                    players: updatedPlayers
+                });
+                
+                amIReady = !amIReady;
+                document.getElementById('ready-text').textContent = amIReady ? 'غير جاهز' : 'جاهز';
+                
+            } catch (error) {
+                console.error("Error toggling ready status:", error);
+            }
+        };
+
+        window.leaveRoom = async function() {
+            if(confirm('هل تريد مغادرة الغرفة؟')) {
+                await closeRoom();
+                showBeautifulAlert('info', 'مغادرة', 'لقد غادرت الغرفة');
+            }
+        };
+
+        window.deleteRoom = async function() {
+            if(confirm('هل تريد حذف الغرفة؟')) {
+                try {
+                    await deleteDoc(doc(db, "rooms", currentRoomId));
+                    await closeRoom();
+                    showBeautifulAlert('info', 'حذف', 'تم حذف الغرفة');
+                } catch (error) {
+                    console.error("Error deleting room:", error);
+                    showBeautifulAlert('error', 'خطأ', 'حدث خطأ في حذف الغرفة');
+                }
+            }
+        };
+
+        async function closeRoom() {
+            if (roomListenerUnsubscribe) {
+                roomListenerUnsubscribe();
+                roomListenerUnsubscribe = null;
+            }
+            
+            if (roomTimerInterval) {
+                clearInterval(roomTimerInterval);
+                roomTimerInterval = null;
+            }
+            
+            if (connectionCheckInterval) {
+                clearInterval(connectionCheckInterval);
+                connectionCheckInterval = null;
+            }
+            
+            // Remove player from room if exists
+            if (currentRoomId) {
+                try {
+                    const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
+                    if (roomDoc.exists()) {
+                        const roomData = roomDoc.data();
+                        const updatedPlayers = roomData.players.filter(p => p.uid !== currentUser.uid);
+                        
+                        if (updatedPlayers.length === 0) {
+                            // Delete room if empty
+                            await deleteDoc(doc(db, "rooms", currentRoomId));
+                        } else {
+                            // Update room with remaining players
+                            await updateDoc(doc(db, "rooms", currentRoomId), {
+                                players: updatedPlayers
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error leaving room:", error);
+                }
+            }
+            
+            // Reset variables
+            currentRoomId = null;
+            isRoomOwner = false;
+            amIReady = false;
+            
+            // Return to main app
+            document.getElementById('room-lobby').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            switchTab('challenges');
+        }
+
+        function startConnectionCheck() {
+            if (connectionCheckInterval) clearInterval(connectionCheckInterval);
+            
+            connectionCheckInterval = setInterval(async () => {
+                try {
+                    // Update last active timestamp
+                    if (currentUser && userData) {
+                        await updateDoc(doc(db, "users", currentUser.uid), {
+                            lastActive: serverTimestamp()
+                        });
+                    }
+                    
+                    // Check room connection
+                    if (currentRoomId) {
+                        const roomDoc = await getDoc(doc(db, "rooms", currentRoomId));
+                        if (!roomDoc.exists()) {
+                            showBeautifulAlert('warning', 'انقطع الاتصال', 'تم إغلاق الغرفة من قبل المالك');
+                            closeRoom();
+                            return;
+                        }
+                    }
+                    
+                    // Update connection status
+                    updateConnectionStatus(true);
+                } catch (error) {
+                    console.error("Connection check error:", error);
+                    updateConnectionStatus(false);
+                }
+            }, 2000); // Check every 2 seconds
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connection-status');
+            
+            if (connected) {
+                statusElement.innerHTML = '<i class="fas fa-wifi"></i> <span>متصل</span>';
+                statusElement.className = 'connection-status connected';
+            } else {
+                statusElement.innerHTML = '<i class="fas fa-wifi-slash"></i> <span>غير متصل</span>';
+                statusElement.className = 'connection-status disconnected';
+            }
+            
+            statusElement.classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
